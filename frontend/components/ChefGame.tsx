@@ -12,11 +12,23 @@ import { classifyWord, generateLevel, type Level } from "../lib/levels";
 
 type Screen = "home" | "level" | "grand" | "multi";
 
+const DISH_ART: Record<string, string> = {
+  "Салат": "img/dish_salad.jpg",
+  "Пицца": "img/dish_pizza.jpg",
+  "Суши": "img/dish_sushi.jpg",
+  "Лапша": "img/dish_soup.jpg",
+  "Торт": "img/dish_cake.jpg",
+  "Рагу": "img/dish_soup.jpg",
+  "Пельмени": "img/dish_soup.jpg",
+  "Креветки": "img/dish_shrimp.jpg",
+  "Капкейк": "img/dish_cupcake.jpg",
+  "Сэндвич": "img/dish_sandwich.jpg",
+  "Суп": "img/dish_soup.jpg",
+  "Рулет": "img/dish_roll.jpg",
+};
+
 function dishArt(name: string): string {
-  if (name === "Пицца" || name === "Сэндвич" || name === "Рулет") return "img/dish_pizza.svg";
-  if (name === "Суши" || name === "Креветки") return "img/dish_sushi.svg";
-  if (name === "Торт" || name === "Капкейк") return "img/dish_cake.svg";
-  return "img/dish_salad.svg";
+  return DISH_ART[name] ?? "img/dish_salad.jpg";
 }
 
 const KITCHEN_RU: Record<string, { name: string; emoji: string }> = {
@@ -461,7 +473,7 @@ function LevelScreen({
 
       {done && (
         <div className="wc-overlay">
-          <div className="wc-modal">
+          <div className="wc-modal" style={{ backgroundImage: "url(img/celebrate.jpg)" }}>
             <div className="confetti">
               {["#ff7a2f", "#37b24d", "#3f97d4", "#f2c14e", "#e03131"].map((c, i) => (
                 <i key={i} style={{
