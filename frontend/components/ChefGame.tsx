@@ -12,6 +12,13 @@ import { classifyWord, generateLevel, type Level } from "../lib/levels";
 
 type Screen = "home" | "level" | "grand" | "multi";
 
+function dishArt(name: string): string {
+  if (name === "Пицца" || name === "Сэндвич" || name === "Рулет") return "img/dish_pizza.svg";
+  if (name === "Суши" || name === "Креветки") return "img/dish_sushi.svg";
+  if (name === "Торт" || name === "Капкейк") return "img/dish_cake.svg";
+  return "img/dish_salad.svg";
+}
+
 const KITCHEN_RU: Record<string, { name: string; emoji: string }> = {
   street: { name: "Уличная кухня", emoji: "🌭" },
   bakery: { name: "Пекарня", emoji: "🥐" },
@@ -126,9 +133,13 @@ function HomeScreen({
   const kitchens = Object.entries(KITCHEN_RU);
   return (
     <div>
+      <div className="wc-hero">
+        <img src="img/hero.jpg" alt="" />
+        <div className="wc-hero-title">Готовь слова — корми гостей!</div>
+      </div>
       <div className="wc-card">
         <div className="wc-dish-hero">
-          <div className="wc-dish-emoji">{preview.dish.emoji}</div>
+          <img className="wc-dish-img" src={dishArt(preview.dish.name)} alt="" />
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 900, fontSize: 20 }}>
               Уровень {levelNo} · {preview.dish.name}
@@ -159,7 +170,9 @@ function HomeScreen({
           const unlocked = levelNo >= from;
           return (
             <div key={id} className={`wc-map-row ${unlocked ? "" : "locked"}`}>
-              <div className="wc-map-emoji">{unlocked ? info.emoji : "🔒"}</div>
+              <div className="wc-map-emoji">
+                <img src={`img/kitchen_${id}.jpg`} alt="" className={unlocked ? "" : "locked"} />
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 800 }}>{info.name}</div>
                 <div style={{ opacity: 0.7, fontSize: 13 }}>
@@ -370,9 +383,11 @@ function LevelScreen({
     <div>
       <div className="wc-level-header">
         <button className="wc-tool" onClick={onHome}>←</button>
-        <div className="wc-pill">
-          {grand ? "🌀 Гранд Тур" : `Уровень ${levelNo}`} · {level.dish.emoji}{" "}
-          {level.dish.name}
+        <div className="wc-pill" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <img className="wc-dish-img small" src={dishArt(level.dish.name)} alt="" />
+          <span>
+            {grand ? "🌀 Гранд Тур" : `Уровень ${levelNo}`} · {level.dish.name}
+          </span>
         </div>
         <button className="wc-tool" onClick={doHint}>💡</button>
       </div>
@@ -447,7 +462,15 @@ function LevelScreen({
       {done && (
         <div className="wc-overlay">
           <div className="wc-modal">
-            <div className="big">{level.dish.emoji}</div>
+            <div className="confetti">
+              {["#ff7a2f", "#37b24d", "#3f97d4", "#f2c14e", "#e03131"].map((c, i) => (
+                <i key={i} style={{
+                  left: `${8 + i * 18}%`, background: c,
+                  animationDelay: `${i * 0.35}s`,
+                }} />
+              ))}
+            </div>
+            <img className="big-img" src={dishArt(level.dish.name)} alt="" />
             <div style={{ fontSize: 24, fontWeight: 900 }}>{level.dish.name} готов!</div>
             <div className="wc-stars">⭐⭐⭐</div>
             <div style={{ fontWeight: 800 }}>

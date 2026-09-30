@@ -22,10 +22,16 @@ n = 0
 for f in root.rglob("*"):
     if f.is_file() and f.suffix in {".html", ".js", ".css", ".txt", ".json"}:
         s = f.read_text(encoding="utf-8")
-        if "_next" in s:
-            f.write_text(s.replace("_next", "next"), encoding="utf-8")
+        orig = s
+        # loop: "__next"-style identifiers shed one underscore per pass
+        while "_next" in s:
+            s = s.replace("_next", "next")
+        # file:// needs relative URLs — leading "/" resolves to the FS root
+        s = s.replace('"/next/', '"./next/').replace("(/next/", "(./next/")
+        if s != orig:
+            f.write_text(s, encoding="utf-8")
             n += 1
-print(f"rewrote _next→next in {n} files")
+print(f"rewrote bundle paths in {n} files")
 PYEOF
 
 echo "3/5 · keystore"
