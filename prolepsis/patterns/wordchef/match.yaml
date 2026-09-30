@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Match Lifecycle" — Word Chef
+#   A match is a cloth: created on one beam, finished with a sign-off.
+#   The unraveler exists for disputed/voided matches — a cancelled future.
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.match.v1
+  authority: server
+
+data:
+  operation: match_lifecycle
+
+artifacts:
+  MatchCloth:
+    title: MATCH CLOTH · {{ f.match_id }}
+    warping: hard
+  MatchSignOff:
+    title: MATCH SIGN-OFF · {{ f.match_id }}
+    warping: soft
+
+events:
+
+  MATCH_CREATE:
+    requires: []
+    facts: [match_id, mode, players, rounds_total, kitchen, seed_fingerprint]
+    fact_types:
+      match_id: string
+      mode: string
+      players: number
+      rounds_total: number
+      kitchen: string
+      seed_fingerprint: string
+    selvedges:
+      - rule: at least one chef per match
+        check: f.players >= 1
+      - rule: no more than eight chefs per match
+        check: f.players <= 8
+      - rule: a match has at least one round
+        check: f.rounds_total >= 1
+    weaves:
+      MatchCloth:
+        weft: |
+          MATCH {{ f.match_id }} WARPED
+          MODE: {{ f.mode }} · KITCHEN: {{ f.kitchen }}
+          CHEFS: {{ f.players }} · ROUNDS: {{ f.rounds_total }}
+          SEED FINGERPRINT: {{ f.seed_fingerprint }}
+
+  MATCH_FINISH:
+    requires: [MATCH_CREATE]
+    facts: [match_id, winner_id, total_score, total_dishes, verified]
+    fact_types:
+      match_id: string
+      winner_id: string
+      total_score: number
+      total_dishes: number
+      verified: number
+    selvedges:
+      - rule: a finished match has a non-negative total
+        check: f.total_score >= 0
+      - rule: a finished match served at least zero dishes
+        check: f.total_dishes >= 0
+      - rule: the verified flag is 0 or 1
+        check: f.verified <= 1
+    weaves:
+      MatchSignOff:
+        weft: |
+          MATCH {{ f.match_id }} COMPLETE
+          WINNER: {{ f.winner_id }}
+          TOTAL SCORE: {{ f.total_score }} · DISHES: {{ f.total_dishes }}
+          VERIFIED: {{ f.verified }}
+
+  MATCH_VOIDED:
+    requires: [MATCH_CREATE]
+    facts: [match_id, reason]
+    fact_types:
+      match_id: string
+      reason: string
+    unravels:
+      after: MatchCloth
+      compensation: |
+        ── COMPENSATION · MATCH {{ f.match_id }} VOIDED ──
+        reason: {{ f.reason }}
+        The cloth is off the beam; scores do not count.

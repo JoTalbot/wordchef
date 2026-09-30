@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/JoTalbot/prolepsis/main/patterns/release.schema.json",
+  "title": "PATTERN — the Jacquard language (YAML serialization)",
+  "description": "A process declaration: the inevitable is prewoven; an event only carries the weft.",
+  "type": "object",
+  "required": [
+    "artifacts",
+    "events"
+  ],
+  "properties": {
+    "yarn": {
+      "type": "object",
+      "description": "Project constants; visible in templates as pattern.name"
+    },
+    "data": {
+      "type": "object",
+      "description": "Cloth data; replaceable without touching the pattern (one cut — many cloths)"
+    },
+    "artifacts": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "The entire future cloth — declared up front. Key order defines file numbering.",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Title template ({{ pattern.… }})"
+              },
+              "warping": {
+                "enum": [
+                  "hard",
+                  "soft"
+                ],
+                "default": "hard",
+                "description": "hard — the base is woven at warping time; soft — the address is reserved, the base is tied on when the event arrives"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "warping": {
+      "type": "object",
+      "description": "What the loom warps in fans (once, O(1))",
+      "properties": {
+        "shared": {
+          "type": "array",
+          "description": "Shared warp blocks: rendered once, written once, fanned out into every listed artifact",
+          "items": {
+            "type": "object",
+            "required": [
+              "into",
+              "block"
+            ],
+            "properties": {
+              "into": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true,
+                "description": "Target artifacts"
+              },
+              "block": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Template rendered once with cloth data (no event facts)"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "events": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/event"
+      }
+    }
+  },
+  "$defs": {
+    "selvedge": {
+      "type": "object",
+      "required": [
+        "rule",
+        "check"
+      ],
+      "description": "An invariant: the reed checks the expression BEFORE the weft is beaten in",
+      "properties": {
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "check": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A Jacquard expression: f.*, pattern.*, fact(\"NAME\").* + yarn (human_date, fmt_num, total, listing)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "description": "Either weaves (brings a weft) or unravels (removes the future)",
+      "properties": {
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "Shed: events that must have happened before this one"
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "Mandatory payload keys — the reed checks the shape before any computation"
+        },
+        "fact_types": {
+          "type": "object",
+          "description": "Type guards: fact name → type (date/string/number/list/semver); the reed checks BEFORE any computation or weaving",
+          "additionalProperties": {
+            "enum": ["date", "string", "number", "list", "semver"]
+          }
+        },
+        "selvedges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selvedge"
+          }
+        },
+        "weaves": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Artifact → weft template (only the diff)",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "weft"
+            ],
+            "properties": {
+              "weft": {
+                "type": "string",
+                "description": "Template {{ }} / {% for %}"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "unravels": {
+          "type": "object",
+          "required": [
+            "after"
+          ],
+          "properties": {
+            "after": {
+              "type": "string",
+              "description": "Take off the beam everything after this artifact"
+            },
+            "compensation": {
+              "type": "string",
+              "description": "Compensation pick template"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "weaves"
+          ]
+        },
+        {
+          "required": [
+            "unravels"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

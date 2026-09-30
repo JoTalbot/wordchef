@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Verification" — Word Chef
+#   After a match is finished, its full intent log can be replayed and the
+#   canonical digest recomputed. This pattern seals the verification verdict
+#   so disputed matches have an answerable question: does the digest match?
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.verify.v1
+  authority: server
+
+data:
+  operation: verification
+
+artifacts:
+  VerificationReport:
+    title: VERIFICATION REPORT · {{ f.match_id }}
+    warping: hard
+
+events:
+
+  MATCH_VERIFIED:
+    requires: []
+    facts: [match_id, replayed, digest_match, executions, intent_count, verdict]
+    fact_types:
+      match_id: string
+      replayed: number
+      digest_match: number
+      executions: number
+      intent_count: number
+      verdict: string
+    selvedges:
+      - rule: the replayed flag is 0 or 1
+        check: f.replayed <= 1
+      - rule: the digest flag is 0 or 1
+        check: f.digest_match <= 1
+      - rule: a verification counts at least one execution
+        check: f.executions >= 1
+    weaves:
+      VerificationReport:
+        weft: |
+          MATCH {{ f.match_id }} · REPLAY {{ f.replayed }} · DIGEST MATCH {{ f.digest_match }}
+          EXECUTIONS: {{ f.executions }} · INTENTS: {{ f.intent_count }}
+          VERDICT: {{ f.verdict }}
+          Replay is byte-exact or the verdict says otherwise.

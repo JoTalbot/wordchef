@@ -1,0 +1,340 @@
+{
+  "source_version": "PROLEPSIS-WORKFLOW v1",
+  "data": {
+    "project": "WEAVE",
+    "repo": "github.com/JoTalbot/prolepsis",
+    "license": "MIT",
+    "maintainer": "JoTalbot",
+    "release": "v1.4.2",
+    "previous": "v1.4.1",
+    "date": "2026-09-27",
+    "issue": "#42 — login timeout on session refresh",
+    "highlights": [
+      "content-addressed beam: 100 releases = 1 letterhead",
+      "pick-log replay: byte-exact audit of any cloth",
+      "selvedge type guards on every payload"
+    ],
+    "contributors": [
+      {
+        "name": "JoTalbot",
+        "commits": 214
+      },
+      {
+        "name": "Iryna Tkachuk",
+        "commits": 96
+      }
+    ],
+    "dist": [
+      {
+        "file": "weave-1.4.2.tar.gz",
+        "size": 148
+      },
+      {
+        "file": "weave-1.4.2-py3-none-any.whl",
+        "size": 152
+      }
+    ]
+  },
+  "doc_registry": "ghcr.io/jotalbot/prolepsis",
+  "shared_warps": [
+    {
+      "fans": [
+        "ReleaseNotes",
+        "Announcement",
+        "SignOff"
+      ]
+    },
+    {
+      "fans": [
+        "ReleaseNotes",
+        "Announcement"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "ReleaseNotes",
+      "warping": "hard",
+      "uses": [
+        "date"
+      ]
+    },
+    {
+      "name": "TestReport",
+      "warping": "soft",
+      "uses": [
+        "date",
+        "passed",
+        "failed"
+      ]
+    },
+    {
+      "name": "BuildManifest",
+      "warping": "soft",
+      "uses": []
+    },
+    {
+      "name": "Checksums",
+      "warping": "soft",
+      "uses": [
+        "files"
+      ]
+    },
+    {
+      "name": "DockerNotes",
+      "warping": "soft",
+      "uses": []
+    },
+    {
+      "name": "Announcement",
+      "warping": "soft",
+      "uses": []
+    },
+    {
+      "name": "SignOff",
+      "warping": "soft",
+      "uses": [
+        "date",
+        "signer"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "TAG_CUT",
+      "requires": [],
+      "facts": [
+        [
+          "version",
+          "semver"
+        ],
+        [
+          "date",
+          "date"
+        ]
+      ],
+      "constraints": [
+        {
+          "id": "the_tag_must_match_the_declared_release",
+          "expr": {
+            "eq": [
+              {
+                "get": [
+                  "f",
+                  "version"
+                ]
+              },
+              {
+                "get": [
+                  "doc",
+                  "release"
+                ]
+              }
+            ]
+          },
+          "message": "the tag must match the declared release"
+        }
+      ],
+      "produces": [
+        "ReleaseNotes"
+      ]
+    },
+    {
+      "name": "CI_GREEN",
+      "requires": [
+        "TAG_CUT"
+      ],
+      "facts": [
+        [
+          "date",
+          "date"
+        ],
+        [
+          "passed",
+          "int"
+        ],
+        [
+          "failed",
+          "int"
+        ]
+      ],
+      "constraints": [
+        {
+          "id": "no_failing_tests_may_pass_the_reed",
+          "expr": {
+            "eq": [
+              {
+                "get": [
+                  "f",
+                  "failed"
+                ]
+              },
+              {
+                "lit": 0
+              }
+            ]
+          },
+          "message": "no failing tests may pass the reed"
+        }
+      ],
+      "produces": [
+        "TestReport",
+        "BuildManifest"
+      ]
+    },
+    {
+      "name": "ARTIFACTS_BUILT",
+      "requires": [
+        "CI_GREEN"
+      ],
+      "facts": [
+        [
+          "date",
+          "date"
+        ],
+        [
+          "files",
+          "list"
+        ]
+      ],
+      "constraints": [
+        {
+          "id": "the_build_matches_the_declared_distribution",
+          "expr": {
+            "eq": [
+              {
+                "sum": [
+                  {
+                    "get": [
+                      "f",
+                      "files"
+                    ]
+                  },
+                  "size"
+                ]
+              },
+              {
+                "sum": [
+                  {
+                    "get": [
+                      "doc",
+                      "dist"
+                    ]
+                  },
+                  "size"
+                ]
+              }
+            ]
+          },
+          "message": "the build matches the declared distribution"
+        }
+      ],
+      "produces": [
+        "Checksums",
+        "DockerNotes"
+      ]
+    },
+    {
+      "name": "PUBLISHED",
+      "requires": [
+        "ARTIFACTS_BUILT"
+      ],
+      "facts": [
+        [
+          "date",
+          "date"
+        ],
+        [
+          "registry",
+          "string"
+        ]
+      ],
+      "constraints": [
+        {
+          "id": "publish_to_the_declared_registry_only",
+          "expr": {
+            "eq": [
+              {
+                "get": [
+                  "f",
+                  "registry"
+                ]
+              },
+              {
+                "get": [
+                  "doc",
+                  "registry"
+                ]
+              }
+            ]
+          },
+          "message": "publish to the declared registry only"
+        }
+      ],
+      "produces": [
+        "Announcement"
+      ]
+    },
+    {
+      "name": "RELEASE_SIGNED",
+      "requires": [
+        "PUBLISHED"
+      ],
+      "facts": [
+        [
+          "date",
+          "date"
+        ],
+        [
+          "signer",
+          "string"
+        ]
+      ],
+      "constraints": [
+        {
+          "id": "sign_off_no_earlier_than_the_tag",
+          "expr": {
+            "ge": [
+              {
+                "get": [
+                  "f",
+                  "date"
+                ]
+              },
+              {
+                "get": [
+                  "prior",
+                  "TAG_CUT",
+                  "date"
+                ]
+              }
+            ]
+          },
+          "message": "sign-off no earlier than the tag"
+        }
+      ],
+      "produces": [
+        "SignOff"
+      ]
+    },
+    {
+      "name": "RELEASE_CANCELED",
+      "requires": [
+        "TAG_CUT"
+      ],
+      "facts": [
+        [
+          "reason",
+          "string"
+        ]
+      ],
+      "constraints": [],
+      "unravels": {
+        "after": "ReleaseNotes"
+      },
+      "compensation_uses": [
+        "reason"
+      ]
+    }
+  ]
+}

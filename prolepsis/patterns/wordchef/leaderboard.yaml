@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Leaderboard" — Word Chef
+#   Leaderboard rows are computed server-side and sealed twice: once as a
+#   sheet (the row), once as a seal (the committed snapshot). Position is
+#   always >= 1 and scores never go negative — the reed insists.
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.leaderboard.v1
+  authority: server
+
+data:
+  operation: leaderboard_service
+
+artifacts:
+  LeaderboardSheet:
+    title: LEADERBOARD SHEET · {{ f.season }}
+    warping: hard
+  LeaderboardSeal:
+    title: LEADERBOARD SEAL · {{ f.season }}
+    warping: soft
+
+events:
+
+  LEADERBOARD_UPDATE:
+    requires: []
+    facts: [season, player_id, match_id, score, dishes, position]
+    fact_types:
+      season: string
+      player_id: string
+      match_id: string
+      score: number
+      dishes: number
+      position: number
+    selvedges:
+      - rule: a leaderboard score never goes negative
+        check: f.score >= 0
+      - rule: positions start at one
+        check: f.position >= 1
+      - rule: a row counts at least zero dishes
+        check: f.dishes >= 0
+    weaves:
+      LeaderboardSheet:
+        weft: |
+          SEASON {{ f.season }} · ROW {{ f.position }}
+          CHEF: {{ f.player_id }} · MATCH {{ f.match_id }}
+          SCORE: {{ f.score }} · DISHES: {{ f.dishes }}
+
+  LEADERBOARD_COMMIT:
+    requires: [LEADERBOARD_UPDATE]
+    facts: [season, entries, top_score, snapshot_digest]
+    fact_types:
+      season: string
+      entries: number
+      top_score: number
+      snapshot_digest: string
+    selvedges:
+      - rule: a snapshot has at least one entry
+        check: f.entries >= 1
+      - rule: the top score never goes negative
+        check: f.top_score >= 0
+    weaves:
+      LeaderboardSeal:
+        weft: |
+          SEASON {{ f.season }} · SNAPSHOT SEALED
+          ENTRIES: {{ f.entries }} · TOP SCORE: {{ f.top_score }}
+          DIGEST: {{ f.snapshot_digest }}

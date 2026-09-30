@@ -1,0 +1,11 @@
+# Word Chef — standalone Prolepsis Agent Platform server (ops/audit)
+FROM python:3.13-slim
+
+WORKDIR /app
+COPY prolepsis /app/prolepsis
+RUN pip install --no-cache-dir pyyaml
+
+ENV PYTHONPATH=/app/prolepsis/vendor
+EXPOSE 7397
+CMD ["python3", "-m", "prolepsis._cli", "agent-serve", \
+     "--host", "0.0.0.0", "--port", "7397", "--state-dir", "/app/data/prolepsis-executions"]

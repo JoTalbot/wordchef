@@ -1,0 +1,152 @@
+/** Typed Word Chef API client. All game truth lives on the server. */
+
+export interface Player {
+  player_id: string;
+  name: string;
+  xp: number;
+}
+
+export interface OrderView {
+  order_id: string;
+  kind: string;
+  difficulty: number;
+  tray: string;
+  time_limit: number;
+  base_reward: number;
+  min_length: number;
+  required_letter: string;
+  theme: string;
+  streak_needed: number;
+  flavor_request: string;
+  secret: string;
+  has_secret: boolean;
+  streak_left: number;
+  used_words: string[];
+}
+
+export interface PlayerView {
+  player_id: string;
+  name: string;
+  score: number;
+  combo: number;
+  heat: number;
+  spice_charges: number;
+  golden: number;
+  prep_tokens: number;
+  boost_armed: boolean;
+  round_dishes: number;
+  dishes: number;
+  order: OrderView | null;
+  order_deadline: number;
+  order_started_at: number;
+  leaderboard?: BoardRow[];
+  round_no?: number;
+  rounds_total?: number;
+  finished?: boolean;
+  mode?: string;
+}
+
+export interface BoardRow {
+  position: number;
+  player_id: string;
+  display_name: string;
+  score: number;
+  dishes: number;
+  best_word: string;
+}
+
+export interface MatchView {
+  match_id: string;
+  mode: string;
+  kitchen: string;
+  round_no: number;
+  rounds_total: number;
+  round_active: boolean;
+  finished: boolean;
+  leaderboard: BoardRow[];
+  chaos_log: Array<Record<string, string>>;
+}
+
+export interface IntentResult {
+  accepted: boolean;
+  action: string;
+  reason: string;
+  player_id: string;
+  payload: {
+    player: PlayerView;
+    leaderboard: BoardRow[];
+    round_complete: boolean;
+    dish?: Record<string, unknown>;
+    score_delta?: number;
+    next_order?: OrderView;
+    chaos?: Record<string, string>;
+    execution?: { execution_id: string; digest: string; verified: boolean | null; checkpoint_id: string };
+    [key: string]: unknown;
+  };
+}
+
+async function json<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...init,
+  });
+  const body = await res.json();
+  if (!res.ok) {
+    const detail = (body as { detail?: { message?: string } })?.detail;
+    throw new Error(detail?.message || `HTTP ${res.status}`);
+  }
+  return body as T;
+}
+
+export const api = {
+  register: (name: string) =>
+    json<Player>('/api/players', { method: 'POST', body: JSON.stringify({ name }) }),
+
+  info: () => json<{ kitchens: Array<Record<string, unknown>> }>('/api/info'),
+
+  createMatch: (mode: string, player_ids: string[], rounds: number, kitchen_id: string) =>
+    json<MatchView>('/api/matches', {
+      method: 'POST',
+      body: JSON.stringify({ mode, player_ids, rounds, kitchen_id }),
+    }),
+
+  startMatch: (matchId: string) =>
+    json<MatchView>(`/api/matches/${matchId}/start`, { method: 'POST' }),
+
+  matchState: (matchId: string) => json<MatchView>(`/api/matches/${matchId}`),
+
+  playerView: (matchId: string, playerId: string) =>
+    json<PlayerView>(`/api/matches/${matchId}/players/${playerId}`),
+
+  intent: (matchId: string, playerId: string, intent: Record<string, unknown>) =>
+    json<IntentResult>(`/api/matches/${matchId}/intent`, {
+      method: 'POST',
+      body: JSON.stringify({ player_id: playerId, ...intent }),
+    }),
+
+  verify: (matchId: string) =>
+    json<{ verdict: string }>(`/api/matches/${matchId}/verify`, { method: 'POST' }),
+
+  leaderboard: () => json<{ entries: BoardRow[] }>('/api/leaderboard'),
+
+  progression: (playerId: string) =>
+    json<{ xp: number; kitchen_name: string; next_kitchen: { name: string; remaining: number } | null }>(
+      `/api/players/${playerId}/progression`),
+};
+
+export function subscribe(matchId: string, onEvent: (event: Record<string, unknown>) => void): () => void {
+  const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${proto}://${window.location.host}/api/ws/matches/${matchId}`);
+  ws.onmessage = (message) => {
+    try {
+      const data = JSON.parse(message.data);
+      if (data.type === 'EVENT' && data.event) onEvent(data.event);
+      if (data.type === 'SYNC' && Array.isArray(data.events)) {
+        for (const event of data.events) onEvent(event);
+      }
+    } catch {
+      /* ignore malformed frames */
+    }
+  };
+  return () => ws.close();
+}

@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Round Flow" — Word Chef
+#   A round opens (trays dealt, timers armed) and closes (scores banked).
+#   The round summary is the unit leaderboard runs are audited against.
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.round.v1
+  authority: server
+
+data:
+  operation: round_flow
+
+artifacts:
+  RoundTicket:
+    title: ROUND TICKET · {{ f.match_id }} #{{ f.round_no }}
+    warping: hard
+  RoundSummary:
+    title: ROUND SUMMARY · {{ f.match_id }} #{{ f.round_no }}
+    warping: soft
+
+events:
+
+  ROUND_START:
+    requires: []
+    facts: [match_id, round_no, mode, kitchen, players, seed_fingerprint]
+    fact_types:
+      match_id: string
+      round_no: number
+      mode: string
+      kitchen: string
+      players: number
+      seed_fingerprint: string
+    selvedges:
+      - rule: rounds start at one
+        check: f.round_no >= 1
+      - rule: at least one chef is on the line
+        check: f.players >= 1
+      - rule: no more than eight chefs per kitchen
+        check: f.players <= 8
+    weaves:
+      RoundTicket:
+        weft: |
+          SERVICE BEGINS · MATCH {{ f.match_id }} · ROUND {{ f.round_no }}
+          MODE: {{ f.mode }} · KITCHEN: {{ f.kitchen }}
+          CHEFS ON THE LINE: {{ f.players }}
+          SEED FINGERPRINT: {{ f.seed_fingerprint }}
+
+  ROUND_END:
+    requires: [ROUND_START]
+    facts: [match_id, round_no, score_delta, dishes, combo_peak, heat_peak, chaos_events]
+    fact_types:
+      match_id: string
+      round_no: number
+      score_delta: number
+      dishes: number
+      combo_peak: number
+      heat_peak: number
+      chaos_events: number
+    selvedges:
+      - rule: a round never subtracts score
+        check: f.score_delta >= 0
+      - rule: a round serves at least zero dishes
+        check: f.dishes >= 0
+      - rule: combo peak is never negative
+        check: f.combo_peak >= 0
+      - rule: heat peak is never negative
+        check: f.heat_peak >= 0
+    weaves:
+      RoundSummary:
+        weft: |
+          SERVICE ENDS · MATCH {{ f.match_id }} · ROUND {{ f.round_no }}
+          SCORES BANKED: {{ f.score_delta }} · DISHES: {{ f.dishes }}
+          PEAK COMBO ×{{ f.combo_peak }} · PEAK HEAT {{ f.heat_peak }}
+          CHAOS EVENTS: {{ f.chaos_events }}

@@ -1,0 +1,67 @@
+# PATTERNSMITH DRAFT · template 'hotfix' · order: Hotfix v1.4.4 for issue #77 — session leak in the refresh fl
+# validated: pattern schema + reed · STATUS: awaiting human signature
+
+yarn:
+  project: WEAVE
+  repo: github.com/JoTalbot/prolepsis
+  license: MIT
+  registry: ghcr.io/jotalbot/prolepsis
+  maintainer: JoTalbot
+data:
+  release: v1.4.4
+  date: '2026-09-30'
+  issue: '#77 — session leak in the refresh flow'
+  note: hotfix
+artifacts:
+  HotfixNotes:
+    title: HOTFIX RELEASE NOTES · {{ pattern.release }}
+    warping: hard
+  TestReport:
+    title: CI TEST REPORT
+    warping: soft
+warping:
+  shared:
+  - into:
+    - HotfixNotes
+    block: |-
+      ── WARP · version banner (woven once, fanned out) ──
+      {{ pattern.project }} {{ pattern.release }} · {{ human_date(pattern.date) }} · {{ pattern.license }}
+events:
+  HOTFIX_CUT:
+    requires: []
+    facts:
+    - version
+    - date
+    fact_types:
+      version: semver
+      date: date
+    selvedges:
+    - rule: the tag must match the declared hotfix
+      check: f.version == pattern.release
+    weaves:
+      HotfixNotes:
+        weft: |-
+          Cut by {{ pattern.maintainer }} on {{ human_date(f.date) }}
+          Resolves {{ pattern.issue }}
+
+          {{ pattern.note }}
+  HOTFIX_CI:
+    requires:
+    - HOTFIX_CUT
+    facts:
+    - date
+    - passed
+    - failed
+    fact_types:
+      date: date
+      passed: number
+      failed: number
+    selvedges:
+    - rule: no failing tests may pass the reed
+      check: f.failed == 0
+    weaves:
+      TestReport:
+        weft: |-
+          Suite: hotfix matrix · {{ human_date(f.date) }}
+          Tests: {{ f.passed }} passed · {{ f.failed }} failed
+          Gate: green — the reed may beat this weft in

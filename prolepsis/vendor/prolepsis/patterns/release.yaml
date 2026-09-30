@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=./release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Release"
+#   language: JACQUARD v0.4 (YAML) · runtime: LOOM v0.6
+#   principle: the inevitable is prewoven; an event only carries the weft
+# ══════════════════════════════════════════════════════════════════════════
+#
+# The flagship example is self-referential: WEAVE cutting a release of WEAVE.
+# Seven artifacts, six events, five selvedges, nine type guards, one
+# unraveling. Every document a real release pipeline produces — notes,
+# CI report, build manifest, checksums, container notes, announcement,
+# sign-off — woven as one cloth on one shared beam.
+#
+#   yarn      — project constants (templates see them as pattern.name)
+#   data      — per-release data (replaceable: one pattern — many cloths);
+#               dates quoted so YAML does not parse them
+#   artifacts — the ENTIRE future cloth, each with a warping level:
+#                 hard — letterhead + shared blocks woven at warping time
+#                 soft — address reserved; the base is tied on by its event
+#   warping   — fans: shared blocks rendered once and fanned out
+#   events    — sheds (requires), fact shape, type guards, weft templates,
+#               selvedges, and the unraveling event
+#
+# Templates:
+#   {{ expression }}                          f.* (facts), pattern.* (data),
+#                                             yarn: human_date, fmt_num,
+#                                             total, listing, fact("NAME")
+#   {% for i, item in list %} … {% endfor %}  weft loop (i counts from 1)
+
+yarn:
+  project: WEAVE
+  repo: github.com/JoTalbot/prolepsis
+  license: MIT
+  registry: ghcr.io/jotalbot/prolepsis
+  maintainer: JoTalbot
+
+data:
+  release: v1.4.2
+  previous: v1.4.1
+  date: "2026-09-27"
+  issue: "#42 — login timeout on session refresh"
+  highlights:
+    - "content-addressed beam: 100 releases = 1 letterhead"
+    - "pick-log replay: byte-exact audit of any cloth"
+    - "selvedge type guards on every payload"
+  contributors:
+    - { name: JoTalbot, commits: 214 }
+    - { name: Iryna Tkachuk, commits: 96 }
+  dist:
+    - { file: weave-1.4.2.tar.gz, size: 148 }
+    - { file: weave-1.4.2-py3-none-any.whl, size: 152 }
+
+artifacts:
+  ReleaseNotes:
+    title: RELEASE NOTES · {{ pattern.release }}
+    warping: hard          # the notes exist the moment the tag is cut — weave now
+  TestReport:
+    title: CI TEST REPORT
+    warping: soft          # exists only if CI goes green — reserve the address
+  BuildManifest:
+    title: BUILD MANIFEST
+    warping: soft
+  Checksums:
+    title: DISTRIBUTION CHECKSUMS
+    warping: soft
+  DockerNotes:
+    title: CONTAINER IMAGE NOTES
+    warping: soft
+  Announcement:
+    title: RELEASE ANNOUNCEMENT
+    warping: soft
+  SignOff:
+    title: RELEASE SIGN-OFF
+    warping: soft
+
+warping:
+  # fan #3: every shared block is rendered ONCE, written ONCE as a block,
+  # and fanned out into all listed manifests (the classic world would
+  # recompute and rewrite it in every document).
+  shared:
+    - into: [ReleaseNotes, Announcement, SignOff]
+      block: |
+        ── WARP · version banner (woven once, fanned out) ──
+        {{ pattern.project }} {{ pattern.release }} · {{ human_date(pattern.date) }} · {{ pattern.license }}
+    - into: [ReleaseNotes, Announcement]
+      block: |
+        ── WARP · contributors (woven once, fanned out) ──
+        {% for i, c in pattern.contributors %}  {{ i }}. {{ c.name }} — {{ c.commits }} commits
+        {% endfor %}
+
+events:
+
+  TAG_CUT:
+    requires: []
+    facts: [version, date]
+    fact_types: { version: semver, date: date }
+    selvedges:
+      - rule: the tag must match the declared release
+        check: f.version == pattern.release
+    weaves:
+      ReleaseNotes:
+        weft: |
+          Cut by {{ pattern.maintainer }} on {{ human_date(f.date) }}
+          Previous release: {{ pattern.previous }} · resolves {{ pattern.issue }}
+
+          Highlights:
+          {% for i, h in pattern.highlights %}  {{ i }}. {{ h }}
+          {% endfor %}
+
+  CI_GREEN:
+    requires: [TAG_CUT]
+    facts: [date, passed, failed]
+    fact_types: { date: date, passed: number, failed: number }
+    selvedges:
+      - rule: no failing tests may pass the reed
+        check: f.failed == 0
+    weaves:
+      TestReport:
+        weft: |
+          Suite: full matrix · {{ human_date(f.date) }}
+          Tests: {{ f.passed }} passed · {{ f.failed }} failed
+          Gate: green — the reed may beat this weft in
+      BuildManifest:
+        weft: |
+          Built from {{ pattern.repo }} at tag {{ pattern.release }}
+          {% for i, d in pattern.dist %}  {{ i }}. {{ d.file }} · {{ fmt_num(d.size) }} KB
+          {% endfor %}
+
+  ARTIFACTS_BUILT:
+    requires: [CI_GREEN]
+    facts: [date, files]
+    fact_types: { date: date, files: list }
+    selvedges:
+      - rule: the build matches the declared distribution
+        check: total(f.files, "size") == total(pattern.dist, "size")
+    weaves:
+      Checksums:
+        weft: |
+          {% for i, d in f.files %}{{ d.file }} · {{ fmt_num(d.size) }} KB · sealed
+          {% endfor %}
+          Total: {{ fmt_num(total(f.files, "size")) }} KB
+      DockerNotes:
+        weft: |
+          Image: {{ pattern.registry }}:{{ pattern.release }}
+          Base: python:3.13-slim · layers: 7
+          Provenance: built from the CI-green commit only
+
+  PUBLISHED:
+    requires: [ARTIFACTS_BUILT]
+    facts: [date, registry]
+    fact_types: { date: date, registry: string }
+    selvedges:
+      - rule: publish to the declared registry only
+        check: f.registry == pattern.registry
+    weaves:
+      Announcement:
+        weft: |
+          {{ pattern.project }} {{ pattern.release }} is out —
+          {{ pattern.registry }}:{{ pattern.release }}
+          Highlights: {{ listing(pattern.highlights, "{}") }}
+
+  RELEASE_SIGNED:
+    requires: [PUBLISHED]
+    facts: [date, signer]
+    fact_types: { date: date, signer: string }
+    selvedges:
+      - rule: sign-off no earlier than the tag
+        check: f.date >= fact("TAG_CUT").date
+    weaves:
+      SignOff:
+        weft: |
+          Signed off by {{ f.signer }} on {{ human_date(f.date) }}
+          Release {{ pattern.release }} is complete and reproducible
+
+  RELEASE_CANCELED:            # an unraveler: the future will not happen
+    requires: [TAG_CUT]
+    facts: [reason]
+    fact_types: { reason: string }
+    unravels:
+      after: ReleaseNotes      # take off the beam everything after this artifact
+      compensation: |
+        ── COMPENSATION PICK · UNRAVELING ──
+        RELEASE {{ pattern.release }} CANCELED · reason: {{ f.reason }}

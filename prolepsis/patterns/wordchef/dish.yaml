@@ -1,0 +1,154 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Dish Service" — Word Chef
+#   language: JACQUARD v0.4 (YAML) · runtime: Prolepsis Agent Platform v1
+#
+#   The hot path of the game: a player serves a dish for the current order.
+#   The claimed result travels as facts; the loom's weaver RECOMPUTES the
+#   dish with the game's own deterministic scorer and refuses to weave a
+#   receipt whose numbers differ. The receipt is the anti-cheat record.
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.dish.v1
+  engine: wordchef-1.0
+
+data:
+  operation: dish_submit
+  authority: server
+
+artifacts:
+  DishReceipt:
+    title: DISH RECEIPT · {{ f.order_id }}
+    warping: hard
+  PrepNote:
+    title: MISE EN PLACE · {{ f.order_id }}
+    warping: hard
+  ScoreSheet:
+    title: SCORE SHEET · {{ f.order_id }}
+    warping: soft
+
+warping:
+  shared:
+    - into: [DishReceipt]
+      block: |
+        ── WARP · kitchen header (woven once, fanned out) ──
+        {{ pattern.game }} · {{ pattern.schema }} · authority: {{ pattern.authority }}
+
+events:
+
+  DISH_SUBMIT:
+    requires: []
+    facts: [match_id, player_id, order_id, word, word_len, tray, elapsed,
+            valid, reason, score_delta, combo_before, combo_after,
+            heat_before, heat_after, spice, golden_delta, flavor,
+            secret_hit, kitchen, order_snapshot, claimed_result,
+            prep_tokens, boost_applied, double_applied]
+    fact_types:
+      match_id: string
+      player_id: string
+      order_id: string
+      word: string
+      word_len: number
+      tray: string
+      elapsed: number
+      valid: number
+      reason: string
+      score_delta: number
+      combo_before: number
+      combo_after: number
+      heat_before: number
+      heat_after: number
+      spice: number
+      golden_delta: number
+      flavor: string
+      secret_hit: number
+      kitchen: string
+      order_snapshot: string
+      claimed_result: string
+      prep_tokens: number
+      boost_applied: number
+      double_applied: number
+    selvedges:
+      - rule: a dish is at least two letters
+        check: f.word_len >= 2
+      - rule: a score never goes negative
+        check: f.score_delta >= 0
+      - rule: combo never goes negative
+        check: f.combo_after >= 0
+      - rule: heat never goes negative
+        check: f.heat_after >= 0
+      - rule: golden ingredients never go negative
+        check: f.golden_delta >= 0
+      - rule: elapsed time is never negative
+        check: f.elapsed >= 0
+      - rule: the valid flag is 0 or 1
+        check: f.valid <= 1
+      - rule: the valid flag is never negative
+        check: f.valid >= 0
+    weaves:
+      DishReceipt:
+        weft: |
+          CHEF: {{ f.player_id }} · MATCH {{ f.match_id }}
+          ORDER: {{ f.order_id }} · KITCHEN {{ f.kitchen }}
+          DISH: "{{ f.word }}" ({{ f.word_len }} letters) from tray "{{ f.tray }}"
+          SAUCE: spice {{ f.spice }} · flavor {{ f.flavor }} · secret {{ f.secret_hit }}
+          VERDICT: valid {{ f.valid }} · {{ f.reason }}
+          SCORE: {{ f.score_delta }} pts
+          COMBO: {{ f.combo_before }} → {{ f.combo_after }} · HEAT: {{ f.heat_before }} → {{ f.heat_after }}
+          GOLDEN EARNED: {{ f.golden_delta }} · elapsed {{ f.elapsed }}s
+          ── AUDIT (recomputed by the weaver) ──
+          order: {{ f.order_snapshot }}
+          claimed: {{ f.claimed_result }}
+          prep tokens {{ f.prep_tokens }} · boost {{ f.boost_applied }} · double {{ f.double_applied }}
+
+  SCORE_AWARD:
+    requires: [DISH_SUBMIT]
+    facts: [match_id, player_id, order_id, score_delta, score_total, combo_after, heat_after]
+    fact_types:
+      match_id: string
+      player_id: string
+      order_id: string
+      score_delta: number
+      score_total: number
+      combo_after: number
+      heat_after: number
+    selvedges:
+      - rule: an award never goes negative
+        check: f.score_delta >= 0
+      - rule: a running total never goes negative
+        check: f.score_total >= 0
+    weaves:
+      ScoreSheet:
+        weft: |
+          SCORE SHEET · CHEF {{ f.player_id }} · MATCH {{ f.match_id }}
+          ORDER {{ f.order_id }} · AWARDED {{ f.score_delta }}
+          RUNNING TOTAL: {{ f.score_total }}
+          COMBO ×{{ f.combo_after }} · HEAT {{ f.heat_after }}
+
+  PREP_SERVICE:
+    requires: []
+    facts: [match_id, player_id, order_id, word, word_len, points, prep_tokens]
+    fact_types:
+      match_id: string
+      player_id: string
+      order_id: string
+      word: string
+      word_len: number
+      points: number
+      prep_tokens: number
+    selvedges:
+      - rule: prep words are two or three letters
+        check: f.word_len <= 3
+      - rule: prep points are never negative
+        check: f.points >= 0
+      - rule: prep tokens stay within the cap
+        check: f.prep_tokens <= 3
+    weaves:
+      PrepNote:
+        weft: |
+          CHEF: {{ f.player_id }} · ORDER {{ f.order_id }}
+          PREP: "{{ f.word }}" ({{ f.word_len }} letters)
+          BANKED: {{ f.points }} pts · prep tokens {{ f.prep_tokens }}
+          The combo stands — mise en place never breaks service.

@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Order Service" — Word Chef
+#   Customer orders are generated server-side from the match seed and sealed
+#   on the beam before any player sees them. Completion closes the ticket.
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.order.v1
+  authority: server
+
+data:
+  operation: order_service
+
+artifacts:
+  OrderTicket:
+    title: ORDER TICKET · {{ f.order_id }}
+    warping: hard
+  OrderOutcome:
+    title: ORDER OUTCOME · {{ f.order_id }}
+    warping: soft
+
+events:
+
+  ORDER_GENERATE:
+    requires: []
+    facts: [match_id, player_id, order_id, kind, difficulty, tray,
+            time_limit, base_reward, flavor_request, theme, secret]
+    fact_types:
+      match_id: string
+      player_id: string
+      order_id: string
+      kind: string
+      difficulty: number
+      tray: string
+      time_limit: number
+      base_reward: number
+      flavor_request: string
+      theme: string
+      secret: string
+    selvedges:
+      - rule: difficulty stays inside the kitchen scale
+        check: f.difficulty <= 9
+      - rule: difficulty is at least one
+        check: f.difficulty >= 1
+      - rule: an order has a real timer
+        check: f.time_limit >= 5
+      - rule: a reward is never negative
+        check: f.base_reward >= 0
+    weaves:
+      OrderTicket:
+        weft: |
+          KITCHEN ORDER · {{ f.order_id }}
+          CHEF: {{ f.player_id }} · MATCH {{ f.match_id }}
+          STYLE: {{ f.kind }} · difficulty {{ f.difficulty }}
+          BASKET: "{{ f.tray }}" · timer {{ f.time_limit }}s
+          REWARD: {{ f.base_reward }} pts
+          CRAVING: {{ f.flavor_request }} · THEME: {{ f.theme }}
+          SECRET MENU: {{ f.secret }}
+
+  ORDER_COMPLETE:
+    requires: [ORDER_GENERATE]
+    facts: [order_id, satisfied, dishes, elapsed, bonus]
+    fact_types:
+      order_id: string
+      satisfied: number
+      dishes: number
+      elapsed: number
+      bonus: number
+    selvedges:
+      - rule: the satisfied flag is 0 or 1
+        check: f.satisfied <= 1
+      - rule: a ticket records at least zero dishes
+        check: f.dishes >= 0
+      - rule: closing time is never negative
+        check: f.elapsed >= 0
+      - rule: completion bonus is never negative
+        check: f.bonus >= 0
+    weaves:
+      OrderOutcome:
+        weft: |
+          ORDER {{ f.order_id }} CLOSED
+          satisfied: {{ f.satisfied }} · dishes served: {{ f.dishes }}
+          time on the pass: {{ f.elapsed }}s · bonus: {{ f.bonus }} pts

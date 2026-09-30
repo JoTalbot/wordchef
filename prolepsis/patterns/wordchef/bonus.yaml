@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../../prolepsis/vendor/prolepsis/patterns/release.schema.json
+# ══════════════════════════════════════════════════════════════════════════
+#   PATTERN "Bonus & Chaos" — Word Chef
+#   Golden Ingredient spends, spice charges and Chaos Kitchen strikes are
+#   sealed here — every risk and every reward has a receipt on the beam.
+# ══════════════════════════════════════════════════════════════════════════
+
+yarn:
+  game: Word Chef
+  schema: wordchef.bonus.v1
+  authority: server
+
+data:
+  operation: bonus_service
+
+artifacts:
+  BonusCoupon:
+    title: BONUS COUPON · {{ f.player_id }}
+    warping: hard
+  ChaosNotice:
+    title: CHAOS NOTICE · {{ f.match_id }}
+    warping: hard
+
+events:
+
+  BONUS_APPLY:
+    requires: []
+    facts: [match_id, player_id, effect, cost, effect_value, golden_after]
+    fact_types:
+      match_id: string
+      player_id: string
+      effect: string
+      cost: number
+      effect_value: number
+      golden_after: number
+    selvedges:
+      - rule: a bonus costs nothing negative
+        check: f.cost >= 0
+      - rule: a bonus effect is never negative
+        check: f.effect_value >= 0
+      - rule: golden stock never goes negative
+        check: f.golden_after >= 0
+    weaves:
+      BonusCoupon:
+        weft: |
+          CHEF: {{ f.player_id }} · MATCH {{ f.match_id }}
+          EFFECT: {{ f.effect }} · COST: {{ f.cost }} golden
+          POWER: {{ f.effect_value }} · GOLDEN LEFT: {{ f.golden_after }}
+
+  CHAOS_EVENT:
+    requires: []
+    facts: [match_id, event_type, actor_id, victim_id, param]
+    fact_types:
+      match_id: string
+      event_type: string
+      actor_id: string
+      victim_id: string
+      param: string
+    selvedges:
+      - rule: a chaos event names its target
+        check: f.victim_id != ""
+    weaves:
+      ChaosNotice:
+        weft: |
+          ⚡ CHAOS IN THE KITCHEN · MATCH {{ f.match_id }}
+          EVENT: {{ f.event_type }}
+          CHEF {{ f.actor_id }} → {{ f.victim_id }} · param {{ f.param }}
+          No refunds. Service continues.

@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/JoTalbot/prolepsis/main/canonical.schema.json",
+  "title": "Canonical WEAVE IR v1 — serialized document",
+  "description": "The language-neutral semantic kernel of Prolepsis (canonical.py). Phase 1 of the Canonical program; contracts C0–C32 in docs/canonical-ir.md. This schema is the first gate for untrusted documents (C26); full semantic validation lives in canonical.py (IRDocument.from_canonical).",
+  "type": "object",
+  "required": [
+    "ir_version",
+    "schema_version",
+    "compatibility_version",
+    "intent",
+    "nodes",
+    "events"
+  ],
+  "properties": {
+    "ir_version": {
+      "type": "string",
+      "pattern": "^v?\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$",
+      "description": "C2: the IR version this document targets"
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "C2: the serialization schema version"
+    },
+    "compatibility_version": {
+      "type": "string",
+      "description": "C2: breaking semantic changes require a new major here"
+    },
+    "namespaces": {
+      "type": "object",
+      "description": "C27: extension namespaces — prefix → URI; the built-in 'weave' namespace is implicit",
+      "additionalProperties": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "intent": {
+      "$ref": "#/$defs/intent"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/eventDecl"
+      }
+    },
+    "initial": {
+      "type": "object",
+      "description": "C4: canonical initial state (no floats; binaries as {\"$cas\": …} refs)"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "canonicalValue": {
+      "description": "C4/C22: null/bool/int/string/list/map only — floats are not canonical in v1",
+      "$comment": "JSON Schema cannot forbid floats selectively in draft 2020-12; the strict parser in canonical.py loads() rejects them. Numbers here are ints by convention."
+    },
+    "expression": {
+      "type": "object",
+      "description": "C0/C29: an operator tree with exactly one operator; the set is closed",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "propertyNames": {
+        "enum": [
+          "lit",
+          "get",
+          "eq",
+          "ne",
+          "lt",
+          "le",
+          "gt",
+          "ge",
+          "and",
+          "or",
+          "not",
+          "add",
+          "sub",
+          "mul",
+          "sum",
+          "count"
+        ]
+      }
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "pure",
+            "filesystem",
+            "network",
+            "process",
+            "database",
+            "secret",
+            "external_service"
+          ],
+          "description": "C13: a closed set of effect classes"
+        },
+        "params": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraint": {
+      "type": "object",
+      "required": [
+        "id",
+        "expr"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expr": {
+          "$ref": "#/$defs/expression"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "intent": {
+      "type": "object",
+      "description": "C31: WHAT and WHY — never HOW; the runtime derives the plan",
+      "required": [
+        "goal"
+      ],
+      "properties": {
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constraint"
+          }
+        },
+        "prefer": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "description": "C5: an executable operation with explicit ports, requirements and declared effects",
+      "required": [
+        "id",
+        "operation",
+        "effects"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "a namespaced symbol (C27)"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/port"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/port"
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constraint"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "description": "C13: undeclared effects are forbidden — 'pure' must be declared explicitly"
+        },
+        "speculative": {
+          "type": "boolean",
+          "default": false
+        },
+        "hints": {
+          "type": "object",
+          "description": "scheduling policy (WEAVE warping levels) — explicitly NON-semantic"
+        }
+      },
+      "additionalProperties": false
+    },
+    "port": {
+      "type": "array",
+      "maxItems": 2,
+      "description": "(name, canonical type)",
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "enum": [
+            "null",
+            "bool",
+            "int",
+            "string",
+            "list",
+            "map",
+            "ref",
+            "date",
+            "semver"
+          ]
+        }
+      ],
+      "minItems": 2
+    },
+    "eventDecl": {
+      "type": "object",
+      "description": "C8: an event type — its facts (canonical types) and constraints (the reed)",
+      "required": [
+        "event_type"
+      ],
+      "properties": {
+        "event_type": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/port"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constraint"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

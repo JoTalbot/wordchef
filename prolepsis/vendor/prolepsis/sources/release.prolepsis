@@ -1,0 +1,78 @@
+# A source program in PROLEPSIS-SCRIPT 1, a line-oriented workflow DSL.
+# This is parsed source syntax, not a serialized JSON/YAML object graph.
+PROLEPSIS-SCRIPT 1
+
+# State assignments; repeated += declarations build ordered source lists.
+state project = "WEAVE"
+state repo = "github.com/JoTalbot/prolepsis"
+state license = "MIT"
+state registry = "ghcr.io/jotalbot/prolepsis"
+state maintainer = "JoTalbot"
+state release = "v1.4.2"
+state previous = "v1.4.1"
+state date = "2026-09-27"
+state issue = "#42 — login timeout on session refresh"
+state highlight += "content-addressed beam: 100 releases = 1 letterhead"
+state highlight += "pick-log replay: byte-exact audit of any cloth"
+state highlight += "selvedge type guards on every payload"
+state contributor += "JoTalbot" commits 214
+state contributor += "Iryna Tkachuk" commits 96
+state dist += "weave-1.4.2.tar.gz" size 148
+state dist += "weave-1.4.2-py3-none-any.whl" size 152
+
+# Artifact declarations identify source facts consumed by each render.
+artifact ReleaseNotes hard uses date
+artifact TestReport soft uses date, passed, failed
+artifact BuildManifest soft uses none
+artifact Checksums soft uses files
+artifact DockerNotes soft uses none
+artifact Announcement soft uses none
+artifact SignOff soft uses date, signer
+
+# Fan-out declarations create the two canonical warp nodes.
+warp fans ReleaseNotes, Announcement, SignOff
+warp fans ReleaseNotes, Announcement
+
+# Event blocks carry type declarations, guards, order, and production order.
+event TAG_CUT requires -
+  fact version semver
+  fact date date
+  guard the_tag_must_match_the_declared_release | "the tag must match the declared release" | fact.version == doc.release
+  produce ReleaseNotes
+end
+
+event CI_GREEN requires TAG_CUT
+  fact date date
+  fact passed int
+  fact failed int
+  guard no_failing_tests_may_pass_the_reed | "no failing tests may pass the reed" | fact.failed == 0
+  produce TestReport
+  produce BuildManifest
+end
+
+event ARTIFACTS_BUILT requires CI_GREEN
+  fact date date
+  fact files list
+  guard the_build_matches_the_declared_distribution | "the build matches the declared distribution" | total(fact.files, "size") == total(doc.dist, "size")
+  produce Checksums
+  produce DockerNotes
+end
+
+event PUBLISHED requires ARTIFACTS_BUILT
+  fact date date
+  fact registry string
+  guard publish_to_the_declared_registry_only | "publish to the declared registry only" | fact.registry == doc.registry
+  produce Announcement
+end
+
+event RELEASE_SIGNED requires PUBLISHED
+  fact date date
+  fact signer string
+  guard sign_off_no_earlier_than_the_tag | "sign-off no earlier than the tag" | fact.date >= prior("TAG_CUT", "date")
+  produce SignOff
+end
+
+event RELEASE_CANCELED requires TAG_CUT
+  fact reason string
+  unravel ReleaseNotes uses reason
+end

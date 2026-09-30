@@ -1,0 +1,34 @@
+services:
+  wordchef:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - wordchef-data:/app/data
+    environment:
+      - WC_DATA_DIR=/app/data
+      - WC_SEASON=season-1
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Optional ops/audit endpoint: stock Prolepsis Agent Platform HTTP server.
+  # Start with: docker compose --profile platform up
+  prolepsis:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prolepsis
+    profiles: ["platform"]
+    ports:
+      - "7397:7397"
+    volumes:
+      - wordchef-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  wordchef-data:
