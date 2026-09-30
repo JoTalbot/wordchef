@@ -16,7 +16,7 @@ if [ -d android/app/src/main/assets/www/_next ]; then
   mv android/app/src/main/assets/www/_next android/app/src/main/assets/www/next
 fi
 python3 - << 'PYEOF'
-import pathlib
+import pathlib, re
 root = pathlib.Path("android/app/src/main/assets/www")
 n = 0
 for f in root.rglob("*"):
@@ -28,6 +28,8 @@ for f in root.rglob("*"):
             s = s.replace("_next", "next")
         # file:// needs relative URLs — leading "/" resolves to the FS root
         s = s.replace('"/next/', '"./next/').replace("(/next/", "(./next/")
+        # favicon & images referenced root-absolute → make relative for file://
+        s = re.sub(r'(href|src)="/(icon\.png|img/)', r'\1="./\2', s)
         if s != orig:
             f.write_text(s, encoding="utf-8")
             n += 1
