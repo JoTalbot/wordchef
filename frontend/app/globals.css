@@ -532,3 +532,38 @@ button {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
 }
 .select-btn.mode-banner .sub { color: rgba(255, 255, 255, 0.92); }
+
+/* ── third art wave: dishes, mp banners, coins, spice ────── */
+.wc-coin {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  vertical-align: -5px;
+}
+.gc-banner {
+  height: 88px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.gc-banner.slim { height: 48px; }
+.gc-shell-bg {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+.gc-spice {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  vertical-align: -3px;
+}
+.gc-customer {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}

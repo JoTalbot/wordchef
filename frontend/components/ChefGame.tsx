@@ -16,10 +16,10 @@ const DISH_ART: Record<string, string> = {
   "Салат": "img/dish_salad.jpg",
   "Пицца": "img/dish_pizza.jpg",
   "Суши": "img/dish_sushi.jpg",
-  "Лапша": "img/dish_soup.jpg",
+  "Лапша": "img/dish_noodles.jpg",
   "Торт": "img/dish_cake.jpg",
-  "Рагу": "img/dish_soup.jpg",
-  "Пельмени": "img/dish_soup.jpg",
+  "Рагу": "img/dish_ragout.jpg",
+  "Пельмени": "img/dish_pelmeni.jpg",
   "Креветки": "img/dish_shrimp.jpg",
   "Капкейк": "img/dish_cupcake.jpg",
   "Сэндвич": "img/dish_sandwich.jpg",
@@ -98,7 +98,7 @@ export default function ChefGame() {
       <div className="wc-splash" aria-hidden style={{ backgroundImage: "url(img/splash.jpg)" }} />
       <div className="wc-top">
         <div className="wc-logo">WORD CHEF</div>
-        <div className="wc-pill">🪙 {coins}</div>
+        <div className="wc-pill"><img className="wc-coin" src="img/coins.jpg" alt="" /> {coins}</div>
       </div>
 
       {screen === "home" && (

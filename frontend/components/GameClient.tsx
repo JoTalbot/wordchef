@@ -212,6 +212,7 @@ export default function GameClient() {
           </button>
         </div>
         <div className="panel">
+          <div className="gc-banner" style={{ backgroundImage: "url(img/howto.jpg)" }} />
           <h2>HOW TO COOK</h2>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
             🍳 Tap letters to build a <b style={{ color: 'var(--text)' }}>dish</b> (word) that satisfies the customer order.<br />
@@ -236,6 +237,7 @@ export default function GameClient() {
           <h1>WORD CHEF</h1>
           <div className="tagline">SERVICE SETUP</div>
         </div>
+        <div className="gc-banner" style={{ backgroundImage: "url(img/lobby_banner.jpg)" }} />
         <div className="panel">
           <h2>GAME MODE</h2>
           <div className="select-grid">
@@ -278,6 +280,7 @@ export default function GameClient() {
           <h1>SERVICE OVER</h1>
           <div className="tagline">{match?.mode?.replace('_', ' ')}</div>
         </div>
+        <div className="gc-banner" style={{ backgroundImage: "url(img/results_banner.jpg)" }} />
         <div className="panel">
           <h2>FINAL STANDINGS</h2>
           {board.map((row: BoardRow) => (
@@ -321,7 +324,10 @@ export default function GameClient() {
   const low = left < 8;
 
   return (
-    <div className="shell">
+    <div
+      className="shell gc-shell-bg"
+      style={{ backgroundImage: "linear-gradient(rgba(22, 13, 8, 0.84), rgba(22, 13, 8, 0.84)), url(img/service_bg.jpg)" }}
+    >
       {toasts.map((t) => (
         <div key={t.id} className="toast">{t.text}</div>
       ))}
@@ -347,6 +353,11 @@ export default function GameClient() {
 
       <div className="order-card">
         <div className="customer">
+          <img
+            className="gc-customer"
+            src={`img/guest_${["street", "bakery", "sushi", "space", "cyber", "ancient", "midnight"][(match?.round_no ?? 1) % 7]}.jpg`}
+            alt=""
+          />
           <div className="customer-name">
             CUSTOMER · ROUND {match?.round_no ?? 1}/{match?.rounds_total ?? 3}
             {order ? ` · ${order.kind.replace(/_/g, ' ')}` : ''}
@@ -398,7 +409,7 @@ export default function GameClient() {
             disabled={busy || (me?.spice_charges ?? 0) <= 0}
             onClick={() => setSpiceArmed((s) => !s)}
           >
-            🌶️ SPICE {me?.spice_charges ?? 0}
+            <img className="gc-spice" src="img/spice.jpg" alt="" /> SPICE {me?.spice_charges ?? 0}
           </button>
           <button className="btn" disabled={busy || composedWord.length > 3 || composedWord.length < 2} onClick={() => void prep()}>
             PREP
@@ -436,6 +447,7 @@ export default function GameClient() {
         ))}
         {chaosFeed.length > 0 && (
           <div style={{ marginTop: 10 }}>
+            <div className="gc-banner slim" style={{ backgroundImage: "url(img/chaos_feed.jpg)" }} />
             <h2>CHAOS FEED</h2>
             {chaosFeed.map((line, i) => (
               <div key={i} style={{ fontSize: 12, color: 'var(--accent2)', padding: '2px 0' }}>⚡ {line}</div>
