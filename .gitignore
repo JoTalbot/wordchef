@@ -17,3 +17,10 @@ data/
 .DS_Store
 .idea/
 .vscode/
+
+# Android build artifacts
+android/.gradle/
+android/app/build/
+android/app/src/main/assets/www/
+android/keystore.jks
+android/local.properties

@@ -162,3 +162,24 @@ class TestApi:
         verdict = client.post(f"/api/matches/{mid}/verify").json()
         assert verdict["verdict"] == "verified"
         assert verdict["verify_execution"]["verified"] is True
+
+
+class TestLevels:
+    def test_level_endpoint(self, client):
+        data = client.get("/api/levels/3").json()
+        assert data["level_no"] == 3
+        assert data["wheel"] and data["board"]
+
+    def test_level_complete_validates(self, client):
+        lv = client.get("/api/levels/3").json()
+        words = [b["word"] for b in lv["board"]]
+        res = client.post("/api/levels/complete", json={"level_no": 3, "words": words}).json()
+        assert res["coins"] > 0
+        assert res["execution"]["verified"] is True
+        # idempotent on replay
+        res2 = client.post("/api/levels/complete", json={"level_no": 3, "words": words}).json()
+        assert res2["already_done"] is True
+        # faked completion rejected
+        bad = client.post("/api/levels/complete",
+                          json={"level_no": 4, "words": ["ыыыы"]})
+        assert bad.status_code == 422

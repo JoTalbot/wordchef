@@ -1,0 +1,452 @@
+{
+ "1": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "фирма"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -1,
+    "word": "мир"
+   },
+   {
+    "across": false,
+    "c": 3,
+    "r": 0,
+    "word": "миф"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🥗",
+   "name": "Салат"
+  },
+  "kitchen": "street",
+  "level_no": 1,
+  "pool": "фирма",
+  "wheel": [
+   "р",
+   "м",
+   "и",
+   "ф",
+   "а"
+  ]
+ },
+ "100": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "пластик"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": 0,
+    "word": "ластик"
+   },
+   {
+    "across": false,
+    "c": 2,
+    "r": -5,
+    "word": "плитка"
+   },
+   {
+    "across": true,
+    "c": 2,
+    "r": -5,
+    "word": "плита"
+   },
+   {
+    "across": false,
+    "c": 4,
+    "r": -6,
+    "word": "липа"
+   },
+   {
+    "across": false,
+    "c": 6,
+    "r": -8,
+    "word": "пила"
+   },
+   {
+    "across": true,
+    "c": 5,
+    "r": -7,
+    "word": "сила"
+   },
+   {
+    "across": false,
+    "c": 8,
+    "r": -8,
+    "word": "лак"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🍲",
+   "name": "Суп"
+  },
+  "kitchen": "ancient",
+  "level_no": 100,
+  "pool": "пластик",
+  "wheel": [
+   "п",
+   "т",
+   "с",
+   "к",
+   "а",
+   "и",
+   "л"
+  ]
+ },
+ "15": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "колено"
+   },
+   {
+    "across": false,
+    "c": 0,
+    "r": 0,
+    "word": "клен"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -3,
+    "word": "окно"
+   },
+   {
+    "across": false,
+    "c": 2,
+    "r": 0,
+    "word": "лен"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🍕",
+   "name": "Пицца"
+  },
+  "kitchen": "street",
+  "level_no": 15,
+  "pool": "колено",
+  "wheel": [
+   "к",
+   "о",
+   "л",
+   "н",
+   "е",
+   "о"
+  ]
+ },
+ "2": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "доска"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -1,
+    "word": "коса"
+   },
+   {
+    "across": false,
+    "c": 4,
+    "r": -1,
+    "word": "сад"
+   },
+   {
+    "across": true,
+    "c": 4,
+    "r": -1,
+    "word": "сок"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🥗",
+   "name": "Салат"
+  },
+  "kitchen": "street",
+  "level_no": 2,
+  "pool": "доска",
+  "wheel": [
+   "д",
+   "с",
+   "к",
+   "а",
+   "о"
+  ]
+ },
+ "25": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "подвал"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -1,
+    "word": "вода"
+   },
+   {
+    "across": false,
+    "c": 3,
+    "r": 0,
+    "word": "вал"
+   },
+   {
+    "across": false,
+    "c": 5,
+    "r": -2,
+    "word": "пол"
+   }
+  ],
+  "bonus": [
+   "двп",
+   "опал",
+   "плод"
+  ],
+  "dish": {
+   "emoji": "🍣",
+   "name": "Суши"
+  },
+  "kitchen": "bakery",
+  "level_no": 25,
+  "pool": "подвал",
+  "wheel": [
+   "п",
+   "л",
+   "д",
+   "а",
+   "о",
+   "в"
+  ]
+ },
+ "250": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "равелин"
+   },
+   {
+    "across": false,
+    "c": 0,
+    "r": -2,
+    "word": "вера"
+   },
+   {
+    "across": true,
+    "c": -2,
+    "r": -2,
+    "word": "лавр"
+   },
+   {
+    "across": false,
+    "c": 3,
+    "r": -1,
+    "word": "нерв"
+   },
+   {
+    "across": false,
+    "c": -2,
+    "r": -4,
+    "word": "вал"
+   },
+   {
+    "across": true,
+    "c": -3,
+    "r": -4,
+    "word": "ива"
+   },
+   {
+    "across": false,
+    "c": 6,
+    "r": -2,
+    "word": "лен"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🍕",
+   "name": "Пицца"
+  },
+  "kitchen": "midnight",
+  "level_no": 250,
+  "pool": "равелин",
+  "wheel": [
+   "р",
+   "в",
+   "н",
+   "л",
+   "е",
+   "и",
+   "а"
+  ]
+ },
+ "3": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "слива"
+   },
+   {
+    "across": false,
+    "c": 0,
+    "r": 0,
+    "word": "сила"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -2,
+    "word": "вал"
+   },
+   {
+    "across": true,
+    "c": 0,
+    "r": -2,
+    "word": "ива"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🥗",
+   "name": "Салат"
+  },
+  "kitchen": "street",
+  "level_no": 3,
+  "pool": "слива",
+  "wheel": [
+   "л",
+   "а",
+   "в",
+   "и",
+   "с"
+  ]
+ },
+ "42": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "завтрак"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -1,
+    "word": "варка"
+   },
+   {
+    "across": false,
+    "c": 3,
+    "r": -4,
+    "word": "закат"
+   },
+   {
+    "across": true,
+    "c": 3,
+    "r": -3,
+    "word": "арка"
+   },
+   {
+    "across": false,
+    "c": 6,
+    "r": -6,
+    "word": "ваза"
+   },
+   {
+    "across": true,
+    "c": 5,
+    "r": -5,
+    "word": "таз"
+   }
+  ],
+  "bonus": [
+   "карта",
+   "трава"
+  ],
+  "dish": {
+   "emoji": "🍰",
+   "name": "Торт"
+  },
+  "kitchen": "sushi",
+  "level_no": 42,
+  "pool": "завтрак",
+  "wheel": [
+   "а",
+   "т",
+   "к",
+   "з",
+   "в",
+   "р",
+   "а"
+  ]
+ },
+ "7": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "сдача"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": 0,
+    "word": "дача"
+   },
+   {
+    "across": false,
+    "c": 4,
+    "r": -1,
+    "word": "сад"
+   },
+   {
+    "across": false,
+    "c": 0,
+    "r": -2,
+    "word": "час"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🥗",
+   "name": "Салат"
+  },
+  "kitchen": "street",
+  "level_no": 7,
+  "pool": "сдача",
+  "wheel": [
+   "д",
+   "с",
+   "ч",
+   "а",
+   "а"
+  ]
+ }
+}

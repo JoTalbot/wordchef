@@ -41,6 +41,13 @@ CREATE TABLE IF NOT EXISTS match_players (
     position    INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (match_id, player_id)
 );
+CREATE TABLE IF NOT EXISTS levels_done (
+    player_id  TEXT NOT NULL,
+    level_no   INTEGER NOT NULL,
+    coins      INTEGER NOT NULL,
+    PRIMARY KEY (player_id, level_no)
+);
+
 CREATE TABLE IF NOT EXISTS intents (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     match_id    TEXT NOT NULL,
@@ -160,6 +167,22 @@ class Store:
                 "SELECT * FROM match_players WHERE match_id=? ORDER BY position",
                 (match_id,)).fetchall()
         return [dict(r) for r in rows]
+
+    # ── campaign levels ──────────────────────────────────────
+
+    def level_done(self, player_id: str, level_no: int) -> dict | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM levels_done WHERE player_id=? AND level_no=?",
+                (player_id, level_no)).fetchone()
+        return dict(row) if row else None
+
+    def mark_level(self, player_id: str, level_no: int, coins: int) -> None:
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR IGNORE INTO levels_done(player_id, level_no, coins)"
+                " VALUES(?,?,?)", (player_id, level_no, coins))
+            self._conn.commit()
 
     # ── intents (the replay log) ─────────────────────────────
 

@@ -1,0 +1,35 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.wordchef.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.wordchef.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(rootProject.file("keystore.jks"))
+            storePassword System.getenv("WC_KEYSTORE_PASS") ?: "wordchef"
+            keyAlias System.getenv("WC_KEY_ALIAS") ?: "wordchef"
+            keyPassword System.getenv("WC_KEY_PASS") ?: "wordchef"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

@@ -1,5 +1,27 @@
 /** Typed Word Chef API client. All game truth lives on the server. */
 
+/** Base origin: same-origin on the web, the hosted server inside the Android
+ * wrapper (file:// origin), overridable via window.__WC_API__. */
+export const API_BASE: string =
+  (typeof window !== "undefined" && (window as unknown as { __WC_API__?: string }).__WC_API__) ||
+  (typeof window !== "undefined" && window.location.protocol === "file:"
+    ? "http://129.213.177.56"
+    : "");
+
+function apiUrl(path: string): string {
+  return `${API_BASE}${path}`;
+}
+
+function wsUrl(path: string): string {
+  if (API_BASE) {
+    const u = new URL(API_BASE);
+    const proto = u.protocol === "https:" ? "wss:" : "ws:";
+    return `${proto}//${u.host}${path}`;
+  }
+  const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${proto}//${window.location.host}${path}`;
+}
+
 export interface Player {
   player_id: string;
   name: string;
@@ -86,7 +108,7 @@ export interface IntentResult {
 }
 
 async function json<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
+  const res = await fetch(apiUrl(url), {
     headers: { 'Content-Type': 'application/json' },
     ...init,
   });
@@ -135,8 +157,7 @@ export const api = {
 };
 
 export function subscribe(matchId: string, onEvent: (event: Record<string, unknown>) => void): () => void {
-  const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  const ws = new WebSocket(`${proto}://${window.location.host}/api/ws/matches/${matchId}`);
+  const ws = new WebSocket(wsUrl(`/api/ws/matches/${matchId}`));
   ws.onmessage = (message) => {
     try {
       const data = JSON.parse(message.data);

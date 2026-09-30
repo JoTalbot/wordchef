@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- chef hat + spoon silhouette -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,26c-8,0 -14,6 -14,13c0,2 0.5,4 1.5,6c-5,1 -9,6 -9,12c0,7 6,12 13,12h21c7,0 13,-5 13,-12c0,-6 -4,-11 -9,-12c1,-2 1.5,-4 1.5,-6c0,-7 -6,-13 -14,-13z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,72h32v6h-32z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,80h24v6h-24z" />
+</vector>

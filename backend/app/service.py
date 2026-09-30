@@ -504,6 +504,55 @@ class GameService:
                 player["order"].pop("order_id", None)
         return json.dumps(data, sort_keys=True)
 
+    # ─────────────────────── campaign levels ───────────────────────
+
+    def get_level(self, level_no: int) -> dict:
+        from wordchef_game.levels import generate_level
+        return generate_level(level_no).to_dict()
+
+    def complete_level(self, player_id: str | None, level_no: int,
+                       words: list[str], bonus: list[str]) -> dict:
+        """Authoritative level completion: the server re-validates every word
+        against the deterministic level and seals the reward through Prolepsis."""
+        from wordchef_game.levels import generate_level
+        pid = player_id or "anon"
+        lv = generate_level(level_no)
+        board_words = {b.word for b in lv.board}
+        valid_board = [w for w in words if w in board_words]
+        valid_bonus = [w for w in bonus if w in set(lv.bonus)]
+        if set(valid_board) != board_words:
+            raise GameError(
+                "level_incomplete", "not all level words were served", 422)
+
+        done = self.store.level_done(pid, level_no)
+        coins = (sum(2 * len(w) for w in valid_board)
+                 + sum(len(w) for w in valid_bonus) + 30 + level_no)
+        if done is not None:
+            return {"level_no": level_no, "coins": done["coins"],
+                    "board": valid_board, "bonus": valid_bonus,
+                    "already_done": True, "execution": None}
+
+        state = eng.start_match(
+            match_id=f"level:{level_no}:{pid}", mode="SOLO",
+            seed=f"level-{level_no}", player_ids=[pid],
+            kitchen_id=lv.kitchen, rounds_total=1)
+        op, events, rid = ops.op_result_commit(
+            state, winner_id=pid, total_score=coins,
+            total_dishes=len(valid_board), verified=1)
+        record = self.runtime.execute_op(op, events, request_id=rid)
+        self._record_exec(state.match_id, record)
+        self.store.mark_level(pid, level_no, coins)
+        if pid != "anon":
+            self.store.add_xp(pid, coins, golden=0)
+
+        return {"level_no": level_no, "coins": coins,
+                "board": valid_board, "bonus": valid_bonus,
+                "already_done": False,
+                "execution": {
+                    "execution_id": record.execution_id, "digest": record.digest,
+                    "verified": record.verified,
+                    "checkpoint_id": record.checkpoint_id}}
+
     # ─────────────────────── views ───────────────────────
 
     def match_view(self, match_id: str) -> dict:

@@ -1,5 +1,5 @@
-import GameClient from '@/components/GameClient';
+import ChefGame from '@/components/ChefGame';
 
 export default function Home() {
-  return <GameClient />;
+  return <ChefGame />;
 }

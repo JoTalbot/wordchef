@@ -153,6 +153,30 @@ def verify(match_id: str, request: Request):
 
 # ── leaderboard & audit ─────────────────────────────────────
 
+
+class LevelCompleteBody(BaseModel):
+    level_no: int
+    words: list[str] = []
+    bonus: list[str] = []
+    player_id: str | None = None
+
+
+@router.get("/levels/{level_no}")
+def get_level(level_no: int, request: Request):
+    if level_no < 1:
+        raise HTTPException(400, "level_no must be >= 1")
+    return service(request).get_level(level_no)
+
+
+@router.post("/levels/complete")
+def complete_level(body: LevelCompleteBody, request: Request):
+    try:
+        return service(request).complete_level(
+            body.player_id, body.level_no, body.words, body.bonus)
+    except GameError as exc:
+        raise _err(exc)
+
+
 @router.get("/leaderboard")
 def leaderboard(request: Request, limit: int = 50):
     return {"season": "season-1", "entries": service(request).leaderboard(limit)}
