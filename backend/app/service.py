@@ -150,7 +150,13 @@ class GameService:
         return self.match_view(match_id)
 
     def _begin_round(self, state: eng.MatchState) -> None:
-        state = eng.start_round(state)
+        # one clock reading per engine call, recorded so replay is exact
+        now = time.time()
+        state = eng.start_round(state, now=now)
+        seq = self._next_seq(state.match_id)
+        self.store.record_intent(
+            state.match_id, "@system", seq,
+            {"action": "ROUND_START"}, {"now": now, "round_no": state.round_no})
         self._matches[state.match_id] = state
         self._persist(state, status="playing")
 
@@ -190,6 +196,15 @@ class GameService:
 
     # ─────────────────────── intents ───────────────────────
 
+    def _next_seq(self, match_id: str) -> int:
+        """Monotonic per-match step counter; survives service restarts."""
+        if match_id not in self._intent_counter:
+            rows = self.store.intents(match_id)
+            self._intent_counter[match_id] = max(
+                (r["seq"] for r in rows), default=0)
+        self._intent_counter[match_id] += 1
+        return self._intent_counter[match_id]
+
     def submit_intent(self, match_id: str, player_id: str, intent: dict) -> dict:
         with self._lock(match_id):
             state = self._match(match_id)
@@ -200,8 +215,7 @@ class GameService:
             if player_id not in state.players:
                 raise GameError("unknown_player", "player not in match", 404)
 
-            self._intent_counter[match_id] += 1
-            seq = self._intent_counter[match_id]
+            seq = self._next_seq(match_id)
             action = str(intent.get("action", "")).upper()
             player_before = state.players[player_id]
             order_before = player_before.order
@@ -210,11 +224,15 @@ class GameService:
                 "golden": player_before.golden, "score": player_before.score,
             }
 
-            state, outcome = eng.apply_intent(state, player_id, intent)
+            # one clock reading for the whole action: engine + log + replay
+            now = time.time()
+            state, outcome = eng.apply_intent(state, player_id, intent, now=now)
             self._matches[match_id] = state
 
             # intent log first (replay material), then prolepsis, then state
-            self.store.record_intent(match_id, player_id, seq, intent, outcome.to_dict())
+            self.store.record_intent(
+                match_id, player_id, seq, intent, outcome.to_dict(),
+                created_at=now)
 
             record = self._execute_for_action(
                 state, player_id, action, outcome, order_before, snapshot_before, seq)
@@ -287,6 +305,7 @@ class GameService:
     # ─────────────────────── round / match closing ───────────────────────
 
     def _close_round(self, state: eng.MatchState) -> None:
+        now = time.time()
         score_delta = sum(p.score for p in state.players.values())
         dishes = sum(p.round_dishes for p in state.players.values())
         combo_peak = max((p.combo for p in state.players.values()), default=0)
@@ -300,12 +319,16 @@ class GameService:
                 state, player, player.order,
                 satisfied=1 if player.used_words else 0,
                 dishes=len(player.used_words),
-                elapsed=int(max(0, time.time() - player.order_started_at)))
+                elapsed=int(max(0, now - player.order_started_at)))
             self.runtime.execute_op_async(op, events, request_id=rid)
 
-        state = eng.end_round(state)
+        state = eng.end_round(state, now=now)
         self._matches[state.match_id] = state
         self._persist(state, status="finished" if state.finished else "playing")
+        seq = self._next_seq(state.match_id)
+        self.store.record_intent(
+            state.match_id, "@system", seq,
+            {"action": "ROUND_END"}, {"now": now, "round_no": state.round_no})
 
         op, events, rid = ops.op_end_round(
             state, score_delta=score_delta, dishes=dishes,
@@ -418,11 +441,30 @@ class GameService:
         }
 
     def _replay_timeline(self, state: eng.MatchState, intents: list[dict]) -> list[dict]:
-        """Rebuild the deterministic timeline: rounds opened at recorded
-        boundaries; intents replayed in seq order with their original clocks."""
+        """Rebuild the deterministic timeline. Round boundaries and intents are
+        replayed with the exact clock readings recorded at play time; a legacy
+        synthetic fallback covers matches recorded before boundary logging."""
         timeline: list[dict] = []
+        has_steps = any(i.get("player_id") == "@system" for i in intents)
+        if has_steps:
+            for item in sorted(intents, key=lambda x: x["seq"]):
+                if item.get("player_id") == "@system":
+                    action = str(item.get("intent", {}).get("action", "")).upper()
+                    if action == "ROUND_START":
+                        timeline.append(
+                            {"kind": "round", "now": item["outcome"]["now"]})
+                    elif action == "ROUND_END":
+                        timeline.append(
+                            {"kind": "end", "now": item["outcome"]["now"]})
+                    continue
+                timeline.append({
+                    "kind": "intent", "player_id": item["player_id"],
+                    "intent": item["intent"], "outcome": item["outcome"],
+                    "now": item["created_at"],
+                })
+            return timeline
+
         rounds = state.round_no
-        used_rounds = 0
         intents_by_round: dict[int, list[dict]] = defaultdict(list)
         # derive round membership from the outcome payloads (order ids carry -rN-)
         for item in intents:

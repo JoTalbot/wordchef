@@ -135,3 +135,46 @@ class TestRestart:
         assert checkpoint["checkpoint_id"] == record.checkpoint_id
         assert checkpoint["digest"] == record.digest
         rt.shutdown()
+
+
+class TestClockDeterminism:
+    def test_replay_verifies_across_second_boundaries(self, tmp_root, monkeypatch):
+        """Wall clock straddling integer-second boundaries must not change
+        outcomes: engine, intent log and replay share one clock reading per
+        action (regression: int-second elapsed truncation)."""
+        import time as time_mod
+        from app.service import GameService
+        from app.store import Store
+
+        store = Store(tmp_root / "game.db")
+        rt = WordChefRuntime(tmp_root / "prolepsis")
+        svc = GameService(store, rt)
+
+        # step clock: every reading advances 0.6s → constantly crosses boundaries
+        clock = {"t": 1000.4}
+
+        def fake_time():
+            clock["t"] += 0.6
+            return clock["t"]
+
+        monkeypatch.setattr(time_mod, "time", fake_time)
+
+        player = svc.register_player("TickTock")
+        view = svc.create_match(mode="SOLO", player_ids=[player["player_id"]],
+                                rounds=1, seed="clock-seed")
+        mid = view["match_id"]
+        svc.start_match(mid)
+        for _ in range(6):
+            view = svc.player_view(mid, player["player_id"])
+            if not view.get("order"):
+                break
+            word = find_word(Order.from_dict(view["order"]))
+            svc.submit_intent(mid, player["player_id"],
+                              {"action": "SUBMIT_DISH", "word": word})
+
+        verdict = svc.verify_match(mid)
+        assert verdict["outcome_match"] is True
+        assert verdict["state_match"] is True
+        assert verdict["verdict"] == "verified"
+        rt.shutdown()
+        store.close()

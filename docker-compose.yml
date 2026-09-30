@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.backend
     ports:
-      - "8000:8000"
+      - "${WC_BIND:-0.0.0.0}:${WC_PORT:-8000}:8000"
     volumes:
       - wordchef-data:/app/data
     environment:
@@ -25,7 +25,7 @@ services:
       dockerfile: docker/Dockerfile.prolepsis
     profiles: ["platform"]
     ports:
-      - "7397:7397"
+      - "${WC_PLEPSIS_BIND:-0.0.0.0}:${WC_PLEPSIS_PORT:-7397}:7397"
     volumes:
       - wordchef-data:/app/data
     restart: unless-stopped

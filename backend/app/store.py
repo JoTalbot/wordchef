@@ -164,13 +164,15 @@ class Store:
     # ── intents (the replay log) ─────────────────────────────
 
     def record_intent(self, match_id: str, player_id: str, seq: int,
-                      intent: dict, outcome: dict) -> None:
+                      intent: dict, outcome: dict,
+                      created_at: float | None = None) -> None:
         with self._lock:
             self._conn.execute(
                 "INSERT INTO intents(match_id, player_id, seq, intent_json,"
                 " outcome_json, created_at) VALUES(?,?,?,?,?,?)",
                 (match_id, player_id, seq, json.dumps(intent, sort_keys=True),
-                 json.dumps(outcome, sort_keys=True), time.time()))
+                 json.dumps(outcome, sort_keys=True),
+                 created_at if created_at is not None else time.time()))
             self._conn.commit()
 
     def intents(self, match_id: str) -> list[dict]:
