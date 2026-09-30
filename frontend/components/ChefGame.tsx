@@ -162,7 +162,10 @@ function HomeScreen({
     <div>
       <div className="wc-hero">
         <img src="img/hero.jpg" alt="" />
-        <div className="wc-hero-title">Готовь слова — корми гостей!</div>
+        <div className="wc-hero-title">
+          <img className="wc-avatar-chip" src="img/chef_avatar.jpg" alt="" />
+          Готовь слова — корми гостей!
+        </div>
       </div>
       <div className="wc-card">
         <div className="wc-dish-hero">
@@ -190,13 +193,20 @@ function HomeScreen({
           <span>🌀 Гранд Тур</span>
           <small>бесконечный режим{grandBest > 0 ? ` · рекорд ${grandBest}` : ""}</small>
         </button>
-        <button className="wc-btn" onClick={onMulti}>
-          🏆 Мультиплеер — Quick Cook и Chaos Kitchen
+        <button
+          className="wc-btn wc-banner-btn"
+          style={{ backgroundImage: "url(img/mode_chaos.jpg)" }}
+          onClick={onMulti}
+        >
+          <span>🏆 Мультиплеер</span>
+          <small>Quick Cook · Chaos Kitchen</small>
         </button>
       </div>
 
       <div className="wc-card">
-        <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 6 }}>🗺 Карта кухонь</div>
+        <div className="wc-banner-strip" style={{ backgroundImage: "url(img/grand_map.jpg)" }}>
+          <span>🗺 Карта кухонь</span>
+        </div>
         {kitchens.map(([id, info], i) => {
           const from = i * 20 + 1;
           const unlocked = levelNo >= from;
@@ -211,6 +221,12 @@ function HomeScreen({
                   Уровни {from}–{from + 19}
                 </div>
               </div>
+              <img
+                className="wc-medal"
+                src={levelNo >= from + 20 ? "img/ach_gold.jpg" : unlocked ? "img/ach_silver.jpg" : "img/ach_bronze.jpg"}
+                alt=""
+                style={{ opacity: unlocked ? 1 : 0.45 }}
+              />
               {levelNo >= from && levelNo < from + 20 && (
                 <div className="wc-pill" style={{ padding: "4px 10px", fontSize: 13 }}>
                   сейчас
@@ -436,7 +452,9 @@ function LevelScreen({
               Блюдо: {found.length}/{boardWords.length} · гость {guestArt(level.kitchen).nick}
             </span>
           </span>
-          <span className="wc-bonus-jar">🎁 {bonusFound.length}</span>
+          <span className="wc-bonus-jar">
+            <img className="wc-jar-img" src="img/bonus_jar.jpg" alt="" /> {bonusFound.length}
+          </span>
         </div>
         <div className="wc-bar">
           <div style={{ width: `${(found.length / Math.max(1, boardWords.length)) * 100}%` }} />
@@ -509,9 +527,15 @@ function LevelScreen({
                 }} />
               ))}
             </div>
+            <div className="wc-banner-strip" style={{ backgroundImage: "url(img/recipe_book.jpg)" }}>
+              <span>📖 Новый рецепт записан!</span>
+            </div>
             <img className="big-img" src={dishArt(level.dish.name)} alt="" />
             <div style={{ fontSize: 24, fontWeight: 900 }}>{level.dish.name} готов!</div>
-            <div className="wc-stars">⭐⭐⭐</div>
+            <div className="wc-stars">
+              <img className="wc-medal big" src="img/ach_gold.jpg" alt="" />
+              ⭐⭐⭐
+            </div>
             <div style={{ fontWeight: 800 }}>
               +{30 + levelNo} 🪙 · бонусных слов: {bonusFound.length}
             </div>

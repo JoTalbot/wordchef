@@ -474,3 +474,61 @@ button {
   0%, 55% { opacity: 1; }
   100% { opacity: 0; visibility: hidden; }
 }
+
+/* ── second art wave: modes, medals, map, jar, flame ─────── */
+.wc-avatar-chip {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  margin-right: 10px;
+  vertical-align: middle;
+  box-shadow: var(--shadow);
+}
+.wc-banner-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  border-radius: 14px;
+  padding: 14px 12px;
+  margin-bottom: 10px;
+  font-weight: 900;
+  font-size: 18px;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.wc-medal {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: var(--shadow);
+}
+.wc-medal.big {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 2px auto 4px;
+}
+.wc-jar-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+.gc-flame {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  vertical-align: -3px;
+}
+.select-btn.mode-banner {
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  min-height: 88px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.select-btn.mode-banner .sub { color: rgba(255, 255, 255, 0.92); }

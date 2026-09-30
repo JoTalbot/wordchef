@@ -242,7 +242,8 @@ export default function GameClient() {
             {MODES.map((m) => (
               <button
                 key={m.id}
-                className={`select-btn ${mode === (m.id === 'CHAOSS' ? 'CHAOS_KITCHEN' : m.id) ? 'active' : ''}`}
+                className={`select-btn mode-banner ${mode === (m.id === 'CHAOSS' ? 'CHAOS_KITCHEN' : m.id) ? 'active' : ''}`}
+                style={{ backgroundImage: `url(img/${m.id === 'CHAOSS' ? 'mode_chaos' : 'mode_quick'}.jpg)` }}
                 onClick={() => setMode(m.id === 'CHAOSS' ? 'CHAOS_KITCHEN' : m.id)}
               >
                 <div className="title">{m.title}</div>
@@ -331,7 +332,7 @@ export default function GameClient() {
 
       <div className="hud">
         <div className="hud-card heat">
-          <div className="label">🔥 HEAT</div>
+          <div className="label"><img className="gc-flame" src="img/combo_flame.jpg" alt="" /> HEAT</div>
           <div className="value">{me?.heat ?? 0}</div>
         </div>
         <div className="hud-card combo">
