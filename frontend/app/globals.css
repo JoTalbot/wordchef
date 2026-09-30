@@ -440,3 +440,37 @@ button {
 .combo { color: var(--accent); font-weight: 900; }
 .small { font-size: 13px; opacity: 0.75; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── guests, splash, banner ─────────────────────────────── */
+.wc-guest {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  border: 3px solid var(--accent2);
+  box-shadow: var(--shadow);
+}
+.wc-banner-btn {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  padding: 26px 18px;
+  text-align: left;
+}
+.wc-banner-btn span { display: block; font-size: 22px; }
+.wc-banner-btn small { display: block; font-weight: 800; opacity: 0.95; }
+.wc-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #2a1405 center/cover no-repeat;
+  pointer-events: none;
+  animation: splashOut 1.4s ease forwards;
+}
+@keyframes splashOut {
+  0%, 55% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}

@@ -27,6 +27,20 @@ const DISH_ART: Record<string, string> = {
   "Рулет": "img/dish_roll.jpg",
 };
 
+const GUEST_ART: Record<string, { img: string; nick: string }> = {
+  street: { img: "img/guest_street.jpg", nick: "Марко" },
+  bakery: { img: "img/guest_bakery.jpg", nick: "Бабушка Зита" },
+  sushi: { img: "img/guest_sushi.jpg", nick: "Юки" },
+  space: { img: "img/guest_space.jpg", nick: "Космо-шеф" },
+  cyber: { img: "img/guest_cyber.jpg", nick: "Нейро" },
+  ancient: { img: "img/guest_ancient.jpg", nick: "Мудрец" },
+  midnight: { img: "img/guest_midnight.jpg", nick: "Кот Борис" },
+};
+
+function guestArt(kitchen: string) {
+  return GUEST_ART[kitchen] ?? GUEST_ART.street;
+}
+
 function dishArt(name: string): string {
   return DISH_ART[name] ?? "img/dish_salad.jpg";
 }
@@ -81,6 +95,7 @@ export default function ChefGame() {
 
   return (
     <div className="wc-shell">
+      <div className="wc-splash" aria-hidden style={{ backgroundImage: "url(img/splash.jpg)" }} />
       <div className="wc-top">
         <div className="wc-logo">WORD CHEF</div>
         <div className="wc-pill">🪙 {coins}</div>
@@ -167,8 +182,13 @@ function HomeScreen({
         <button className="wc-btn green" onClick={onPlay}>
           ▶ Играть
         </button>
-        <button className="wc-btn alt" onClick={onGrand}>
-          🌀 Гранд Тур · бесконечный режим {grandBest > 0 ? `· рекорд ${grandBest}` : ""}
+        <button
+          className="wc-btn wc-banner-btn"
+          style={{ backgroundImage: "url(img/grandtour.jpg)" }}
+          onClick={onGrand}
+        >
+          <span>🌀 Гранд Тур</span>
+          <small>бесконечный режим{grandBest > 0 ? ` · рекорд ${grandBest}` : ""}</small>
         </button>
         <button className="wc-btn" onClick={onMulti}>
           🏆 Мультиплеер — Quick Cook и Chaos Kitchen
@@ -405,9 +425,16 @@ function LevelScreen({
       </div>
 
       <div className="wc-card" style={{ marginTop: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 800 }}>
-          <span>
-            Блюдо: {found.length}/{boardWords.length} слов
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 800, gap: 10 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+            <img
+              className="wc-guest"
+              src={guestArt(level.kitchen).img}
+              alt=""
+            />
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              Блюдо: {found.length}/{boardWords.length} · гость {guestArt(level.kitchen).nick}
+            </span>
           </span>
           <span className="wc-bonus-jar">🎁 {bonusFound.length}</span>
         </div>
