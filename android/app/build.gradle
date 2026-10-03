@@ -1,4 +1,4 @@
-plugins { id 'com.android.application' }
+plugins { id 'com.android.application' }\n\ndependencies {\n    implementation 'androidx.webkit:webkit:1.12.1'\n}
 
 android {
     namespace 'com.wordchef.app'
