@@ -45,7 +45,7 @@ jobs:
         working-directory: frontend
         run: |
           npm ci --no-audit --no-fund
-          npm run build
+          WORDCHEF_ANDROID=1 npm run build
           test -f out/index.html
 
       - name: Copy frontend export into Android assets
