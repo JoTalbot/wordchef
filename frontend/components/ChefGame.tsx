@@ -164,10 +164,25 @@ const KITCHEN_RU: Record<string, { name: string; emoji: string }> = {
 
 const HINT_COST = 25;
 
-function load(key: string, dflt: number): number {
+function load(key: string, dflt: number, min = 0): number {
   if (typeof window === "undefined") return dflt;
-  const v = Number(window.localStorage.getItem(key));
-  return Number.isFinite(v) && v > 0 ? v : dflt;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === null || raw.trim() === "") return dflt;
+    const value = Number(raw);
+    return Number.isSafeInteger(value) && value >= min ? value : dflt;
+  } catch {
+    return dflt;
+  }
+}
+
+function save(key: string, value: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, String(value));
+  } catch {
+    // The campaign remains playable if browser storage is unavailable.
+  }
 }
 
 export default function ChefGame() {
@@ -175,45 +190,60 @@ export default function ChefGame() {
   const [coins, setCoins] = useState(0);
   const [levelNo, setLevelNo] = useState(1);
   const [grandBest, setGrandBest] = useState(0);
+  const [grandRound, setGrandRound] = useState(1);
+  const [storageReady, setStorageReady] = useState(false);
   const [toast, setToast] = useState("");
+  const toastTimer = useRef<number | null>(null);
 
   useEffect(() => {
     setCoins(load("wc_coins", 100));
-    setLevelNo(load("wc_level", 1));
+    setLevelNo(load("wc_level", 1, 1));
     setGrandBest(load("wc_grand_best", 0));
+    setStorageReady(true);
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") window.localStorage.setItem("wc_coins", String(coins));
-  }, [coins]);
+    if (storageReady) save("wc_coins", coins);
+  }, [coins, storageReady]);
   useEffect(() => {
-    if (typeof window !== "undefined" && screen !== "grand")
-      window.localStorage.setItem("wc_level", String(levelNo));
-  }, [levelNo, screen]);
+    if (storageReady && screen !== "grand") save("wc_level", levelNo);
+  }, [levelNo, screen, storageReady]);
   useEffect(() => {
-    if (typeof window !== "undefined")
-      window.localStorage.setItem("wc_grand_best", String(grandBest));
-  }, [grandBest]);
+    if (storageReady) save("wc_grand_best", grandBest);
+  }, [grandBest, storageReady]);
 
   const flash = useCallback((msg: string) => {
     setToast(msg);
-    window.setTimeout(() => setToast(""), 1600);
+    if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => {
+      setToast("");
+      toastTimer.current = null;
+    }, 1800);
+  }, []);
+
+  useEffect(() => () => {
+    if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
   }, []);
 
   return (
     <div className="wc-shell">
       <div className="wc-splash" aria-hidden style={{ backgroundImage: "url(img/splash.webp)" }} />
-      <div className="wc-top">
-        <div className="wc-logo">WORD CHEF</div>
-        <div className="wc-pill"><img className="wc-coin" src="img/coins.webp" alt="" /> {coins}</div>
-      </div>
+      {screen !== "level" && screen !== "grand" && (
+        <div className="wc-top">
+          <div className="wc-logo">WORD CHEF</div>
+          <div className="wc-pill"><img className="wc-coin" src="img/coins.webp" alt="" /> {coins}</div>
+        </div>
+      )}
 
       {screen === "home" && (
         <HomeScreen
           levelNo={levelNo}
           grandBest={grandBest}
           onPlay={() => setScreen("level")}
-          onGrand={() => setScreen("grand")}
+          onGrand={() => {
+            setGrandRound(grandBest + 1);
+            setScreen("grand");
+          }}
           onMulti={() => setScreen("multi")}
         />
       )}
@@ -230,15 +260,13 @@ export default function ChefGame() {
       )}
       {screen === "grand" && (
         <LevelScreen
-          levelNo={2000 + grandBest + 1}
+          levelNo={2000 + grandRound}
           coins={coins}
-          addCoins={(n) => {
-            setCoins((c) => c + n);
-            setGrandBest((b) => b + 1);
-          }}
+          addCoins={(n) => setCoins((c) => c + n)}
           spendCoins={(n) => setCoins((c) => Math.max(0, c - n))}
-          onNext={() => undefined}
+          onNext={() => setGrandRound((n) => n + 1)}
           onHome={() => setScreen("home")}
+          onGrandComplete={() => setGrandBest((best) => Math.max(best, grandRound))}
           grand
           flash={flash}
         />
@@ -252,7 +280,7 @@ export default function ChefGame() {
         </div>
       )}
 
-      {toast && <div className="wc-toast">{toast}</div>}
+      {toast && <div className="wc-toast" role="status" aria-live="polite">{toast}</div>}
     </div>
   );
 }
@@ -350,11 +378,11 @@ function HomeScreen({
 }
 
 function LevelScreen({
-  levelNo, coins, addCoins, spendCoins, onNext, onHome, grand, flash,
+  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash,
 }: {
   levelNo: number; coins: number;
   addCoins: (n: number) => void; spendCoins: (n: number) => void;
-  onNext: () => void; onHome: () => void; grand?: boolean;
+  onNext: () => void; onHome: () => void; onGrandComplete?: () => void; grand?: boolean;
   flash: (m: string) => void;
 }) {
   const level = useMemo<Level>(() => generateLevel(levelNo), [levelNo]);
@@ -398,6 +426,7 @@ function LevelScreen({
     } else {
       setShake(true);
       window.setTimeout(() => setShake(false), 300);
+      flash("Такого слова нет в этом заказе");
     }
     setCurrent([]);
   }, [level, found, bonusFound, addCoins, flash]);
@@ -407,6 +436,7 @@ function LevelScreen({
       setDone(true);
       const reward = 30 + levelNo;
       addCoins(reward);
+      if (grand) onGrandComplete?.();
       if (typeof window !== "undefined" && typeof fetch === "function") {
         // best-effort server sync (offline play stays fully local)
         fetch("/api/levels/complete", {
@@ -449,6 +479,11 @@ function LevelScreen({
   const onPointerDown = (e: React.PointerEvent) => {
     dragging.current = true;
     usedInSwipe.current = new Set();
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Pointer capture is best-effort; ordinary taps still work without it.
+    }
     const rect = wheelRef.current?.getBoundingClientRect();
     if (!rect) return;
     const hit = hitTest(e.clientX - rect.left, e.clientY - rect.top);
@@ -480,8 +515,10 @@ function LevelScreen({
   // keyboard support (desktop)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const target = e.target;
+      if (target instanceof HTMLElement && target.closest("button, a, input, textarea, select, [contenteditable='true']")) return;
       if (e.key === "Enter") { submitWord(current.map((i) => wheel[i])); return; }
-      if (e.key === "Backspace") { setCurrent((c) => c.slice(0, -1)); return; }
+      if (e.key === "Backspace") { e.preventDefault(); setCurrent((c) => c.slice(0, -1)); return; }
       const ch = e.key.toLowerCase().replace("ё", "е");
       if (/^[а-я]$/.test(ch)) {
         const idx = wheel.findIndex((l, i) => l === ch && !current.includes(i));
@@ -493,14 +530,16 @@ function LevelScreen({
   }, [current, wheel, pickTile, submitWord]);
 
   const doHint = () => {
-    if (coins < HINT_COST) { flash("Мало монет — нужно 25 🪙"); return; }
-    const target = remaining[0];
-    if (!target) return;
-    const key0 = `${target}:0`;
+    const target = remaining.find((word) =>
+      [...word].some((_, i) => !hinted[`${word}:${i}`]),
+    );
+    if (!target) { flash("Все доступные буквы уже открыты"); return; }
+    if (coins < HINT_COST) { flash(`Мало монет — нужно ${HINT_COST} 🪙`); return; }
+
     const nextIdx = [...target].findIndex((_, i) => !hinted[`${target}:${i}`]);
-    const key = `${target}:${nextIdx < 0 ? 0 : nextIdx}`;
+    setHinted((h) => ({ ...h, [`${target}:${nextIdx}`]: true }));
     spendCoins(HINT_COST);
-    setHinted((h) => ({ ...h, [key]: true, ...(nextIdx < 0 ? { [key0]: true } : {}) }));
+    flash(`Открыта буква «${target[nextIdx]}» · −${HINT_COST} 🪙`);
   };
 
   const doShuffle = () => setWheel((w) => {
@@ -542,69 +581,112 @@ function LevelScreen({
   return (
     <div>
       <div className="wc-level-header">
-        <button className="wc-tool" onClick={onHome}>←</button>
-        <div className="wc-pill" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <img className="wc-dish-img small" src={dishArt(level.dish.name)} alt="" />
-          <span>
-            {grand ? "🌀 Гранд Тур" : `Уровень ${levelNo}`} · {level.dish.name}
-          </span>
+        <button
+          type="button"
+          className="wc-level-back"
+          onClick={onHome}
+          aria-label="Назад к карте кухонь"
+          title="Назад к карте"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+        <div className="wc-level-badge">
+          {grand ? "ГРАНД ТУР" : `УРОВЕНЬ ${levelNo}`}
         </div>
-        <button className="wc-tool" onClick={doHint} title={`Подсказка · ${HINT_COST} 🪙`} aria-label="Подсказка">
+        <div className="wc-level-coins" role="status" aria-label={`Монеты: ${coins}`}>
+          <img className="wc-coin" src="img/coins.webp" alt="" />
+          <span>{coins.toLocaleString("ru-RU")}</span>
+        </div>
+        <button
+          type="button"
+          className="wc-hint-action"
+          onClick={doHint}
+          title={`Открыть букву · ${HINT_COST} монет`}
+          aria-label={`Открыть букву за ${HINT_COST} монет`}
+        >
           <img src="img/ui_hint.webp" alt="" />
+          <span>{HINT_COST}</span>
         </button>
       </div>
 
-      <div className="wc-card" style={{ marginTop: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 800, gap: 10 }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-            <img
-              className="wc-guest"
-              src={guestArt(level.kitchen).img}
-              alt=""
-            />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              Блюдо: {found.length}/{boardWords.length} · гость {guestArt(level.kitchen).nick}
-            </span>
-          </span>
-          <span className="wc-bonus-jar">
-            <img className="wc-jar-img" src="img/bonus_jar.webp" alt="" /> {bonusFound.length}
-          </span>
+      <h1 className="wc-dish-heading">{level.dish.name}</h1>
+
+      <section className="wc-card wc-game-status" aria-label="Прогресс заказа">
+        <img
+          className="wc-guest"
+          src={guestArt(level.kitchen).img}
+          alt={guestArt(level.kitchen).nick}
+        />
+        <div className="wc-order-progress">
+          <div className="wc-progress-caption">
+            <span>Слова блюда</span>
+            <strong>{found.length} <span aria-hidden="true">/</span> {boardWords.length}</strong>
+          </div>
+          <div
+            className="wc-bar"
+            role="progressbar"
+            aria-label="Прогресс приготовления блюда"
+            aria-valuemin={0}
+            aria-valuemax={boardWords.length}
+            aria-valuenow={found.length}
+            aria-valuetext={`${found.length} из ${boardWords.length} слов`}
+          >
+            <div style={{ width: `${(found.length / Math.max(1, boardWords.length)) * 100}%` }} />
+          </div>
+          <div className="wc-guest-say" aria-live="polite">
+            «{guestProgress(level.kitchen, found.length, boardWords.length) ?? guestLine(level.kitchen, levelNo)}»
+          </div>
         </div>
-        <div className="wc-bar">
-          <div style={{ width: `${(found.length / Math.max(1, boardWords.length)) * 100}%` }} />
-        </div>
-        <div className="wc-guest-say">
-          «{guestProgress(level.kitchen, found.length, boardWords.length) ?? guestLine(level.kitchen, levelNo)}»
+        <span
+          className="wc-bonus-jar"
+          role="status"
+          aria-label={`Найдено бонусных слов: ${bonusFound.length}`}
+        >
+          <img className="wc-jar-img" src="img/bonus_jar.webp" alt="" />
+          <span className="wc-bonus-count">{bonusFound.length}</span>
+        </span>
+      </section>
+
+      <div className="wc-grid-scroll" role="region" aria-label="Кроссворд блюда" tabIndex={0}>
+        <div
+          className={`wc-grid ${shake ? "wc-shake" : ""}`}
+          role="group"
+          aria-label="Буквенная доска заказа"
+          style={{ gridTemplateColumns: `repeat(${grid.cols}, 38px)` }}
+        >
+          {Array.from({ length: grid.rows }).map((_, ri) =>
+            Array.from({ length: grid.cols }).map((_, ci) => {
+              const r = grid.minR + ri, c = grid.minC + ci;
+              const st = cellState(r, c);
+              if (!st) return <div key={`${r},${c}`} aria-hidden="true" />;
+              const visible = st.filled || st.revealed;
+              return (
+                <div
+                  key={`${r},${c}`}
+                  className={`wc-cell ${st.filled ? "filled" : st.revealed ? "hinted" : "open"} ${st.hot ? "hot" : ""}`}
+                  aria-label={visible ? `Буква ${st.letter}` : "Закрытая клетка"}
+                >
+                  {visible ? st.letter : ""}
+                </div>
+              );
+            }),
+          )}
         </div>
       </div>
 
-      <div className={`wc-grid ${shake ? "wc-shake" : ""}`}
-        style={{ gridTemplateColumns: `repeat(${grid.cols}, 38px)` }}>
-        {Array.from({ length: grid.rows }).map((_, ri) =>
-          Array.from({ length: grid.cols }).map((_, ci) => {
-            const r = grid.minR + ri, c = grid.minC + ci;
-            const st = cellState(r, c);
-            if (!st) return <div key={`${r},${c}`} />;
-            return (
-              <div
-                key={`${r},${c}`}
-                className={`wc-cell ${st.filled ? "filled" : st.revealed ? "hinted" : "open"} ${st.hot ? "hot" : ""}`}
-              >
-                {st.filled || st.revealed ? st.letter : ""}
-              </div>
-            );
-          }),
-        )}
-      </div>
-
-      <div className="wc-wordbar">
-        {current.length === 0 ? (
-          <span style={{ opacity: 0.35, fontSize: 18, letterSpacing: 0 }}>
-            Свайпни или тапни буквы…
-          </span>
-        ) : (
-          current.map((i, k) => <span key={k}>{wheel[i]}</span>)
-        )}
+      <div className="wc-word-entry" role="status" aria-live="polite" aria-atomic="true">
+        <div className={`wc-wordbar ${current.length > 0 ? "has-word" : "is-empty"}`}>
+          <div className="wc-wordbar-letters">
+            {current.length === 0 ? (
+              <span className="wc-wordbar-placeholder">Выберите буквы</span>
+            ) : (
+              current.map((i, k) => <span className="wc-word-chip" key={`${i}-${k}`}>{wheel[i]}</span>)
+            )}
+          </div>
+        </div>
+        <span className="wc-wordbar-label">
+          {current.length > 0 ? `СЛОВО · ${current.length} БУКВ` : "СЛОВО"}
+        </span>
       </div>
 
       <div
@@ -619,6 +701,17 @@ function LevelScreen({
         {wheel.map((letter, i) => (
           <div
             key={`${letter}-${i}`}
+            role="button"
+            tabIndex={0}
+            aria-label={`Буква ${letter}, плитка ${i + 1}`}
+            aria-pressed={current.includes(i)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                pickTile(i);
+              }
+            }}
             className={`wc-tile ${current.includes(i) ? "on" : ""}`}
             style={{
               left: centers[i].x,
@@ -634,15 +727,52 @@ function LevelScreen({
         ))}
       </div>
 
-      <div className="wc-wheel-tools">
-        <button className="wc-tool" onClick={doShuffle}>🔀</button>
-        <button className="wc-tool" onClick={() => submitWord(current.map((i) => wheel[i]))}>✅</button>
-        <button className="wc-tool" onClick={() => setCurrent([])}>⌫</button>
+      <div className="wc-wheel-tools" role="group" aria-label="Действия со словом">
+        <button
+          type="button"
+          className="wc-action-button"
+          onClick={doShuffle}
+          aria-label="Перемешать буквы"
+          title="Перемешать буквы"
+        >
+          <span className="wc-action-icon" aria-hidden="true">🔀</span>
+          <span>Перемешать</span>
+        </button>
+        <button
+          type="button"
+          className="wc-action-button primary"
+          onClick={() => submitWord(current.map((i) => wheel[i]))}
+          disabled={current.length < 2}
+          aria-label="Приготовить слово"
+          title="Приготовить слово"
+        >
+          <span className="wc-action-icon" aria-hidden="true">🍲</span>
+          <span>Готовить</span>
+        </button>
+        <button
+          type="button"
+          className="wc-action-button"
+          onClick={() => setCurrent((c) => c.slice(0, -1))}
+          disabled={current.length === 0}
+          aria-label="Удалить последнюю букву"
+          title="Удалить последнюю букву"
+        >
+          <span className="wc-action-icon" aria-hidden="true">↩</span>
+          <span>Назад</span>
+        </button>
       </div>
 
       {done && (
         <div className="wc-overlay">
-          <div className="wc-modal" style={{ backgroundImage: "url(img/celebrate.webp)" }}>
+          <div
+            className="wc-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="wc-completion-title"
+            aria-describedby="wc-completion-reward"
+            tabIndex={-1}
+            style={{ backgroundImage: "url(img/celebrate.webp)" }}
+          >
             <div className="confetti">
               {["#ff7a2f", "#37b24d", "#3f97d4", "#f2c14e", "#e03131"].map((c, i) => (
                 <i key={i} style={{
@@ -655,7 +785,7 @@ function LevelScreen({
               <span>📖 Новый рецепт записан!</span>
             </div>
             <img className="big-img" src={dishArt(level.dish.name)} alt="" />
-            <div style={{ fontSize: 24, fontWeight: 900 }}>{level.dish.name} готов!</div>
+            <div id="wc-completion-title" style={{ fontSize: 24, fontWeight: 900 }}>{level.dish.name} готов!</div>
             {dishNote(level.dish.name) && (
               <div className="wc-recipe-note">«{dishNote(level.dish.name)}»</div>
             )}
@@ -663,15 +793,15 @@ function LevelScreen({
               <img className="wc-medal big" src="img/ach_gold.webp" alt="" />
               ⭐⭐⭐
             </div>
-            <div style={{ fontWeight: 800 }}>
+            <div id="wc-completion-reward" style={{ fontWeight: 800 }}>
               +{30 + levelNo} 🪙 · бонусных слов: {bonusFound.length}
             </div>
             <button
               className="wc-btn green"
               onClick={() => {
                 setDone(false);
-                if (grand) { flash("Готовим следующий заказ!"); window.location.reload(); }
-                else onNext();
+                if (grand) flash("Готовим следующий заказ!");
+                onNext();
               }}
             >
               {grand ? "🌀 Следующий заказ" : "▶ Дальше"}
