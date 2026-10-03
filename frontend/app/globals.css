@@ -1724,3 +1724,122 @@ button {
   .wc-home-avatar { width:52px; height:52px; }
   .wc-home-current { padding:12px; }
 }
+
+/* ── modes & victory refresh: walnut / brass / recipe-book system ───── */
+.wc-game-screen.wc-grand-screen { padding-bottom: 12px; }
+.wc-grand-screen .wc-level-header {
+  border-color: rgba(244,195,93,.28);
+  background: linear-gradient(180deg,rgba(75,40,19,.97),rgba(35,17,9,.97));
+  box-shadow: 0 5px 0 rgba(12,5,2,.42),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.wc-grand-screen .wc-level-back,
+.wc-grand-screen .wc-level-badge,
+.wc-grand-screen .wc-level-coins,
+.wc-grand-screen .wc-hint-action {
+  border-color: rgba(244,195,93,.32);
+  background: linear-gradient(180deg,#5b3219,#30170b);
+  color:#ffe9b4;
+  box-shadow:0 3px 0 rgba(14,6,2,.34),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.wc-grand-screen .wc-level-badge { color:#ffd36a; }
+.wc-grand-screen .wc-level-badge::after { content:" · ГРАНД ТУР"; color:#7edb73; font-weight:1000; }
+.wc-grand-screen .wc-dish-heading {
+  color:#fff0c9;
+  text-shadow:0 3px 0 #64310f,0 7px 16px rgba(0,0,0,.38);
+}
+.wc-grand-screen .wc-dish-heading::before,
+.wc-grand-screen .wc-dish-heading::after { background:linear-gradient(90deg,transparent,#e5b85d); }
+.wc-grand-screen .wc-grid-scroll {
+  border-color:#9b6129;
+  box-shadow:0 9px 0 rgba(30,12,4,.46),0 16px 24px rgba(0,0,0,.24);
+}
+.wc-grand-screen .wc-wordbar,
+.wc-grand-screen .wc-wordbar-placeholder {
+  border-color:#b77730;
+  background:linear-gradient(180deg,#fff3d4,#d9ae69);
+  color:#4c2913;
+  box-shadow:0 4px 0 rgba(44,18,5,.3),inset 0 1px 0 #fff;
+}
+.wc-grand-screen .wc-tile.on { background-image:url(/img/ui_gold_tile.webp); }
+.wc-grand-screen .wc-action-bar {
+  border-color:rgba(230,181,82,.4);
+  background:linear-gradient(180deg,rgba(74,39,18,.98),rgba(35,17,8,.98));
+  box-shadow:0 -5px 0 rgba(18,7,2,.25),0 -14px 24px rgba(0,0,0,.18);
+}
+
+/* Victory is a recipe card, not a generic beige browser dialog. */
+.wc-win-modal {
+  border:2px solid #b97932;
+  background-color:#3a1d0d;
+  background-image:linear-gradient(155deg,rgba(67,32,13,.94),rgba(30,13,7,.97)),url("/img/celebrate.webp");
+  color:#fff1cf;
+  box-shadow:0 22px 52px rgba(8,3,1,.58),0 0 0 1px rgba(255,216,126,.12);
+}
+.wc-win-stamp { border-color:rgba(245,195,93,.35); background:rgba(255,235,183,.09); color:#ffd36a; }
+.wc-win-title { color:#fff1c9; text-shadow:0 3px 0 #6c310e,0 7px 15px rgba(0,0,0,.38); }
+.wc-win-subtitle { color:#e6cda4; }
+.wc-win-recipe-card,.wc-win-reward,.wc-win-bonus {
+  border-color:rgba(231,187,111,.28); background:rgba(255,240,204,.09);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.wc-win-recipe-copy strong { color:#fff0c8; }
+.wc-recipe-note,.wc-win-reward span,.wc-win-bonus span { color:#d6bd94; }
+.wc-win-dish { border-color:#f7d487; background:#6b421f; box-shadow:0 4px 0 rgba(16,6,2,.34),0 7px 14px rgba(0,0,0,.25); }
+.wc-win-reward strong { color:#ffd15b; }
+.wc-win-bonus strong { color:#8bdb72; }
+.wc-win-modal .wc-stars { color:#ffd05a; text-shadow:0 2px 0 rgba(117,64,7,.48); }
+.wc-win-actions .wc-btn.ghost { border-color:rgba(245,201,116,.28); background:rgba(255,238,200,.08); color:#f0d8ac; }
+.wc-win-actions .wc-btn.green {
+  border:1px solid #318d48; background:linear-gradient(180deg,#63d56e,#24974a); color:#fff9e7;
+  box-shadow:0 5px 0 rgba(20,74,32,.5),inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+/* Multiplayer now shares the same kitchen visual language. */
+.wc-multi-screen { position:relative; padding-bottom:10px; }
+.wc-multi-screen > .wc-multi-back {
+  min-height:42px; margin:0 0 7px; padding:8px 12px; border:1px solid rgba(245,196,91,.28);
+  border-radius:14px; background:linear-gradient(180deg,#5a3219,#30170b); color:#ffe7b3;
+  box-shadow:0 4px 0 rgba(12,5,2,.38);
+}
+.wc-multi-screen .shell { max-width:none; padding:0 0 18px; }
+.wc-multi-screen .brand { padding:3px 6px 4px; }
+.wc-multi-screen .brand h1 { color:#ffd36a; text-shadow:0 3px 0 #71340f,0 6px 12px rgba(0,0,0,.35); }
+.wc-multi-screen .brand .tagline { color:#e4c89c; opacity:.86; }
+.wc-multi-screen .panel {
+  margin-top:9px; padding:14px; border:2px solid #a96d30; border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,247,225,.98),rgba(224,184,116,.98));
+  box-shadow:0 7px 0 rgba(34,14,5,.38),inset 0 1px 0 #fff;
+}
+.wc-multi-screen .panel h2 { color:#4b2914; letter-spacing:.4px; }
+.wc-multi-screen .gc-banner {
+  min-height:104px; margin-top:7px; border:2px solid #9c612b; border-radius:19px; box-shadow:0 7px 0 rgba(30,12,4,.34);
+}
+.wc-multi-screen .field { border:2px solid #c88b3e; background:#fff7e4; color:#4a2916; box-shadow:inset 0 2px 4px rgba(66,32,9,.08); }
+.wc-multi-screen .field:focus { border-color:#3c9c50; }
+.wc-multi-screen .select-grid { gap:8px; }
+.wc-multi-screen .select-btn { min-height:105px; overflow:hidden; border:2px solid #bd8140; border-radius:17px; box-shadow:0 5px 0 rgba(65,29,8,.25); }
+.wc-multi-screen .select-btn.active { border-color:#5eaf58; box-shadow:0 5px 0 rgba(44,95,39,.28),inset 0 0 0 2px rgba(130,216,105,.28); }
+.wc-multi-screen .btn.primary {
+  border:2px solid #288646; background-image:none; background:linear-gradient(180deg,#64d86f,#26994b);
+  color:#fff9e7; text-shadow:0 2px 2px rgba(0,0,0,.22); box-shadow:0 5px 0 rgba(25,89,39,.42),inset 0 1px 0 rgba(255,255,255,.3);
+}
+.wc-multi-screen .btn:not(.primary) { border:1px solid #c79049; background:linear-gradient(180deg,#fff0ca,#d3a461); color:#563017; box-shadow:0 4px 0 rgba(72,31,7,.2); }
+.wc-multi-screen .gc-shell-bg { padding:0 0 18px; border-radius:22px; overflow:hidden; }
+.wc-multi-screen .gc-shell-bg .brand h1 { color:#fff0c9; }
+.wc-multi-screen .hud { padding:7px 2px; }
+.wc-multi-screen .hud-card { min-width:88px; padding:8px 11px; border:1px solid rgba(244,198,102,.24); border-radius:14px; }
+.wc-multi-screen .order-card { border:2px solid #b87832; border-radius:18px; box-shadow:0 6px 0 rgba(45,19,5,.3),inset 0 1px 0 #fff; }
+.wc-multi-screen .letters .letter { width:48px; height:48px; border-radius:13px; }
+.wc-multi-screen .composer .word-preview {
+  padding:8px 10px; border:2px solid #a86b2e; border-radius:16px; background:linear-gradient(180deg,#fff4d7,#dfb56f);
+  color:#4d2b15; box-shadow:0 4px 0 rgba(45,19,5,.25),inset 0 1px 0 #fff;
+}
+.wc-multi-screen .board-row { padding:10px 7px; border-bottom:1px dashed rgba(104,57,17,.25); }
+.wc-multi-screen .pts { color:#4d9d4e; }
+.wc-multi-screen .footer-note { color:#f0d8ad; opacity:.78; }
+@media (max-width:390px) {
+  .wc-multi-screen .select-grid { grid-template-columns:1fr; }
+  .wc-multi-screen .select-btn { min-height:88px; }
+  .wc-multi-screen .letters .letter { width:44px; height:44px; }
+  .wc-win-modal { border-radius:22px; }
+}

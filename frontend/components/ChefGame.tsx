@@ -272,8 +272,8 @@ export default function ChefGame() {
         />
       )}
       {screen === "multi" && (
-        <div>
-          <button className="wc-btn ghost" onClick={() => setScreen("home")}>
+        <div className="wc-multi-screen">
+          <button className="wc-btn ghost wc-multi-back" onClick={() => setScreen("home")}>
             ← Назад в кухню
           </button>
           <GameClient />
@@ -639,7 +639,7 @@ function LevelScreen({
   };
 
   return (
-    <div className="wc-game-screen">
+    <div className={grand ? "wc-game-screen wc-grand-screen" : "wc-game-screen"}>
       <div className="wc-level-header">
         <button
           type="button"
