@@ -470,8 +470,11 @@ function LevelScreen({
   const onPointerUp = () => {
     if (!dragging.current) return;
     dragging.current = false;
-    if (current.length >= 2) submitWord(current.map((i) => wheel[i]));
-    else setCurrent([]);
+    // Жест, прошедший по двум и более плиткам, — это свайп: сразу готовим блюдо.
+    // Одиночный тап selection не трогает: иначе отпускание пальца стирало
+    // букву и «тапай буквы» из подсказки не работало вовсе. Тапами можно
+    // набрать слово и отправить его кнопкой ✅.
+    if (usedInSwipe.current.size >= 2) submitWord(current.map((i) => wheel[i]));
   };
 
   // keyboard support (desktop)

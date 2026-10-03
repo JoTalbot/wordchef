@@ -67,14 +67,29 @@ def _expand(ref: str) -> set[str]:
     return {ref.replace("${id}", kid) for kid in KITCHEN_IDS}
 
 
+def _code_files() -> list[Path]:
+    """Every source file that may reference a shipped asset.
+
+    Art is wired in three places: the campaign component, the multiplayer
+    component, and `app/globals.css` (game-screen theming uses background
+    images). Scanning only the components once cost us a false orphan report.
+    """
+    root = ROOT / "frontend"
+    files: list[Path] = []
+    for pattern in ("components/*.tsx", "components/*.ts", "app/*.css", "app/*.tsx", "lib/*.ts"):
+        files += [p for p in (root / pattern).parent.glob(Path(pattern).name)
+                  if "node_modules" not in p.parts and "out" not in p.parts]
+    return sorted(set(files))
+
+
 def _referenced_files() -> set[str]:
-    """Every shipped name a component mentions.
+    """Every shipped name the source mentions.
 
     Matching on the file *name* rather than on an `img/…` regex keeps this
     test honest for paths built inline, e.g.
     `url(img/${cond ? 'mode_chaos' : 'mode_quick'}.webp)`.
     """
-    texts = CHEFGAME.read_text(encoding="utf-8") + GAMECLIENT.read_text(encoding="utf-8")
+    texts = "".join(f.read_text(encoding="utf-8") for f in _code_files())
     used = set(_dish_art().values())
     for p in _all_art_files():
         # full name, or bare stem for paths assembled inline
@@ -113,7 +128,7 @@ class TestArtFormat:
     def test_no_jpeg_references_left_in_code(self):
         """The set ships as WebP — a stray .jpg ref is a broken image."""
         offenders = []
-        for f in (CHEFGAME, GAMECLIENT):
+        for f in _code_files():
             for ref in re.findall(r"img/[^\"'`)\s]*\.jpe?g", f.read_text(encoding="utf-8")):
                 offenders.append(f"{f.name}: {ref}")
         assert not offenders, f"остались .jpg-ссылки: {offenders}"
@@ -157,3 +172,16 @@ class TestArtInBundle:
         exported = {p.name for p in out_img.iterdir() if p.is_file()}
         missing = sorted(f for f in _referenced_files() if f not in exported)
         assert not missing, f"нет в статическом экспорте: {missing}"
+
+    def test_css_background_images_resolve_in_export(self):
+        """`url(/img/…)` in the built CSS must point at a shipped file."""
+        css_dir = ROOT / "frontend" / "out" / "_next" / "static" / "css"
+        if not css_dir.is_dir():
+            pytest.skip("нужна сборка фронтенда")
+        out_img = ROOT / "frontend" / "out" / "img"
+        broken = []
+        for css in css_dir.glob("*.css"):
+            for ref in re.findall(r"url\(/img/([A-Za-z0-9_.\-]+)\)", css.read_text(encoding="utf-8")):
+                if not (out_img / ref).is_file():
+                    broken.append(f"{css.name} → {ref}")
+        assert not broken, f"CSS ссылается на отсутствующий арт: {broken}"

@@ -119,6 +119,7 @@ Android build embeds `frontend/out` in the APK assets.
 | after 38 dishes + UI icons + RU build | 3.47 MB | 538 KB headroom |
 | after 48 dishes + WebP migration | **2.64 MB** | 1393 KB headroom |
 | after 54 dishes + refreshed banners | 2.69 MB | 1338 KB headroom |
+| after game-screen theming (11 UI assets) | 2.93 MB | 1093 KB headroom |
 
 Rules of thumb:
 
@@ -136,7 +137,37 @@ WebP migration is **done** (`scripts/to_webp.py`): image payload fell from
 headroom ever gets tight again, the next levers are: 384² dishes (still above
 the 140 px display size), and dropping the two 820-wide banners to 640.
 
-## 6 · Android build
+
+## 6 · Game-screen theming
+
+The core loop is themed with generated art, not gradients:
+
+| UI slot | Asset | How |
+|---|---|---|
+| Campaign background | `ui_wood_table.webp` | wooden table under a warm wash (`html, body`) |
+| Crossword board | `ui_board_surface.webp` | same cutting board as the dish art |
+| Board cells | — | dark "sockets"; `hot` cells get a warm rim inside the socket |
+| Wheel / letter tiles | `ui_tile_wood.webp` | wooden tiles; a picked letter flips to `ui_gold_tile.webp` |
+| Rare letters (J/Q/X/Z) | `ui_gold_tile.webp` | golden ingredients are visible in the tray |
+| Progress bars | `ui_progress_strip.webp` | ember-strip fill |
+| Multiplayer HUD | `ui_hud_plaque.webp` | brass plaque on wood (light text) |
+| Order card | `ui_ticket_paper.webp` | waiter's paper ticket |
+| Primary button | `ui_btn_plate.webp` | wooden plate (trimmed tight) |
+| Served dish | `ui_plate_round.webp` | empty plate under the dish |
+| Game-screen backdrop | `bg_game_kitchen.webp` | night kitchen bokeh instead of a flat wash |
+
+Tiles and plates use `background-blend-mode: multiply` so the light wood from
+the generator lands on the game's warmer tone while text stays legible.
+
+### Android trap: `url()` inside CSS
+
+`url(/img/…)` in a stylesheet resolves against **the stylesheet**, not the
+document — under `file://` in a WebView it points at the filesystem root.
+`scripts/build_android.sh` rewrites such URLs to the right number of `../` for
+the file's depth (three for `next/static/css/`). Verified on the assembled APK:
+all nine CSS references resolve inside `assets/www`.
+
+## 7 · Android build
 
 ```bash
 TOOLS_DIR=~/.cache/wc-tools bash scripts/bootstrap_android_tools.sh   # JDK 17 + Gradle 8.7 + SDK 34
@@ -153,7 +184,7 @@ Why the rename matters: AAPT skips asset directories whose name starts with
 script rewrites `_next` → `next` and makes URLs relative; if a future asset
 directory starts with `_`, add it to that same rewrite step.
 
-## 7 · Level fixtures & parity
+## 8 · Level fixtures & parity
 
 ```bash
 python3 scripts/regen_levels_golden.py            # show churn (no writes)

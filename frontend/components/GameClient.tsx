@@ -117,7 +117,7 @@ export default function GameClient() {
           setChaosFeed((f) => [`${chaos.event_type} → ${chaos.victim_id}`, ...f].slice(0, 6));
         }
       }
-      if (type === 'ROUND_STARTED') say(`Round ${event.round_no} — service!`);
+      if (type === 'ROUND_STARTED') say(`Раунд ${event.round_no} — смена пошла!`);
       if (type === 'MATCH_FINISHED') {
         say('Матч завершён!');
         setScreen('results');
@@ -202,9 +202,9 @@ export default function GameClient() {
         setTimeout(() => setPop(null), 950);
         if (dish?.secret_hit) say('Секретное меню раскрыто! +50%');
       } else if (res.action === 'SUBMIT_DISH' && res.accepted) {
-        say(`Rejected: ${res.reason.replace(/_/g, ' ')}`);
+        say(`Отклонено: ${ruReason(res.reason)}`);
       } else if (!res.accepted) {
-        say(res.reason.replace(/_/g, ' '));
+        say(ruReason(res.reason));
       }
       if (res.payload.chaos) {
         const chaos = res.payload.chaos as Record<string, string>;
@@ -365,7 +365,7 @@ export default function GameClient() {
   return (
     <div
       className="shell gc-shell-bg"
-      style={{ backgroundImage: "linear-gradient(rgba(22, 13, 8, 0.84), rgba(22, 13, 8, 0.84)), url(img/service_bg.webp)" }}
+      style={{ backgroundImage: "linear-gradient(rgba(22, 13, 8, 0.62), rgba(22, 13, 8, 0.74)), url(img/bg_game_kitchen.webp)" }}
     >
       {toasts.map((t) => (
         <div key={t.id} className="toast">{t.text}</div>

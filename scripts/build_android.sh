@@ -26,13 +26,26 @@ for f in root.rglob("*"):
         # loop: "__next"-style identifiers shed one underscore per pass
         while "_next" in s:
             s = s.replace("_next", "next")
-        # file:// needs relative URLs — leading "/" resolves to the FS root
-        s = s.replace('"/next/', '"./next/').replace("(/next/", "(./next/")
-        # favicon & images referenced root-absolute → make relative for file://
-        s = re.sub(r'(href|src)="/(icon\.png|img/)', r'\1="./\2', s)
+        if f.suffix != ".css":
+            # in HTML/JS a leading "/" is document-relative → make it "./"
+            s = s.replace('"/next/', '"./next/').replace("(/next/", "(./next/")
+            s = re.sub(r'(href|src)="/(icon\.png|img/)', r'\1="./\2', s)
         if s != orig:
             f.write_text(s, encoding="utf-8")
             n += 1
+
+# CSS is different: url(/…) resolves against the *stylesheet*, not the
+# document. Rewrite each absolute url() to the right number of "../" for the
+# file's own depth (the game CSS lives at next/static/css/, i.e. three up).
+for f in root.rglob("*.css"):
+    depth = len(f.relative_to(root).parts) - 1
+    prefix = "../" * depth
+    s = f.read_text(encoding="utf-8")
+    new = re.sub(r"url\((['\"]?)/(?!/)", lambda m: f"url({m.group(1)}{prefix}", s)
+    if new != s:
+        f.write_text(new, encoding="utf-8")
+        n += 1
+        print(f"css urls → relative: {f.relative_to(root)} ({prefix or './'})")
 print(f"rewrote bundle paths in {n} files")
 PYEOF
 

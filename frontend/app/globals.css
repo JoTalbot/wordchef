@@ -17,7 +17,13 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(180deg, var(--bg2), var(--bg) 40%);
+  /* стол из светлого дерева под тёплой заливкой — рабочий фон кампании */
+  background-color: #f4e2c6;
+  background-image:
+    linear-gradient(180deg, rgba(255, 246, 233, 0.86), rgba(255, 236, 208, 0.8) 40%),
+    url(/img/ui_wood_table.webp);
+  background-size: auto, cover;
+  background-attachment: fixed, fixed;
   color: var(--ink);
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   min-height: 100vh;
@@ -109,9 +115,13 @@ button {
 }
 .wc-bar > div {
   height: 100%;
-  background: linear-gradient(90deg, var(--good), #8ce99a);
+  background-color: var(--good);
+  background-image: url(/img/ui_progress_strip.webp);
+  background-size: auto 100%;
+  background-repeat: repeat-x;
   border-radius: 999px;
   transition: width 0.4s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .wc-level-header {
@@ -126,13 +136,22 @@ button {
   gap: 5px;
   justify-content: center;
   margin: 16px 0;
+  padding: 12px;
+  border-radius: 20px;
+  /* та же разделочная доска, что и в арте блюд */
+  background-color: #efdcc1;
+  background-image: url(/img/ui_board_surface.webp);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 6px 0 rgba(120, 60, 0, 0.18), inset 0 0 0 2px rgba(120, 60, 0, 0.08);
 }
 
 .wc-cell {
   width: 38px;
   height: 38px;
   border-radius: 9px;
-  background: var(--tile2);
+  background: rgba(120, 60, 0, 0.1);
+  box-shadow: inset 0 2px 3px rgba(90, 50, 10, 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,10 +160,24 @@ button {
   color: var(--ink);
   text-transform: uppercase;
 }
-.wc-cell.open { background: #fff2dc; color: transparent; }
-.wc-cell.filled { background: var(--good); color: #fff; animation: pop 0.25s ease; }
-.wc-cell.hinted { background: var(--accent2); color: var(--ink); }
-.wc-cell.hot { outline: 3px solid var(--accent); }
+.wc-cell.open { background: rgba(74, 40, 8, 0.28); color: transparent; }
+.wc-cell.filled {
+  background: linear-gradient(180deg, #63d67c, var(--good));
+  color: #fff;
+  box-shadow: 0 3px 0 rgba(24, 92, 40, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  animation: pop 0.25s ease;
+}
+.wc-cell.hinted {
+  background: linear-gradient(180deg, #ffd9a0, var(--accent2));
+  color: var(--ink);
+  box-shadow: 0 3px 0 rgba(160, 96, 12, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+/* незаполненные клетки нужных слов — тёплый ободок внутри гнезда,
+   без «плавающих» контуров поверх доски */
+.wc-cell.hot {
+  box-shadow: inset 0 0 0 2px rgba(214, 94, 20, 0.9),
+              inset 0 3px 6px rgba(74, 40, 8, 0.35);
+}
 
 @keyframes pop {
   0% { transform: scale(0.6); }
@@ -186,19 +219,30 @@ button {
   width: 64px;
   height: 64px;
   margin: -32px 0 0 -32px;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #fff, var(--tile2));
-  box-shadow: var(--shadow);
+  border-radius: 16px;
+  /* та же деревянная плитка, что и «золотые ингредиенты» в UI-наборе */
+  background-color: #d9b183;
+  background-image: url(/img/ui_tile_wood.webp);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 0 rgba(90, 50, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
   font-weight: 900;
   text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(60, 30, 0, 0.75);
   transition: transform 0.08s ease, background 0.08s ease;
 }
 .wc-tile.used { transform: scale(0.82); opacity: 0.45; }
-.wc-tile.on { background: var(--accent); color: #fff; transform: scale(1.1); }
+.wc-tile.on {
+  background-image: url(/img/ui_gold_tile.webp);
+  color: #5a3200;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
 
 .wc-wheel-tools {
   display: flex;
@@ -406,6 +450,15 @@ button {
   text-shadow: 0 2px 0 #fff, 0 4px 0 rgba(120, 60, 0, 0.15);
 }
 .brand .tagline { opacity: 0.75; font-weight: 700; margin-top: 2px; }
+/* на тёмном фоне кухни (мультиплеер) бренд должен читаться, а не «светиться» */
+.gc-shell-bg .feedback:not(.good):not(.bad) { color: #f6dfb8; opacity: 0.9; }
+.gc-shell-bg .brand h1 {
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+  margin: 0;
+  letter-spacing: 3px;
+  opacity: 0.92;
+}
 .panel {
   background: var(--tile); border-radius: var(--radius); box-shadow: var(--shadow);
   padding: 16px; margin-top: 12px;
@@ -413,14 +466,23 @@ button {
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .hud { display: flex; gap: 8px; overflow-x: auto; padding: 10px 2px; }
 .hud-card {
-  background: var(--tile); border-radius: 14px; box-shadow: var(--shadow);
-  padding: 8px 12px; min-width: 96px; flex: none;
+  /* латунная плашка на дереве — тёмная, поэтому текст светлый */
+  background-image: url(/img/ui_hud_plaque.webp);
+  background-size: 100% 100%;
+  background-color: #3a2410;
+  border-radius: 12px; padding: 8px 14px; min-width: 96px; flex: none;
+  color: #ffeccd;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
-.hud-card .label { font-size: 11px; opacity: 0.65; font-weight: 800; text-transform: uppercase; }
+.hud-card .label { font-size: 11px; opacity: 0.75; font-weight: 800; text-transform: uppercase; }
 .hud-card .value { font-size: 19px; font-weight: 900; }
 .order-card {
-  background: linear-gradient(180deg, #fff, var(--bg2));
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; margin-top: 10px;
+  /* билет официанта: бумага с неровными краями */
+  background-color: #fdf4e3;
+  background-image: url(/img/ui_ticket_paper.webp);
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px; box-shadow: 0 6px 0 rgba(120, 60, 0, 0.18); padding: 14px; margin-top: 10px;
 }
 .customer { display: flex; align-items: center; gap: 10px; }
 .customer .plate { font-size: 38px; }
@@ -437,10 +499,26 @@ button {
 .letters {
   display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; margin-top: 12px;
 }
-.letters .tile {
-  width: 46px; height: 46px; border-radius: 12px; background: var(--tile);
-  box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
+.letters .letter {
+  width: 46px; height: 46px; border-radius: 11px;
+  background-color: #c9955c;
+  background-image: url(/img/ui_tile_wood.webp);
+  background-size: cover;
+  background-blend-mode: multiply;
+  box-shadow: 0 4px 0 rgba(90, 50, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  display: flex; align-items: center; justify-content: center;
   font-size: 22px; font-weight: 900; text-transform: uppercase;
+  color: #fff; text-shadow: 0 1px 2px rgba(60, 30, 0, 0.75);
+  transition: transform 0.08s ease;
+}
+/* редкие буквы (J/Q/X/Z) — золотые ингредиенты */
+.letters .letter.rare {
+  background-image: url(/img/ui_gold_tile.webp);
+  color: #5a3200; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.letters .letter.used {
+  opacity: 0.5; transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(90, 50, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .composer { margin-top: 12px; }
 .field {
@@ -455,15 +533,37 @@ button {
   color: #fff; background: linear-gradient(180deg, var(--accent2), var(--accent));
   box-shadow: var(--shadow); margin-top: 10px;
 }
-.btn.primary { font-size: 19px; width: 100%; }
+.btn.primary {
+  font-size: 19px; width: 100%;
+  /* деревянная кнопка-плашка из UI-набора */
+  background-image: url(/img/ui_btn_plate.webp);
+  background-size: 100% 100%;
+  background-color: #d09a5e;
+  background-blend-mode: multiply;
+  color: #3b1f04;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
 .btn.green { background: linear-gradient(180deg, #63d67c, var(--good)); }
 .btn.blue { background: linear-gradient(180deg, #8fd3f4, #3f97d4); }
 .btn:active { transform: translateY(2px); }
 .select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 .progress { height: 12px; background: var(--bg2); border-radius: 999px; overflow: hidden; margin-top: 8px; }
-.progress > div { height: 100%; background: linear-gradient(90deg, var(--good), #8ce99a); }
+.progress > div {
+  height: 100%;
+  background-color: var(--good);
+  background-image: url(/img/ui_progress_strip.webp);
+  background-size: auto 100%;
+  background-repeat: repeat-x;
+}
 .word-preview { text-align: center; font-size: 26px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; min-height: 36px; }
 .dish-pop { animation: pop 0.35s ease; }
+.dish-pop .plate {
+  /* тарелка из UI-набора: блюдо подано */
+  width: 54px; height: 54px; margin: 2px auto 0;
+  display: flex; align-items: center; justify-content: center;
+  background-image: url(/img/ui_plate_round.webp);
+  background-size: cover; border-radius: 50%;
+}
 .footer-note { text-align: center; opacity: 0.6; font-size: 12px; margin-top: 14px; }
 .score { font-size: 22px; font-weight: 900; }
 .toast {
