@@ -1,0 +1,43 @@
+name: WordChef backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "game/**"
+      - "prolepsis/**"
+      - "scripts/**"
+      - "tests/**"
+      - "docker/**"
+      - "docker-compose.yml"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - "game/**"
+      - "prolepsis/**"
+      - "scripts/**"
+      - "tests/**"
+      - "docker/**"
+      - "docker-compose.yml"
+      - ".github/workflows/backend.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest fastapi "uvicorn[standard]" "pydantic>=2.7"
+      - name: Run backend and game tests
+        env:
+          PYTHONPATH: backend:game:prolepsis:prolepsis/vendor
+        run: python3 -m pytest tests/ -q
+      - name: Prolepsis acceptance
+        run: python3 scripts/acceptance_prolepsis.py
