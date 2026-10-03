@@ -6,11 +6,17 @@ from fastapi.testclient import TestClient
 def test_health_reports_version_and_security_headers(client: TestClient):
     response = client.get("/healthz")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "game": "wordchef", "version": "1.3.0"}
+    payload = response.json()
+    assert payload["status"] == "ok"
+    assert payload["game"] == "wordchef"
+    assert payload["version"] == "1.4.0"
+    assert isinstance(payload["uptime_s"], (int, float))
+    assert payload["uptime_s"] >= 0
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-frame-options"] == "DENY"
     assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
     assert response.headers["permissions-policy"] == "camera=(), microphone=(), geolocation=()"
+    assert response.headers["cache-control"] == "no-store"
 
 
 def test_registration_normalizes_name(client: TestClient):

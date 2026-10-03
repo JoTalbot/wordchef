@@ -3,12 +3,17 @@
 FROM node:20-alpine AS frontend
 WORKDIR /build
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 COPY frontend ./
 RUN npm run build
 
 # stage 2 · python runtime
 FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/backend:/app/game:/app/prolepsis:/app/prolepsis/vendor \
+    WC_DATA_DIR=/app/data
 
 WORKDIR /app
 COPY docker/requirements.txt /app/docker/requirements.txt
@@ -20,8 +25,12 @@ COPY backend /app/backend
 COPY --from=frontend /build/out /app/frontend/out
 COPY scripts /app/scripts
 
-ENV PYTHONPATH=/app/backend:/app/game:/app/prolepsis:/app/prolepsis/vendor \
-    WC_DATA_DIR=/app/data
+RUN addgroup --system --gid 10001 wordchef \
+    && adduser --system --uid 10001 --ingroup wordchef wordchef \
+    && mkdir -p /app/data \
+    && chown -R wordchef:wordchef /app/data /app/backend /app/game /app/prolepsis /app/frontend /app/scripts
+
+USER 10001:10001
 
 EXPOSE 8000
 CMD ["python3", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

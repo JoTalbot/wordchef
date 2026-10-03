@@ -7,6 +7,7 @@ export) from one origin. Run with:
 """
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -21,11 +22,12 @@ from wordchef_prolepsis.bridge import WordChefRuntime
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Word Chef API", version="1.3.0",
+    app = FastAPI(title="Word Chef API", version="1.4.0",
                   description="Server-authoritative multiplayer word-cooking")
     store = Store(DB_PATH)
     runtime = WordChefRuntime(PROLEPSIS_ROOT)
     app.state.service = GameService(store, runtime)
+    app.state.started_at = time.time()
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
@@ -34,13 +36,15 @@ def create_app() -> FastAPI:
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        response.headers.setdefault("Cache-Control", "no-store")
+        response.headers.setdefault("X-Request-ID", request.headers.get("X-Request-ID", ""))
         return response
 
     app.include_router(router)
 
     @app.get("/healthz")
     def healthz():
-        return JSONResponse({"status": "ok", "game": "wordchef", "version": "1.3.0"})
+        return JSONResponse({"status": "ok", "game": "wordchef", "version": "1.4.0", "uptime_s": round(max(0.0, time.time() - app.state.started_at), 3)})
 
     if FRONTEND_DIR.is_dir():
         assets = FRONTEND_DIR / "_next"
