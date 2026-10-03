@@ -35,6 +35,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install pytest fastapi "uvicorn[standard]" "pydantic>=2.7"
+      - name: Build frontend for shipped-bundle tests
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
       - name: Run backend and game tests
         env:
           PYTHONPATH: backend:game:prolepsis:prolepsis/vendor
