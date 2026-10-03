@@ -1,15 +1,20 @@
 :root {
-  --bg: #fff6e9;
-  --bg2: #ffe9c9;
-  --ink: #4a2c0f;
-  --accent: #ff7a2f;
-  --accent2: #ffb347;
-  --good: #37b24d;
-  --bad: #e03131;
-  --tile: #fffdf7;
-  --tile2: #ffd9a0;
-  --shadow: 0 6px 0 rgba(120, 60, 0, 0.18);
-  --radius: 18px;
+  --bg: #24150d;
+  --bg2: #4a2b18;
+  --ink: #f8e9cf;
+  --ink-dark: #3a210f;
+  --accent: #f6a623;
+  --accent2: #ffc857;
+  --good: #36b85a;
+  --bad: #e0523e;
+  --tile: #fff7e8;
+  --tile2: #d49a55;
+  --wood: #6b3b1d;
+  --wood-deep: #28160d;
+  --cream: #fff4df;
+  --gold: #f5b52b;
+  --shadow: 0 7px 0 rgba(42, 20, 8, 0.42), 0 12px 26px rgba(20, 8, 3, 0.24);
+  --radius: 20px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -17,13 +22,13 @@
 html, body {
   margin: 0;
   padding: 0;
-  /* стол из светлого дерева под тёплой заливкой — рабочий фон кампании */
-  background-color: #f4e2c6;
+  background-color: #2b170d;
   background-image:
-    linear-gradient(180deg, rgba(255, 246, 233, 0.86), rgba(255, 236, 208, 0.8) 40%),
+    linear-gradient(180deg, rgba(22, 12, 7, 0.42), rgba(22, 12, 7, 0.72)),
     url(/img/ui_wood_table.webp);
-  background-size: auto, cover;
-  background-attachment: fixed, fixed;
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
   color: var(--ink);
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   min-height: 100vh;
@@ -38,9 +43,9 @@ button {
 }
 
 .wc-shell {
-  max-width: 520px;
+  width: min(100%, 540px);
   margin: 0 auto;
-  padding: 14px 14px calc(28px + env(safe-area-inset-bottom));
+  padding: 10px 12px calc(30px + env(safe-area-inset-bottom));
 }
 
 .wc-top {
@@ -133,22 +138,22 @@ button {
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border: 1px solid rgba(120, 60, 0, 0.1);
-  border-radius: 20px;
-  background: rgba(255, 246, 233, 0.96);
-  box-shadow: 0 8px 22px rgba(70, 38, 10, 0.12);
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 213, 128, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(57, 31, 17, 0.97), rgba(35, 18, 10, 0.98));
+  box-shadow: 0 8px 0 rgba(16, 8, 4, 0.42), 0 16px 30px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
 }
 .wc-level-back {
   display: grid;
   width: 44px;
   height: 44px;
   place-items: center;
-  border: 2px solid #f0c783;
-  border-radius: 15px;
-  background: linear-gradient(180deg, #fffdf7, #ffedcf);
-  box-shadow: 0 4px 0 rgba(120, 60, 0, 0.16);
-  color: var(--accent);
+  border: 2px solid #e4bd6d;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff7e6, #ead2aa);
+  box-shadow: 0 4px 0 rgba(28, 13, 6, 0.34), inset 0 1px 0 #fff;
+  color: #7b421a;
   font-size: 27px;
   font-weight: 900;
 }
@@ -161,8 +166,8 @@ button {
   overflow: hidden;
   padding: 0 12px;
   border-radius: 15px;
-  background: linear-gradient(180deg, #ffb347, #f47c25);
-  box-shadow: 0 4px 0 rgba(142, 71, 14, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  background: linear-gradient(180deg, #f8ad32, #e97917);
+  box-shadow: 0 4px 0 rgba(93, 43, 8, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.32);
   color: #fff;
   font-size: 13px;
   font-weight: 950;
@@ -177,11 +182,11 @@ button {
   justify-content: center;
   gap: 5px;
   padding: 0 10px;
-  border: 1px solid rgba(120, 60, 0, 0.08);
-  border-radius: 999px;
-  background: linear-gradient(180deg, #fffdf7, #ffedcf);
-  box-shadow: 0 4px 0 rgba(120, 60, 0, 0.12);
-  color: var(--ink);
+  border: 1px solid rgba(255, 213, 128, 0.22);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #4b2b18, #2b180d);
+  box-shadow: 0 4px 0 rgba(10, 5, 2, 0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  color: #fff5dc;
   font-size: 14px;
   font-weight: 900;
   white-space: nowrap;
@@ -195,23 +200,30 @@ button {
   justify-content: center;
   gap: 4px;
   padding: 0 9px;
-  border: 0;
+  border: 1px solid rgba(255, 210, 115, .25);
   border-radius: 15px;
-  background: linear-gradient(180deg, #ffb441, #ef7d19);
-  box-shadow: 0 4px 0 rgba(151, 73, 9, 0.25);
+  background: linear-gradient(180deg, #ffbf48, #ef8b18);
+  box-shadow: 0 4px 0 rgba(96, 45, 7, 0.42), inset 0 1px 0 rgba(255,255,255,0.3);
   color: #fff;
   font-size: 16px;
   font-weight: 950;
 }
 .wc-hint-action img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
 .wc-dish-heading {
-  margin: 14px 0 10px;
-  color: #63370e;
-  font-size: clamp(28px, 8vw, 40px);
-  font-weight: 950;
-  line-height: 1.05;
+  position: relative;
+  margin: 12px -2px 10px;
+  padding: 26px 12px 28px;
+  color: #ffd77c;
+  font-size: clamp(36px, 10vw, 54px);
+  font-weight: 1000;
+  line-height: .95;
   text-align: center;
-  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.65);
+  text-shadow: 0 3px 0 #6b3210, 0 6px 16px rgba(0,0,0,.35);
+  letter-spacing: -.03em;
+  background: linear-gradient(180deg, rgba(78,42,20,.92), rgba(39,20,11,.96));
+  border: 1px solid rgba(255,214,125,.28);
+  border-radius: 26px;
+  box-shadow: 0 7px 0 rgba(18,8,3,.5), inset 0 1px 0 rgba(255,255,255,.08);
 }
 
 .wc-game-status {
@@ -220,10 +232,10 @@ button {
   align-items: center;
   gap: 10px;
   margin-top: 10px;
-  padding: 12px 14px;
-  border: 1px solid rgba(120, 60, 0, 0.1);
-  background: linear-gradient(180deg, #fff8e9, #ffe9c6);
-  box-shadow: 0 7px 0 rgba(120, 60, 0, 0.12), inset 0 1px 0 #fff;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 218, 151, 0.22);
+  background: linear-gradient(145deg, #fff4dc, #e8c58d);
+  box-shadow: 0 7px 0 rgba(43, 20, 8, 0.45), inset 0 1px 0 #fff;
 }
 .wc-game-status .wc-guest {
   width: 64px;
@@ -263,22 +275,23 @@ button {
   gap: 5px;
   justify-content: center;
   margin: 0;
-  padding: 12px;
-  border-radius: 20px;
-  /* та же разделочная доска, что и в арте блюд */
-  background-color: #efdcc1;
-  background-image: url(/img/ui_board_surface.webp);
+  padding: 14px;
+  border-radius: 22px;
+  background-color: #5a3018;
+  background-image: linear-gradient(rgba(53, 24, 10, 0.18), rgba(53, 24, 10, 0.18)), url(/img/ui_board_surface.webp);
   background-size: cover;
   background-position: center;
-  box-shadow: 0 6px 0 rgba(120, 60, 0, 0.18), inset 0 0 0 2px rgba(120, 60, 0, 0.08);
+  border: 2px solid #8e5527;
+  box-shadow: 0 9px 0 rgba(23, 10, 4, 0.5), inset 0 0 0 2px rgba(255, 207, 111, 0.12), inset 0 0 24px rgba(26, 10, 4, 0.32);
 }
 
 .wc-cell {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
-  background: rgba(120, 60, 0, 0.1);
-  box-shadow: inset 0 2px 3px rgba(90, 50, 10, 0.18);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(42, 19, 9, 0.52);
+  border: 1px dashed rgba(255, 196, 79, 0.22);
+  box-shadow: inset 0 2px 5px rgba(12, 5, 2, 0.42), 0 1px 0 rgba(255,255,255,0.04);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,7 +303,7 @@ button {
 .wc-cell.open { background: rgba(74, 40, 8, 0.28); color: transparent; }
 .wc-cell.filled {
   border: 1px solid rgba(151, 90, 27, 0.18);
-  background: linear-gradient(180deg, #fff5df, #efd3a3);
+  background: linear-gradient(180deg, #fff0c9, #dca968);
   color: #5a3200;
   box-shadow: 0 3px 0 rgba(120, 67, 18, 0.27), inset 0 1px 0 rgba(255, 255, 255, 0.75);
   animation: pop 0.25s ease;
@@ -327,15 +340,15 @@ button {
 }
 .wc-wordbar {
   display: flex;
-  min-height: 76px;
+  min-height: 72px;
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
-  border: 3px solid #edb642;
-  border-radius: 24px;
-  background: linear-gradient(180deg, #fff9e9, #ffefd0);
-  box-shadow: 0 5px 0 rgba(161, 105, 24, 0.24), inset 0 1px 0 #fff;
-  color: var(--ink);
+  border: 2px solid #c88b35;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fff5dc, #ead0a2);
+  box-shadow: 0 6px 0 rgba(42, 18, 7, 0.38), inset 0 1px 0 #fff;
+  color: var(--ink-dark);
 }
 .wc-wordbar.has-word { background: linear-gradient(180deg, #fffdf7, #fff0cf); }
 .wc-wordbar-letters {
@@ -353,7 +366,7 @@ button {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: linear-gradient(180deg, #ffc94e, #efa928);
+  background: linear-gradient(180deg, #ffd66c, #d99125);
   box-shadow: 0 4px 0 rgba(150, 86, 19, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   color: #5a3200;
   font-size: clamp(20px, 7vw, 29px);
@@ -373,8 +386,8 @@ button {
 
 .wc-wheel {
   position: relative;
-  width: min(320px, 86vw);
-  height: min(320px, 86vw);
+  width: min(330px, 88vw);
+  height: min(330px, 88vw);
   margin: 6px auto 0;
   touch-action: none;
   user-select: none;
@@ -382,26 +395,24 @@ button {
 
 .wc-tile {
   position: absolute;
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
-  border-radius: 20px;
-  clip-path: polygon(22% 0, 78% 0, 100% 22%, 100% 78%, 78% 100%, 22% 100%, 0 78%, 0 22%);
-  /* Восьмиугольные деревянные ингредиенты, как на концепте игрового экрана. */
-  background-color: #d9a15d;
-  background-image: url(/img/ui_tile_wood.webp);
+  width: 68px;
+  height: 68px;
+  margin: -34px 0 0 -34px;
+  border-radius: 50%;
+  background-color: #9a5b2d;
+  background-image: linear-gradient(rgba(92, 44, 19, 0.18), rgba(92, 44, 19, 0.18)), url(/img/ui_tile_wood.webp);
   background-size: cover;
   background-position: center;
   background-blend-mode: multiply;
-  box-shadow: 0 5px 0 rgba(90, 50, 10, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 0 rgba(35, 14, 5, 0.5), 0 8px 16px rgba(23, 9, 3, 0.22), inset 0 1px 0 rgba(255, 235, 181, 0.42);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
   font-weight: 900;
   text-transform: uppercase;
-  color: #5a3200;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+  color: #f5dfbc;
+  text-shadow: 0 2px 2px rgba(35, 12, 3, 0.7);
   transition: transform 0.08s ease, background 0.08s ease;
 }
 .wc-tile.used { transform: scale(0.82); opacity: 0.45; }
@@ -419,13 +430,13 @@ button {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin: 10px -6px 0;
+  margin: 10px -2px 0;
   padding: 8px;
-  border: 1px solid rgba(120, 60, 0, 0.12);
+  border: 1px solid rgba(255, 213, 128, 0.16);
   border-radius: 22px;
-  background: rgba(255, 246, 233, 0.94);
-  box-shadow: 0 9px 24px rgba(70, 38, 10, 0.16);
-  backdrop-filter: blur(12px);
+  background: rgba(47, 24, 12, 0.94);
+  box-shadow: 0 9px 24px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
 }
 .wc-action-button {
   display: flex;
@@ -436,11 +447,11 @@ button {
   justify-content: center;
   gap: 5px;
   padding: 8px 5px;
-  border: 1px solid rgba(120, 60, 0, 0.1);
+  border: 1px solid rgba(120, 60, 0, 0.16);
   border-radius: 19px;
-  background: linear-gradient(180deg, #fffdf7, #ffedcf);
-  box-shadow: 0 5px 0 rgba(120, 60, 0, 0.16);
-  color: var(--ink);
+  background: linear-gradient(180deg, #fff8e8, #e6c796);
+  box-shadow: 0 5px 0 rgba(23, 10, 4, 0.42), inset 0 1px 0 #fff;
+  color: #4b2a14;
   font-size: 11px;
   font-weight: 900;
   line-height: 1.1;
@@ -450,9 +461,10 @@ button {
 .wc-action-icon { flex: none; font-size: 22px; line-height: 1; }
 .wc-action-button.primary {
   border-color: transparent;
-  background: linear-gradient(180deg, #63d67c, var(--good));
-  box-shadow: 0 4px 0 rgba(24, 92, 40, 0.28);
+  background: linear-gradient(180deg, #52d86f, #1e9d47);
+  box-shadow: 0 4px 0 rgba(24, 92, 40, 0.35), inset 0 1px 0 rgba(255,255,255,.25);
   color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
 }
 .wc-action-button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 rgba(120, 60, 0, 0.15); }
 .wc-action-button:disabled { cursor: not-allowed; filter: grayscale(0.45); opacity: 0.48; }
@@ -1498,3 +1510,18 @@ button {
   .wc-win-dish { width: 66px; height: 66px; }
   .wc-win-reward, .wc-win-bonus { gap: 5px; padding: 7px 5px; }
 }
+
+
+/* ── visual refresh: ingredient-kitchen mobile treatment ───────────── */
+.wc-game-screen { position: relative; }
+.wc-game-screen::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; background:radial-gradient(circle at 15% 18%,rgba(102,177,88,.12),transparent 18%),radial-gradient(circle at 86% 42%,rgba(241,176,57,.12),transparent 20%); }
+.wc-game-screen .wc-level-header { margin-bottom:4px; }
+.wc-game-screen .wc-level-badge::before { content:"❧ "; color:#ffe28d; }
+.wc-game-screen .wc-dish-heading::before,.wc-game-screen .wc-dish-heading::after { content:""; display:inline-block; width:52px; height:1px; margin:0 14px 10px; background:linear-gradient(90deg,transparent,#e4b85f); vertical-align:middle; }
+.wc-game-screen .wc-dish-heading::after { background:linear-gradient(90deg,#e4b85f,transparent); }
+.wc-game-screen .wc-grid-scroll { filter:drop-shadow(0 10px 14px rgba(0,0,0,.18)); }
+.wc-game-screen .wc-cell.hot { box-shadow:inset 0 0 0 2px rgba(255,190,61,.82),inset 0 3px 6px rgba(40,16,5,.45); }
+.wc-game-screen .wc-tile { will-change:transform; }
+.wc-game-screen .wc-tile.on { box-shadow:0 7px 0 rgba(82,38,7,.46),0 10px 18px rgba(245,166,29,.28),inset 0 1px 0 rgba(255,255,255,.58); }
+.wc-game-screen .wc-wordbar-placeholder { color:#7a5a3c; }
+@media (max-width:390px) { .wc-shell{padding-left:9px;padding-right:9px}.wc-level-header{grid-template-columns:40px minmax(0,1fr) auto auto;gap:5px}.wc-level-coins{padding:0 8px}.wc-hint-action{min-width:58px}.wc-dish-heading{font-size:38px;padding-top:22px;padding-bottom:24px}.wc-dish-heading::before,.wc-dish-heading::after{width:32px;margin-left:7px;margin-right:7px}.wc-tile{width:62px;height:62px;margin:-31px 0 0 -31px;font-size:27px}.wc-word-chip{width:38px;height:44px} }
