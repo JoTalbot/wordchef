@@ -9,7 +9,7 @@ def test_health_reports_version_and_security_headers(client: TestClient):
     payload = response.json()
     assert payload["status"] == "ok"
     assert payload["game"] == "wordchef"
-    assert payload["version"] == "1.4.0"
+    assert payload["version"] == "1.4.1"
     assert isinstance(payload["uptime_s"], (int, float))
     assert payload["uptime_s"] >= 0
     assert response.headers["x-content-type-options"] == "nosniff"
