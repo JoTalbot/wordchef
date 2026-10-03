@@ -25,6 +25,16 @@ const DISH_ART: Record<string, string> = {
   "Сэндвич": "img/dish_sandwich.jpg",
   "Суп": "img/dish_soup.jpg",
   "Рулет": "img/dish_roll.jpg",
+  "Борщ": "img/dish_borsch.jpg",
+  "Шашлык": "img/dish_shashlik.jpg",
+  "Блины": "img/dish_bliny.jpg",
+  "Пирог": "img/dish_pirog.jpg",
+  "Пончик": "img/dish_donut.jpg",
+  "Вафли": "img/dish_waffles.jpg",
+  "Мороженое": "img/dish_icecream.jpg",
+  "Тако": "img/dish_taco.jpg",
+  "Плов": "img/dish_plov.jpg",
+  "Смузи": "img/dish_smoothie.jpg",
 };
 
 const GUEST_ART: Record<string, { img: string; nick: string }> = {

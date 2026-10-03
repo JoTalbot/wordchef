@@ -105,6 +105,69 @@
    "л"
   ]
  },
+ "1000": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "трибуна"
+   },
+   {
+    "across": false,
+    "c": 0,
+    "r": 0,
+    "word": "турбина"
+   },
+   {
+    "across": false,
+    "c": 2,
+    "r": -3,
+    "word": "рубин"
+   },
+   {
+    "across": true,
+    "c": 1,
+    "r": -3,
+    "word": "труба"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -6,
+    "word": "бинт"
+   },
+   {
+    "across": true,
+    "c": -1,
+    "r": -6,
+    "word": "туба"
+   },
+   {
+    "across": true,
+    "c": -2,
+    "r": -4,
+    "word": "уран"
+   }
+  ],
+  "bonus": [],
+  "dish": {
+   "emoji": "🥣",
+   "name": "Борщ"
+  },
+  "kitchen": "midnight",
+  "level_no": 1000,
+  "pool": "трибуна",
+  "wheel": [
+   "т",
+   "и",
+   "б",
+   "у",
+   "н",
+   "р",
+   "а"
+  ]
+ },
  "15": {
   "board": [
    {
@@ -287,8 +350,8 @@
   ],
   "bonus": [],
   "dish": {
-   "emoji": "🍕",
-   "name": "Пицца"
+   "emoji": "🍜",
+   "name": "Лапша"
   },
   "kitchen": "midnight",
   "level_no": 250,
@@ -406,6 +469,79 @@
    "а"
   ]
  },
+ "500": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "розетка"
+   },
+   {
+    "across": false,
+    "c": 1,
+    "r": -2,
+    "word": "азот"
+   },
+   {
+    "across": false,
+    "c": 4,
+    "r": -3,
+    "word": "корт"
+   },
+   {
+    "across": true,
+    "c": 4,
+    "r": -2,
+    "word": "отек"
+   },
+   {
+    "across": true,
+    "c": -2,
+    "r": -2,
+    "word": "река"
+   },
+   {
+    "across": false,
+    "c": -2,
+    "r": -2,
+    "word": "роза"
+   },
+   {
+    "across": false,
+    "c": 7,
+    "r": -4,
+    "word": "тока"
+   },
+   {
+    "across": true,
+    "c": 7,
+    "r": -4,
+    "word": "таз"
+   }
+  ],
+  "bonus": [
+   "актер",
+   "катер",
+   "терка"
+  ],
+  "dish": {
+   "emoji": "🥟",
+   "name": "Пельмени"
+  },
+  "kitchen": "midnight",
+  "level_no": 500,
+  "pool": "розетка",
+  "wheel": [
+   "о",
+   "а",
+   "е",
+   "р",
+   "з",
+   "т",
+   "к"
+  ]
+ },
  "7": {
   "board": [
    {
@@ -447,6 +583,79 @@
    "ч",
    "а",
    "а"
+  ]
+ },
+ "999": {
+  "board": [
+   {
+    "across": true,
+    "c": 0,
+    "r": 0,
+    "word": "лопатка"
+   },
+   {
+    "across": false,
+    "c": 0,
+    "r": 0,
+    "word": "лопата"
+   },
+   {
+    "across": false,
+    "c": 2,
+    "r": 0,
+    "word": "полка"
+   },
+   {
+    "across": false,
+    "c": 6,
+    "r": -2,
+    "word": "опал"
+   },
+   {
+    "across": true,
+    "c": 4,
+    "r": -2,
+    "word": "плот"
+   },
+   {
+    "across": false,
+    "c": 4,
+    "r": 0,
+    "word": "тока"
+   },
+   {
+    "across": true,
+    "c": 6,
+    "r": 1,
+    "word": "лак"
+   },
+   {
+    "across": false,
+    "c": 5,
+    "r": -4,
+    "word": "пол"
+   }
+  ],
+  "bonus": [
+   "патока",
+   "плакат",
+   "платок"
+  ],
+  "dish": {
+   "emoji": "🍥",
+   "name": "Рулет"
+  },
+  "kitchen": "midnight",
+  "level_no": 999,
+  "pool": "лопатка",
+  "wheel": [
+   "п",
+   "а",
+   "л",
+   "к",
+   "а",
+   "о",
+   "т"
   ]
  }
 }
