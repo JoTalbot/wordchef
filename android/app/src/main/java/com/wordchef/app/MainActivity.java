@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                return assetLoader.shouldInterceptRequest(url);
+                return assetLoader.shouldInterceptRequest(android.net.Uri.parse(url));
             }
         });
 
