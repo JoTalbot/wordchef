@@ -639,7 +639,7 @@ function LevelScreen({
   };
 
   return (
-    <div>
+    <div className="wc-game-screen">
       <div className="wc-level-header">
         <button
           type="button"
