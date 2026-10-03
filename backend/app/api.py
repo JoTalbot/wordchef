@@ -5,8 +5,8 @@ import asyncio
 import json
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel, Field, field_validator
 
 from app.service import GameError, GameService
 
@@ -24,23 +24,31 @@ def _err(exc: GameError) -> HTTPException:
 # ── models ──────────────────────────────────────────────────
 
 class RegisterBody(BaseModel):
-    name: str = Field(default="Chef", max_length=32)
+    name: str = Field(default="Chef", min_length=1, max_length=32)
+
+    @field_validator("name")
+    @classmethod
+    def clean_name(cls, value: str) -> str:
+        value = " ".join(value.split())
+        if not value:
+            raise ValueError("name must not be blank")
+        return value
 
 
 class CreateMatchBody(BaseModel):
     mode: str = "SOLO"
-    player_ids: list[str] = Field(default_factory=list)
+    player_ids: list[str] = Field(default_factory=list, max_length=8)
     kitchen_id: str = "street"
-    rounds: int = 3
-    seed: str = ""
+    rounds: int = Field(default=3, ge=1, le=12)
+    seed: str = Field(default="", max_length=128)
 
 
 class IntentBody(BaseModel):
-    player_id: str
-    action: str
-    word: str = ""
+    player_id: str = Field(min_length=1, max_length=64)
+    action: str = Field(min_length=1, max_length=32)
+    word: str = Field(default="", max_length=64)
     use_spice: bool = False
-    effect: str = ""
+    effect: str = Field(default="", max_length=32)
 
 
 # ── players ─────────────────────────────────────────────────
@@ -79,7 +87,7 @@ def info(request: Request):
 
 
 @router.get("/dictionary/check")
-def check_word(word: str, request: Request):
+def check_word(word: str = Query(max_length=64), request: Request = None):
     from wordchef_game.dictionary import load_dictionary
     dictionary = load_dictionary()
     return {"word": word.lower(), "is_word": dictionary.is_word(word),
@@ -178,7 +186,7 @@ def complete_level(body: LevelCompleteBody, request: Request):
 
 
 @router.get("/leaderboard")
-def leaderboard(request: Request, limit: int = 50):
+def leaderboard(request: Request, limit: int = Query(default=50, ge=1, le=100)):
     return {"season": "season-1", "entries": service(request).leaderboard(limit)}
 
 

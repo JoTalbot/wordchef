@@ -6,7 +6,7 @@ processes and platforms. The server is authoritative; the client only sends
 intents.
 """
 
-__version__ = "1.2.7"
+__version__ = "1.3.0"
 
 from .rng import Rng, derive_seed  # noqa: F401
 from .engine import MatchState, PlayerState, Outcome, apply_intent, start_match, start_round, end_round  # noqa: F401
