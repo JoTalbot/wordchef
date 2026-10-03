@@ -1,5 +1,7 @@
 # Architecture
 
+> 🇷🇺 Русская версия: [`docs/ru/architecture.md`](ru/architecture.md)
+
 ## Components
 
 | Layer | Path | Responsibility |

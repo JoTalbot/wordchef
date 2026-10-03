@@ -1,5 +1,7 @@
 # Testing
 
+> 🇷🇺 Русская версия: [`docs/ru/testing.md`](ru/testing.md)
+
 Run everything:
 
 ```bash

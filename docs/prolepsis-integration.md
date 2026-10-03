@@ -1,5 +1,7 @@
 # Prolepsis integration
 
+> 🇷🇺 Русская версия: [`docs/ru/prolepsis-integration.md`](ru/prolepsis-integration.md)
+
 Runtime: **Prolepsis v0.39.0** (WEAVE paradigm, Agent Platform v1,
 JACQUARD v0.4 patterns), vendored at `prolepsis/vendor/` and pinned by
 version. Two documented micro-patches (`vendor/PATCHES.md`) restore behavior

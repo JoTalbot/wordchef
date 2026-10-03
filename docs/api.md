@@ -1,5 +1,7 @@
 # API reference
 
+> 🇷🇺 Русская версия: [`docs/ru/api.md`](ru/api.md)
+
 Base URL: same origin as the game (default `http://localhost:8000`).
 All bodies/responses are JSON. Errors: `{"detail": {"code", "message"}}`.
 

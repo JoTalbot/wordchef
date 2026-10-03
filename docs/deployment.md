@@ -1,5 +1,7 @@
 # Deployment
 
+> 🇷🇺 Русская версия: [`docs/ru/deployment.md`](ru/deployment.md)
+
 ## Docker (recommended)
 
 ```bash

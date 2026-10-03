@@ -49,7 +49,7 @@ Word Chef — оригинальная мультиплеерная веб-иг�
 
 Оформление: единый набор арта в «пластилиновом» 3D-стиле (блюда, гости, кухни,
 медальоны, UI-иконки, баннеры). Соглашения по ассетам, промпт-скелет стиля и
-бюджет бандла — в [`docs/art-pipeline.md`](docs/art-pipeline.md).
+бюджет бандла — в [`docs/art-pipeline.md`](docs/ru/art-pipeline.md).
 
 ---
 
@@ -182,7 +182,7 @@ checkpoint_id · verified=true`.
 | GET | `/api/prolepsis/health\|ready\|version` | статус платформы |
 | WS | `/api/ws/matches/{id}` | живая лента (кадры SYNC + EVENT) |
 
-Полный справочник: [`docs/api.md`](docs/api.md).
+Полный справочник: [`docs/api.md`](docs/ru/api.md).
 
 ---
 
@@ -197,7 +197,7 @@ checkpoint_id · verified=true`.
   и **пересчитывается внутри Prolepsis**.
 * Ошибки сбрасывают Комбо (Древняя кухня щитит 1 уровень) и остужают Жар
   (Полночная кухня не остывает).
-* Полные правила: [`docs/game-rules.md`](docs/game-rules.md).
+* Полные правила: [`docs/game-rules.md`](docs/ru/game-rules.md).
 
 ---
 
@@ -245,7 +245,7 @@ tests/
   всё остальное отказывает по принципу fail-closed.
 * **Секреты**: секретов нет в IR и артефактах; матчмейкинг по match id; API
   никогда не доверяет клиентским часам. Разворачивайте за TLS
-  (см. [`docs/deployment.md`](docs/deployment.md)).
+  (см. [`docs/deployment.md`](docs/ru/deployment.md)).
 
 ---
 
@@ -256,21 +256,21 @@ tests/
   том; сервис переживает рестарты (протестировано).
 * Опционально: `python3 -m prolepsis._cli agent-serve --port 7397` как отдельный
   эндпоинт платформы для ops/аудита (health/ready/version/SSE).
-* Детали: [`docs/deployment.md`](docs/deployment.md).
+* Детали: [`docs/deployment.md`](docs/ru/deployment.md).
 
 ---
 
 ## 📚 Документация
 
-* [`docs/architecture.md`](docs/architecture.md) — компоненты и поток данных
-* [`docs/game-rules.md`](docs/game-rules.md) — полные правила и механики
-* [`docs/api.md`](docs/api.md) — справочник REST/WS
-* [`docs/prolepsis-integration.md`](docs/prolepsis-integration.md) — паттерны,
+* [`docs/architecture.md`](docs/ru/architecture.md) — компоненты и поток данных
+* [`docs/game-rules.md`](docs/ru/game-rules.md) — полные правила и механики
+* [`docs/api.md`](docs/ru/api.md) — справочник REST/WS
+* [`docs/prolepsis-integration.md`](docs/ru/prolepsis-integration.md) — паттерны,
   веверы, приёмка
-* [`docs/anti-cheat.md`](docs/anti-cheat.md) — модель угроз и защита
-* [`docs/testing.md`](docs/testing.md) — карта тестов и как их гонять
-* [`docs/deployment.md`](docs/deployment.md) — прод-заметки
-* [`docs/art-pipeline.md`](docs/art-pipeline.md) — арт и контент-пайплайн
+* [`docs/anti-cheat.md`](docs/ru/anti-cheat.md) — модель угроз и защита
+* [`docs/testing.md`](docs/ru/testing.md) — карта тестов и как их гонять
+* [`docs/deployment.md`](docs/ru/deployment.md) — прод-заметки
+* [`docs/art-pipeline.md`](docs/ru/art-pipeline.md) — арт и контент-пайплайн
 
 ---
 

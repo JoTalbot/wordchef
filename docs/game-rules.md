@@ -1,5 +1,7 @@
 # Game rules
 
+> 🇷🇺 Русская версия: [`docs/ru/game-rules.md`](ru/game-rules.md)
+
 ## The loop
 
 ```

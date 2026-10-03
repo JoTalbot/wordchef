@@ -62,6 +62,12 @@ const DISH_ART: Record<string, string> = {
   "Картошка": "img/dish_kartoshka.webp",
   "Лимонад": "img/dish_limonad.webp",
   "Какао": "img/dish_kakao.webp",
+  "Оладушки": "img/dish_oladushki.webp",
+  "Драники": "img/dish_draniki.webp",
+  "Голубцы": "img/dish_golubcy.webp",
+  "Бефстроганов": "img/dish_beefstroganoff.webp",
+  "Пахлава": "img/dish_pahlava.webp",
+  "Эклер": "img/dish_ekler.webp",
 };
 
 const GUEST_ART: Record<string, { img: string; nick: string }> = {

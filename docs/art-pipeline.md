@@ -1,5 +1,7 @@
 # Word Chef · art & content pipeline
 
+> 🇷🇺 Русская версия: [`docs/ru/art-pipeline.md`](ru/art-pipeline.md)
+
 Everything a future "add more dishes / kitchens / guests" commit needs to know.
 Scope: the campaign UI (`frontend/components/ChefGame.tsx`), the level engine
 (`game/wordchef_game/levels.py` + its TS mirror) and the asset set in
@@ -26,6 +28,14 @@ plasticine material, warm palette, **seamless cream-beige background**
 `scripts/to_webp.py` конвертирует и переписывает все ссылки, а
 `tests/frontend/test_art_integrity.py::TestArtFormat` следит, чтобы `.jpg`
 не вернулся ни в код, ни в каталог.
+
+**Banners are a separate visual family.** Dishes and characters are
+"plasticine"; banners (`mode_*`, `lobby_banner`, `results_banner`, `howto`,
+`hero`, `splash`, `grandtour`, `grand_map`, `recipe_book`, `celebrate`) are
+detailed 2D painterly cartoon: dark wood, brass lamps, steam, flying tickets,
+warm amber palette. A new banner must join *that* family — prompt it as
+`Vibrant 2D cartoon game banner: …` and end with
+`wide banner composition 2:1, no text, no lettering, no watermark`.
 
 Reference prompt skeleton (swap the subject line, keep the rest):
 
@@ -108,6 +118,7 @@ Android build embeds `frontend/out` in the APK assets.
 | after 620² normalisation + 28 dishes + icons | 3.59 MB | 417 KB headroom |
 | after 38 dishes + UI icons + RU build | 3.47 MB | 538 KB headroom |
 | after 48 dishes + WebP migration | **2.64 MB** | 1393 KB headroom |
+| after 54 dishes + refreshed banners | 2.69 MB | 1338 KB headroom |
 
 Rules of thumb:
 
@@ -125,7 +136,24 @@ WebP migration is **done** (`scripts/to_webp.py`): image payload fell from
 headroom ever gets tight again, the next levers are: 384² dishes (still above
 the 140 px display size), and dropping the two 820-wide banners to 640.
 
-## 6 · Level fixtures & parity
+## 6 · Android build
+
+```bash
+TOOLS_DIR=~/.cache/wc-tools bash scripts/bootstrap_android_tools.sh   # JDK 17 + Gradle 8.7 + SDK 34
+JAVA_HOME=… ANDROID_HOME=… GRADLE=…/gradle-8.7/bin/gradle bash scripts/build_android.sh
+```
+
+Verified end to end: `assembleRelease` produces a signed APK in ~50 s;
+`assets/www` inside it carries 93 WebP files, zero JPEG, `_next` renamed to
+`next`, all references relative (`./next/…`, `img/…`), signature scheme v2
+valid (`apksigner verify`).
+
+Why the rename matters: AAPT skips asset directories whose name starts with
+`_`, so WebView would find neither JS nor images under `file://`. The build
+script rewrites `_next` → `next` and makes URLs relative; if a future asset
+directory starts with `_`, add it to that same rewrite step.
+
+## 7 · Level fixtures & parity
 
 ```bash
 python3 scripts/regen_levels_golden.py            # show churn (no writes)

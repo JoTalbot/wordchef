@@ -1,5 +1,7 @@
 # Anti-cheat
 
+> 🇷🇺 Русская версия: [`docs/ru/anti-cheat.md`](ru/anti-cheat.md)
+
 ## Threat model
 
 An attacker controls **everything the client sends**: HTTP bodies, WebSocket
