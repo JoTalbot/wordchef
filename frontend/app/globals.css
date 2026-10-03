@@ -1843,3 +1843,74 @@ button {
   .wc-multi-screen .letters .letter { width:44px; height:44px; }
   .wc-win-modal { border-radius:22px; }
 }
+
+
+/* ── final mobile polish: remove legacy cool accents + accessibility ───── */
+.wc-btn.alt {
+  background: linear-gradient(180deg,#d8ad57,#a66a2a);
+  color:#fff6df;
+  border:1px solid rgba(255,221,145,.24);
+}
+.chip.blue {
+  background:#e0b86f;
+  color:#4d2a13;
+}
+.wc-wordbar.has-word {
+  background:linear-gradient(180deg,#fff1cf,#d9ab63);
+  border-color:#b77730;
+  color:#4d2b15;
+}
+.wc-game-status {
+  border-radius:20px;
+}
+.wc-game-status .wc-progress-caption {
+  color:#76583b;
+}
+.wc-game-status .wc-progress-caption strong {
+  color:#4b2915;
+}
+.wc-game-screen .wc-btn.alt {
+  background:linear-gradient(180deg,#d9ad57,#a86a2b);
+}
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline:3px solid #ffd76f;
+  outline-offset:3px;
+}
+.wc-shell img {
+  max-width:100%;
+}
+.wc-win-modal {
+  max-height:calc(100dvh - 28px);
+  padding-bottom:calc(17px + env(safe-area-inset-bottom));
+}
+@media (max-width:430px) {
+  .wc-shell {
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+  .wc-level-header {
+    grid-template-columns:42px minmax(0,1fr) auto auto;
+    gap:6px;
+    padding:7px;
+  }
+  .wc-level-back,
+  .wc-level-badge,
+  .wc-level-coins,
+  .wc-hint-action {
+    height:42px;
+  }
+  .wc-level-back { width:42px; }
+  .wc-level-coins { padding-inline:7px; }
+  .wc-hint-action { min-width:56px; padding-inline:7px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:auto !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+}
