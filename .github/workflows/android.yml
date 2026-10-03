@@ -1,6 +1,7 @@
 name: WordChef Android APK
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "android/**"
