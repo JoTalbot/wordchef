@@ -1,0 +1,45 @@
+name: WordChef frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Verify exported bundle
+        working-directory: .
+        run: |
+          test -f frontend/out/index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          out = Path("frontend/out")
+          total = sum(p.stat().st_size for p in out.rglob("*") if p.is_file())
+          assert total < 4 * 1024 * 1024, f"bundle too large: {total}"
+          html = (out / "index.html").read_text(encoding="utf-8")
+          assert "Word Chef" in html
+          assert "width=device-width" in html
+          for marker in ("cdn.", "unpkg.com", "fonts.googleapis"):
+              assert marker not in html
+          print(f"export verified: {total} bytes")
+          PY
