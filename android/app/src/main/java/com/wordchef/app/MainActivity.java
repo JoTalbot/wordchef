@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
         assetLoader = new WebViewAssetLoader.Builder()
                 .addPathHandler(
                         "/",
-                        new WebViewAssetLoader.AssetsPathHandler(getAssets(), "www")
+                        new WebViewAssetLoader.AssetsPathHandler(this)
                 )
                 .build();
 
