@@ -14,9 +14,9 @@ import androidx.webkit.WebViewAssetLoader;
 /**
  * Word Chef WebView shell over the packaged Next.js export.
  *
- * WebViewAssetLoader exposes the complete assets/www tree through the
- * standard local HTTPS origin, so Next.js root-relative /_next and /img
- * URLs resolve exactly as they do on the web.
+ * Keep the packaged export under a dedicated virtual /assets/ path.
+ * Next.js emits root-relative /_next and /img URLs, so expose those
+ * directories explicitly through the same local HTTPS origin.
  */
 public class MainActivity extends Activity {
     private WebView web;
@@ -39,7 +39,15 @@ public class MainActivity extends Activity {
 
         assetLoader = new WebViewAssetLoader.Builder()
                 .addPathHandler(
-                        "/",
+                        "/assets/",
+                        new WebViewAssetLoader.AssetsPathHandler(this)
+                )
+                .addPathHandler(
+                        "/_next/",
+                        new WebViewAssetLoader.AssetsPathHandler(this)
+                )
+                .addPathHandler(
+                        "/img/",
                         new WebViewAssetLoader.AssetsPathHandler(this)
                 )
                 .build();
@@ -66,7 +74,7 @@ public class MainActivity extends Activity {
         });
 
         web.setBackgroundColor(0xFFFFF6E9);
-        web.loadUrl("https://appassets.androidplatform.net/index.html");
+        web.loadUrl("https://appassets.androidplatform.net/assets/index.html");
     }
 
     @Override
