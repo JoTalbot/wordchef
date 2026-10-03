@@ -5,7 +5,7 @@ import asyncio
 import json
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field, field_validator
 
 from app.service import GameError, GameService
@@ -87,7 +87,7 @@ def info(request: Request):
 
 
 @router.get("/dictionary/check")
-def check_word(word: str = Field(max_length=64), request: Request = None):
+def check_word(word: str = Query(max_length=64), request: Request = None):
     from wordchef_game.dictionary import load_dictionary
     dictionary = load_dictionary()
     return {"word": word.lower(), "is_word": dictionary.is_word(word),
@@ -186,7 +186,7 @@ def complete_level(body: LevelCompleteBody, request: Request):
 
 
 @router.get("/leaderboard")
-def leaderboard(request: Request, limit: int = Field(default=50, ge=1, le=100)):
+def leaderboard(request: Request, limit: int = Query(default=50, ge=1, le=100)):
     return {"season": "season-1", "entries": service(request).leaderboard(limit)}
 
 
