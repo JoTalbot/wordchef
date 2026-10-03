@@ -29,10 +29,49 @@ interface Pop {
 }
 
 const MODES = [
-  { id: 'SOLO', title: 'Solo Service', sub: 'You vs. the dinner rush' },
-  { id: 'QUICK_COOK', title: 'Quick Cook', sub: 'Same ticket for everyone' },
-  { id: 'CHAOSS', title: 'Chaos Kitchen', sub: 'Sabotage allowed' },
+  { id: 'SOLO', title: 'Соло-смена', sub: 'Ты против вечернего наплыва' },
+  { id: 'QUICK_COOK', title: 'Быстрая готовка', sub: 'Всем один и тот же заказ' },
+  { id: 'CHAOSS', title: 'Хаос-кухня', sub: 'Саботаж разрешён' },
 ];
+
+// ── RU labels for protocol enums (server speaks codes, players read Russian) ──
+const MODE_RU: Record<string, string> = {
+  SOLO: 'соло-смена', QUICK_COOK: 'быстрая готовка', CHAOS_KITCHEN: 'хаос-кухня',
+};
+const KIND_RU: Record<string, string> = {
+  SINGLE_WORD: 'любое блюдо', MIN_LENGTH: 'минимум букв', CONTAINS_LETTER: 'нужна буква',
+  THEME: 'меню', STREAK: 'серия', SPEED: 'на скорость',
+};
+const FLAVOR_RU: Record<string, string> = {
+  sweet: 'сладкое', savory: 'солёное', umami: 'умами',
+  tangy: 'кисленькое', rich: 'насыщенное', classic: 'классика',
+};
+const THEME_RU: Record<string, string> = {
+  'street food': 'уличная еда', bakery: 'пекарня', sushi: 'суши', space: 'космос',
+  cyber: 'кибер', ancient: 'древность', 'night market': 'ночной рынок',
+};
+
+/** Rejection codes from the engine (orders.check_order / scoring) → human RU. */
+function ruReason(reason: string): string {
+  if (reason.startsWith('needs_at_least_')) {
+    const n = reason.replace(/\D/g, '');
+    return `нужно минимум ${n} букв`;
+  }
+  if (reason.startsWith('needs_letter_')) return `нужна буква «${reason.slice(-1).toUpperCase()}»`;
+  if (reason.startsWith('not_on_the_')) {
+    const theme = reason.slice('not_on_the_'.length, -'_menu'.length).replace(/_/g, ' ');
+    return `нет в меню «${THEME_RU[theme] ?? theme}»`;
+  }
+  const MAP: Record<string, string> = {
+    empty_word: 'пустое слово',
+    not_in_dictionary: 'такого слова нет в словаре',
+    not_formable_from_tray: 'из этих букв не собрать',
+    word_already_served: 'это слово уже подано',
+    order_expired: 'заказ сгорел — не успел',
+    ok: 'готово',
+  };
+  return MAP[reason] ?? reason.replace(/_/g, ' ');
+}
 
 export default function GameClient() {
   const [screen, setScreen] = useState<Screen>('home');
@@ -80,7 +119,7 @@ export default function GameClient() {
       }
       if (type === 'ROUND_STARTED') say(`Round ${event.round_no} — service!`);
       if (type === 'MATCH_FINISHED') {
-        say('Match finished!');
+        say('Матч завершён!');
         setScreen('results');
       }
       void refresh();
@@ -113,9 +152,9 @@ export default function GameClient() {
   }, [playerId, screen]);
 
   async function register() {
-    const player = await api.register(name || 'Chef');
+    const player = await api.register(name || 'Повар');
     setPlayerId(player.player_id);
-    say(`Welcome, ${player.name}!`);
+    say(`Добро пожаловать, ${player.name}!`);
     setScreen('lobby');
   }
 
@@ -161,7 +200,7 @@ export default function GameClient() {
           secret: Boolean(dish?.secret_hit),
         });
         setTimeout(() => setPop(null), 950);
-        if (dish?.secret_hit) say('SECRET MENU cracked! +50%');
+        if (dish?.secret_hit) say('Секретное меню раскрыто! +50%');
       } else if (res.action === 'SUBMIT_DISH' && res.accepted) {
         say(`Rejected: ${res.reason.replace(/_/g, ' ')}`);
       } else if (!res.accepted) {
@@ -193,14 +232,14 @@ export default function GameClient() {
       <div className="shell">
         <div className="brand">
           <h1>WORD CHEF</h1>
-          <div className="tagline">COOK WORDS · SERVE DISHES · RIDE THE HEAT</div>
+          <div className="tagline">ГОТОВЬ СЛОВА · ПОДАВАЙ БЛЮДА · ДЕРЖИ ЖАР</div>
         </div>
         <div className="panel">
-          <h2>CHEF PROFILE</h2>
+          <h2>ПРОФИЛЬ ШЕФА</h2>
           <div className="row">
             <input
               className="field"
-              placeholder="Your chef name"
+              placeholder="Имя вашего шефа"
               value={name}
               maxLength={24}
               onChange={(e) => setName(e.target.value)}
@@ -208,22 +247,22 @@ export default function GameClient() {
             />
           </div>
           <button className="btn primary" style={{ width: '100%', marginTop: 10 }} onClick={() => void register()}>
-            ENTER THE KITCHEN
+            ВОЙТИ НА КУХНЮ
           </button>
         </div>
         <div className="panel">
           <div className="gc-banner" style={{ backgroundImage: "url(img/howto.jpg)" }} />
-          <h2>HOW TO COOK</h2>
+          <h2>КАК ГОТОВИТЬ</h2>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
-            🍳 Tap letters to build a <b style={{ color: 'var(--text)' }}>dish</b> (word) that satisfies the customer order.<br />
-            🔥 Success feeds <b style={{ color: 'var(--accent)' }}>Heat</b> and <b style={{ color: 'var(--green)' }}>Combo</b> — bigger multipliers, harder tickets.<br />
-            🌶️ Arm <b style={{ color: 'var(--red)' }}>Spice</b> for ×2 points... but a flop burns your combo.<br />
-            ⭐ Rare letters are <b style={{ color: 'var(--gold)' }}>Golden Ingredients</b> — spend them on time, restocks or boosts.<br />
-            🍽️ Short <b style={{ color: 'var(--text)' }}>prep</b> words bank points without breaking combo.
+            🍳 Тапай буквы и собирай <b style={{ color: 'var(--text)' }}>блюдо</b> (слово) под заказ гостя.<br />
+            🔥 Успех кормит <b style={{ color: 'var(--accent)' }}>Жар</b> и <b style={{ color: 'var(--green)' }}>Комбо</b> — множители выше, заказы сложнее.<br />
+            🌶️ Заряди <b style={{ color: 'var(--red)' }}>Приправу</b> на ×2 очка… но провал сжигает комбо.<br />
+            ⭐ Редкие буквы — <b style={{ color: 'var(--gold)' }}>золотые ингредиенты</b>: трать их на время, замену букв или бусты.<br />
+            🍽️ Короткие <b style={{ color: 'var(--text)' }}>заготовки</b> копят очки и не рвут комбо.
           </div>
         </div>
         <div className="footer-note">
-          server-authoritative · every dish sealed on the Prolepsis loom<br />
+          всё считает сервер · каждое блюдо запечатано на станке Prolepsis<br />
           execution id · digest · artifacts · replay-verified
         </div>
       </div>
@@ -235,11 +274,11 @@ export default function GameClient() {
       <div className="shell">
         <div className="brand">
           <h1>WORD CHEF</h1>
-          <div className="tagline">SERVICE SETUP</div>
+          <div className="tagline">СБОР СМЕНЫ</div>
         </div>
         <div className="gc-banner" style={{ backgroundImage: "url(img/lobby_banner.jpg)" }} />
         <div className="panel">
-          <h2>GAME MODE</h2>
+          <h2>РЕЖИМ ИГРЫ</h2>
           <div className="select-grid">
             {MODES.map((m) => (
               <button
@@ -253,19 +292,19 @@ export default function GameClient() {
               </button>
             ))}
           </div>
-          <h2 style={{ marginTop: 14 }}>ROUNDS</h2>
+          <h2 style={{ marginTop: 14 }}>РАУНДЫ</h2>
           <div className="row">
             {[2, 3, 5].map((r) => (
               <button key={r} className={`btn small ${rounds === r ? 'primary' : ''}`} onClick={() => setRounds(r)}>
-                {r} rounds
+                {r} {r === 5 ? 'раундов' : 'раунда'}
               </button>
             ))}
           </div>
           <button className="btn primary" style={{ width: '100%', marginTop: 14 }} onClick={() => void createMatch()}>
-            START SERVICE
+            НАЧАТЬ СМЕНУ
           </button>
           <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8, textAlign: 'center' }}>
-            Multiplayer: share the match code after start — chefs join the same kitchen.
+            Мультиплеер: после старта поделитесь кодом матча — шефы зайдут на ту же кухню.
           </div>
         </div>
       </div>
@@ -277,18 +316,18 @@ export default function GameClient() {
     return (
       <div className="shell">
         <div className="brand">
-          <h1>SERVICE OVER</h1>
-          <div className="tagline">{match?.mode?.replace('_', ' ')}</div>
+          <h1>СМЕНА ОКОНЧЕНА</h1>
+          <div className="tagline">{MODE_RU[match?.mode ?? ''] ?? match?.mode}</div>
         </div>
         <div className="gc-banner" style={{ backgroundImage: "url(img/results_banner.jpg)" }} />
         <div className="panel">
-          <h2>FINAL STANDINGS</h2>
+          <h2>ИТОГИ</h2>
           {board.map((row: BoardRow) => (
             <div key={row.player_id} className={`board-row ${row.player_id === playerId ? 'me' : ''}`}>
               <div className="pos">#{row.position}</div>
               <div className="who">
                 {row.display_name}
-                {row.best_word ? <span style={{ color: 'var(--muted)' }}> · best “{row.best_word}”</span> : null}
+                {row.best_word ? <span style={{ color: 'var(--muted)' }}> · лучшее «{row.best_word}»</span> : null}
               </div>
               <div className="pts">{row.score.toLocaleString()}</div>
             </div>
@@ -296,20 +335,20 @@ export default function GameClient() {
         </div>
         <div className="row">
           <button className="btn" onClick={() => { setScreen('lobby'); setMatchId(''); setMatch(null); setMe(null); }}>
-            NEW MATCH
+            НОВЫЙ МАТЧ
           </button>
           <button
             className="btn primary"
             onClick={async () => {
               const verdict = await api.verify(matchId);
-              say(`Replay verification: ${verdict.verdict}`);
+              say(`Проверка реплея: ${verdict.verdict}`);
             }}
           >
-            REPLAY & VERIFY
+            РЕПЛЕЙ И ПРОВЕРКА
           </button>
         </div>
         <div className="footer-note">
-          every result is sealed as a Prolepsis execution — replay any match byte-exactly
+          каждый результат запечатан как Prolepsis-исполнение — любой матч воспроизводится байт-в-байт
         </div>
       </div>
     );
@@ -338,15 +377,15 @@ export default function GameClient() {
 
       <div className="hud">
         <div className="hud-card heat">
-          <div className="label"><img className="gc-flame" src="img/combo_flame.jpg" alt="" /> HEAT</div>
+          <div className="label"><img className="gc-flame" src="img/combo_flame.jpg" alt="" /> ЖАР</div>
           <div className="value">{me?.heat ?? 0}</div>
         </div>
         <div className="hud-card combo">
-          <div className="label">🍳 COMBO</div>
+          <div className="label">🍳 КОМБО</div>
           <div className="value">×{(1 + Math.min(4, (me?.combo ?? 0) * 0.25)).toFixed(2)}</div>
         </div>
         <div className="hud-card score">
-          <div className="label">⭐ SCORE</div>
+          <div className="label">⭐ ОЧКИ</div>
           <div className="value">{(me?.score ?? 0).toLocaleString()}</div>
         </div>
       </div>
@@ -359,8 +398,8 @@ export default function GameClient() {
             alt=""
           />
           <div className="customer-name">
-            CUSTOMER · ROUND {match?.round_no ?? 1}/{match?.rounds_total ?? 3}
-            {order ? ` · ${order.kind.replace(/_/g, ' ')}` : ''}
+            ГОСТЬ · РАУНД {match?.round_no ?? 1}/{match?.rounds_total ?? 3}
+            {order ? ` · ${KIND_RU[order.kind] ?? order.kind}` : ''}
           </div>
           <div className={`timer ${low ? 'low' : ''}`}>
             {String(Math.floor(left / 60)).padStart(2, '0')}:{String(Math.floor(left % 60)).padStart(2, '0')}
@@ -368,13 +407,13 @@ export default function GameClient() {
         </div>
         <div className="request">{describeOrder(order, me)}</div>
         <div className="constraints">
-          {order?.flavor_request ? <span className="chip green">craves {order.flavor_request}</span> : null}
-          {order?.theme ? <span className="chip blue">menu: {order.theme}</span> : null}
-          {order?.required_letter ? <span className="chip">needs “{order.required_letter.toUpperCase()}”</span> : null}
-          {order?.min_length ? <span className="chip">≥ {order.min_length} letters</span> : null}
-          {order?.has_secret ? <span className="chip gold">a secret menu lurks…</span> : null}
-          {me?.boost_armed ? <span className="chip gold">boost ×1.5 armed</span> : null}
-          {order && order.streak_left > 1 ? <span className="chip blue">streak {order.streak_left} to go</span> : null}
+          {order?.flavor_request ? <span className="chip green">хочет: {FLAVOR_RU[order.flavor_request] ?? order.flavor_request}</span> : null}
+          {order?.theme ? <span className="chip blue">меню: {THEME_RU[order.theme] ?? order.theme}</span> : null}
+          {order?.required_letter ? <span className="chip">нужна буква «{order.required_letter.toUpperCase()}»</span> : null}
+          {order?.min_length ? <span className="chip">≥ {order.min_length} букв</span> : null}
+          {order?.has_secret ? <span className="chip gold">где-то здесь секретное меню…</span> : null}
+          {me?.boost_armed ? <span className="chip gold">буст ×1.5 заряжен</span> : null}
+          {order && order.streak_left > 1 ? <span className="chip blue">серия: осталось {order.streak_left}</span> : null}
         </div>
         <div className="progress">
           <div style={{ width: `${pct}%` }} />
@@ -397,33 +436,33 @@ export default function GameClient() {
         <div className="word-preview" onClick={undo}>
           {composedWord
             ? composedWord.split('').map((c, i) => <span key={i}>{c.toUpperCase()}</span>)
-            : <span className="blank">TAP LETTERS</span>}
+            : <span className="blank">ТАПАЙ БУКВЫ</span>}
           <span className="cursor" />
         </div>
         <div className="actions">
           <button className="btn primary" disabled={busy || !composedWord} onClick={() => void cook()}>
-            🍽️ COOK
+            🍽️ ГОТОВИТЬ
           </button>
           <button
             className={`btn spice ${spiceArmed ? 'armed' : ''}`}
             disabled={busy || (me?.spice_charges ?? 0) <= 0}
             onClick={() => setSpiceArmed((s) => !s)}
           >
-            <img className="gc-spice" src="img/spice.jpg" alt="" /> SPICE {me?.spice_charges ?? 0}
+            <img className="gc-spice" src="img/spice.jpg" alt="" /> ПРИПРАВА {me?.spice_charges ?? 0}
           </button>
           <button className="btn" disabled={busy || composedWord.length > 3 || composedWord.length < 2} onClick={() => void prep()}>
-            PREP
+            ЗАГОТОВКА
           </button>
         </div>
         <div className="utility">
           <button className="btn small" disabled={busy || (me?.golden ?? 0) < 1} onClick={() => void golden('patience')}>
-            ⏱ +15s ({me?.golden ?? 0}⭐)
+            ⏱ +15с ({me?.golden ?? 0}⭐)
           </button>
           <button className="btn small" disabled={busy || (me?.golden ?? 0) < 3} onClick={() => void golden('restock')}>
-            🧺 restock (3⭐)
+            🧺 замена букв (3⭐)
           </button>
           <button className="btn small" disabled={busy} onClick={() => void skip()}>
-            skip order
+            пропустить заказ
           </button>
         </div>
       </div>
@@ -431,14 +470,14 @@ export default function GameClient() {
       <div className={`feedback ${result?.reason === 'dish_served' ? 'good' : result ? 'bad' : ''}`}>
         {result
           ? result.reason === 'dish_served'
-            ? `Delicious! +${result.payload.score_delta ?? 0} pts`
-            : result.reason.replace(/_/g, ' ')
-          : 'Serve a dish to score'}
+            ? `Вкусно! +${result.payload.score_delta ?? 0} очков`
+            : ruReason(result.reason)
+          : 'Подай блюдо — получишь очки'}
       </div>
 
       <div className="panel">
         <h2>
-          <img className="gc-inline-icon" src="img/ui_trophy.jpg" alt="" /> STANDINGS
+          <img className="gc-inline-icon" src="img/ui_trophy.jpg" alt="" /> ТАБЛИЦА
         </h2>
         {(match?.leaderboard ?? []).map((row: BoardRow) => (
           <div key={row.player_id} className={`board-row ${row.player_id === playerId ? 'me' : ''}`}>
@@ -450,7 +489,7 @@ export default function GameClient() {
         {chaosFeed.length > 0 && (
           <div style={{ marginTop: 10 }}>
             <div className="gc-banner slim" style={{ backgroundImage: "url(img/chaos_feed.jpg)" }} />
-            <h2>CHAOS FEED</h2>
+            <h2>ХАОС-ЛЕНТА</h2>
             {chaosFeed.map((line, i) => (
               <div key={i} style={{ fontSize: 12, color: 'var(--accent2)', padding: '2px 0' }}>⚡ {line}</div>
             ))}
@@ -460,17 +499,17 @@ export default function GameClient() {
 
       <div className="row">
         <button className="btn small" disabled={busy || (me?.golden ?? 0) < 1} onClick={() => void ringBell()}>
-          <img className="gc-inline-icon" src="img/ui_bell.jpg" alt="" /> ring the chaos bell (1⭐)
+          <img className="gc-inline-icon" src="img/ui_bell.jpg" alt="" /> звон в хаос-колокол (1⭐)
         </button>
         <button
           className="btn small"
           disabled={busy}
           onClick={async () => {
             const dish = result?.payload.dish as { word?: string } | undefined;
-            say(dish?.word ? `Last dish: ${dish.word}` : 'No dish served yet');
+            say(dish?.word ? `Последнее блюдо: ${dish.word}` : 'Блюдо пока не подано');
           }}
         >
-          last dish
+          последнее блюдо
         </button>
       </div>
 
@@ -480,7 +519,7 @@ export default function GameClient() {
           <div className="plate">{pop.secret ? '🏆' : '🍽️'}</div>
           <div className="delta">+{pop.delta}</div>
           <div className="meta">
-            COMBO ×{pop.combo} {pop.golden > 0 ? `· +${pop.golden} GOLDEN ⭐` : ''}
+            КОМБО ×{pop.combo} {pop.golden > 0 ? `· +${pop.golden} ЗОЛОТО ⭐` : ''}
           </div>
         </div>
       ) : null}
@@ -492,19 +531,19 @@ function describeOrder(
   order: { kind: string; min_length: number; required_letter: string; theme: string; streak_needed: number; streak_left: number } | null,
   me: PlayerView | null,
 ): string {
-  if (!order) return me?.order ? 'Reading the ticket…' : 'Waiting for the next round…';
+  if (!order) return me?.order ? 'Читаем заказ…' : 'Ждём следующий раунд…';
   switch (order.kind) {
     case 'MIN_LENGTH':
-      return `Prepare at least a ${order.min_length}-letter dish`;
+      return `Приготовь блюдо минимум из ${order.min_length} букв`;
     case 'CONTAINS_LETTER':
-      return `Something with “${order.required_letter.toUpperCase()}”, chef!`;
+      return `Блюдо с буквой «${order.required_letter.toUpperCase()}», шеф!`;
     case 'THEME':
-      return `Surprise me from the ${order.theme} menu`;
+      return `Удиви меня из меню «${THEME_RU[order.theme] ?? order.theme}»`;
     case 'STREAK':
-      return `${order.streak_left} dishes in a row — go go go!`;
+      return `${order.streak_left} блюда подряд — давай-давай!`;
     case 'SPEED':
-      return 'Quick! A dish before I change my mind';
+      return 'Быстро! Блюдо, пока я не передумал';
     default:
-      return 'Prepare a dish from these ingredients';
+      return 'Приготовь блюдо из этих букв';
   }
 }

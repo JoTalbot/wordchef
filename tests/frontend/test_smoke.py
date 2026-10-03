@@ -20,8 +20,13 @@ class TestFrontendBuild:
         chunks = list((OUT / "_next" / "static").rglob("*.js"))
         assert chunks, "no JS chunks exported"
         blob = "\n".join(p.read_text(encoding="utf-8", errors="ignore") for p in chunks)
-        # the client must speak the server protocol
-        for marker in ("/api/matches", "/api/players", "SUBMIT_DISH", "SPICE"):
+        # the client must speak the server protocol. The markers below are the
+        # intents and endpoints that actually cross the wire — engine.apply_intent
+        # accepts SUBMIT_DISH / PREP / GOLDEN / RING_BELL / SKIP, spice is a flag
+        # on SUBMIT_DISH (`use_spice`). Do not assert on UI labels here: they are
+        # localised, the protocol is not.
+        for marker in ("/api/matches", "/api/players", "SUBMIT_DISH", "use_spice",
+                       "PREP", "GOLDEN", "RING_BELL", "SKIP"):
             assert marker in blob, f"missing protocol marker {marker}"
 
     def test_bundle_stays_small(self):

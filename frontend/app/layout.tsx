@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Word Chef — cook words, serve dishes',
+  title: 'Word Chef — готовь слова, подавай блюда',
   description:
-    'Dynamic multiplayer word-cooking: assemble dishes from letters, chase combos, ride the heat, spice the risk.',
+    'Мультиплеерная игра-кухня на словах: собирай блюда из букв, лови комбо, держи жар и рискуй с приправой.',
 };
 
 export const viewport: Viewport = {
@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body>{children}</body>
     </html>
   );

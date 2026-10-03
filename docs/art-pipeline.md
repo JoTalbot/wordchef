@@ -15,9 +15,9 @@ plasticine material, warm palette, **seamless cream-beige background**
 
 | Kind | Files | Canvas shipped | Display size |
 |---|---|---|---|
-| Dishes | `dish_<latin>.jpg` | 620 × 620 | 92 px (`.wc-dish-img`), 140 px (`.big-img`) |
-| Guests | `guest_<kitchen>.jpg` | 620 × 620 | 52 px round (`.wc-guest`) |
-| Kitchens | `kitchen_<id>.jpg` | 560 × 560 | 48 px (map) |
+| Dishes | `dish_<latin>.jpg` | 512 × 512 (≤ 60 KB) | 92 px (`.wc-dish-img`), 140 px (`.big-img`) |
+| Guests | `guest_<kitchen>.jpg` | 512 × 512 (≤ 60 KB) | 52 px round (`.wc-guest`) |
+| Kitchens | `kitchen_<id>.jpg` | 512 × 512 (≤ 60 KB) | 48 px (map) |
 | UI icons | `ui_<name>.jpg` | 256 × 256 | 18–54 px inline |
 | Medals | `ach_{gold,silver,bronze}.jpg` | 360 × 360 | 34–56 px |
 | Banners | `hero.jpg` 820 × 410, `splash.jpg` 349 × 620, others 1:1–2:1 | — | CSS `background-size: cover` |
@@ -43,8 +43,16 @@ plain warm cream-beige background — …`.
    its `DISHES`. Order is part of the contract between the two engines.
 3. `frontend/components/ChefGame.tsx` → add `"<Название>": "img/dish_<latin>.jpg"`
    to `DISH_ART` (fallback is `dish_salad.jpg`).
-4. Drop the art into `frontend/public/img/` **already resized** to 620 × 620
-   (quality ≈ 82, progressive) — see §5 for why this is not optional.
+4. Drop the art into `frontend/public/img/`, then run the normaliser — it
+   resizes to the shipped canvas, walks JPEG quality down to fit the byte
+   budget and is safe to re-run:
+
+   ```bash
+   python3 scripts/normalize_art.py          # что будет сделано
+   python3 scripts/normalize_art.py --write  # применить
+   ```
+
+   Never commit the raw 1024² generator output — see §5 for why.
 
 Dish → level mapping is deterministic:
 
@@ -87,7 +95,8 @@ Android build embeds `frontend/out` in the APK assets.
 |---|---|---|
 | before `0f3558f` | ~3.5 MB | — |
 | after 22-dish art (`0f3558f`) | 4.2 MB (1024² art) | **over budget** |
-| after 620² normalisation + 28 dishes + icons (this commit) | 3.59 MB | 417 KB headroom |
+| after 620² normalisation + 28 dishes + icons | 3.59 MB | 417 KB headroom |
+| after 38 dishes + UI icons + RU build | 3.47 MB | 538 KB headroom |
 
 Rules of thumb:
 
@@ -96,9 +105,14 @@ Rules of thumb:
 * before adding a large batch, check with
   `python3 -c "from pathlib import Path;print(sum(p.stat().st_size for p in Path('frontend/out').rglob('*') if p.is_file())/1048576)"`.
 
+`scripts/normalize_art.py` is the enforcement tool: budgets live in its
+`RULES` table, and it will not go below `QUALITY_FLOOR = 70` to hit them — a
+file that cannot fit its budget is reported instead of being mangled.
+
 Recommended follow-up when headroom drops below ~200 KB: migrate `public/img`
-to **WebP** (`quality ≈ 78`) and keep JPEGs only as fallback, or downscale all
-art to 512². Both are mechanical, repo-wide changes.
+to **WebP** (`quality ≈ 78`) and keep JPEGs only as fallback. That is worth
+roughly 40 % of the image payload and is a mechanical, repo-wide change
+(`normalize_art.py` already owns the encode step).
 
 ## 6 · Level fixtures & parity
 

@@ -114,6 +114,16 @@ DISHES = [
     {"emoji": "🍳", "name": "Омлет"},
     {"emoji": "🍞", "name": "Кулич"},
     {"emoji": "🍛", "name": "Гуляш"},
+    {"emoji": "🥠", "name": "Чебурек"},
+    {"emoji": "🥟", "name": "Хинкали"},
+    {"emoji": "🍜", "name": "Рамен"},
+    {"emoji": "🌯", "name": "Буррито"},
+    {"emoji": "🥘", "name": "Паэлья"},
+    {"emoji": "🥐", "name": "Штрудель"},
+    {"emoji": "🍰", "name": "Чизкейк"},
+    {"emoji": "🍢", "name": "Кебаб"},
+    {"emoji": "🥣", "name": "Окрошка"},
+    {"emoji": "🥞", "name": "Сырники"},
 ]
 
 KITCHENS = ["street", "bakery", "sushi", "space", "cyber", "ancient", "midnight"]
