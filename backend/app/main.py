@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -21,16 +21,26 @@ from wordchef_prolepsis.bridge import WordChefRuntime
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Word Chef API", version="1.2.7",
+    app = FastAPI(title="Word Chef API", version="1.3.0",
                   description="Server-authoritative multiplayer word-cooking")
     store = Store(DB_PATH)
     runtime = WordChefRuntime(PROLEPSIS_ROOT)
     app.state.service = GameService(store, runtime)
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        return response
+
     app.include_router(router)
 
     @app.get("/healthz")
     def healthz():
-        return JSONResponse({"status": "ok", "game": "wordchef"})
+        return JSONResponse({"status": "ok", "game": "wordchef", "version": "1.3.0"})
 
     if FRONTEND_DIR.is_dir():
         assets = FRONTEND_DIR / "_next"
