@@ -79,18 +79,18 @@ jobs:
           unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -q "assets/www/index.html"
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/wordchef-v1.4.0.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/wordchef-v1.4.1.apk
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wordchef-v1.4.0-apk
-          path: android/app/build/outputs/apk/debug/wordchef-v1.4.0.apk
+          name: wordchef-v1.4.1-apk
+          path: android/app/build/outputs/apk/debug/wordchef-v1.4.1.apk
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload APK to v1.4.0 release
+      - name: Upload APK to v1.4.1 release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload v1.4.0 app/build/outputs/apk/debug/wordchef-v1.4.0.apk --repo "${{ github.repository }}" --clobber
+        run: gh release upload v1.4.1 app/build/outputs/apk/debug/wordchef-v1.4.1.apk --repo "${{ github.repository }}" --clobber
