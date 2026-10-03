@@ -15,12 +15,17 @@ plasticine material, warm palette, **seamless cream-beige background**
 
 | Kind | Files | Canvas shipped | Display size |
 |---|---|---|---|
-| Dishes | `dish_<latin>.jpg` | 512 × 512 (≤ 60 KB) | 92 px (`.wc-dish-img`), 140 px (`.big-img`) |
-| Guests | `guest_<kitchen>.jpg` | 512 × 512 (≤ 60 KB) | 52 px round (`.wc-guest`) |
-| Kitchens | `kitchen_<id>.jpg` | 512 × 512 (≤ 60 KB) | 48 px (map) |
-| UI icons | `ui_<name>.jpg` | 256 × 256 | 18–54 px inline |
-| Medals | `ach_{gold,silver,bronze}.jpg` | 360 × 360 | 34–56 px |
-| Banners | `hero.jpg` 820 × 410, `splash.jpg` 349 × 620, others 1:1–2:1 | — | CSS `background-size: cover` |
+| Dishes | `dish_<latin>.webp` | 512 × 512 (≤ 60 KB) | 92 px (`.wc-dish-img`), 140 px (`.big-img`) |
+| Guests | `guest_<kitchen>.webp` | 512 × 512 (≤ 60 KB) | 52 px round (`.wc-guest`) |
+| Kitchens | `kitchen_<id>.webp` | 512 × 512 (≤ 60 KB) | 48 px (map) |
+| UI icons | `ui_<name>.webp` | 256 × 256 | 18–54 px inline |
+| Medals | `ach_{gold,silver,bronze}.webp` | 256 × 256 | 34–56 px |
+| Banners | `hero.webp` 820 × 410, `splash.webp` 349 × 620, others 1:1–2:1 | — | CSS `background-size: cover` |
+
+**Формат — WebP.** JPEG в `public/img` не остаётся: генераторы отдают JPEG,
+`scripts/to_webp.py` конвертирует и переписывает все ссылки, а
+`tests/frontend/test_art_integrity.py::TestArtFormat` следит, чтобы `.jpg`
+не вернулся ни в код, ни в каталог.
 
 Reference prompt skeleton (swap the subject line, keep the rest):
 
@@ -43,16 +48,21 @@ plain warm cream-beige background — …`.
    its `DISHES`. Order is part of the contract between the two engines.
 3. `frontend/components/ChefGame.tsx` → add `"<Название>": "img/dish_<latin>.jpg"`
    to `DISH_ART` (fallback is `dish_salad.jpg`).
-4. Drop the art into `frontend/public/img/`, then run the normaliser — it
-   resizes to the shipped canvas, walks JPEG quality down to fit the byte
-   budget and is safe to re-run:
+4. Drop the art into `frontend/public/img/`, then run the tools — the
+   normaliser resizes to the shipped canvas and walks quality down to fit the
+   byte budget; the converter moves anything still in JPEG over to WebP:
 
    ```bash
+   python3 scripts/to_webp.py                # если пришёл JPEG
+   python3 scripts/to_webp.py --write
    python3 scripts/normalize_art.py          # что будет сделано
    python3 scripts/normalize_art.py --write  # применить
    ```
 
    Never commit the raw 1024² generator output — see §5 for why.
+
+5. Add a one-line recipe note to `frontend/lib/dishNotes.ts`. The integrity
+   test requires it: a dish without a note fails the suite.
 
 Dish → level mapping is deterministic:
 
@@ -97,6 +107,7 @@ Android build embeds `frontend/out` in the APK assets.
 | after 22-dish art (`0f3558f`) | 4.2 MB (1024² art) | **over budget** |
 | after 620² normalisation + 28 dishes + icons | 3.59 MB | 417 KB headroom |
 | after 38 dishes + UI icons + RU build | 3.47 MB | 538 KB headroom |
+| after 48 dishes + WebP migration | **2.64 MB** | 1393 KB headroom |
 
 Rules of thumb:
 
@@ -109,10 +120,10 @@ Rules of thumb:
 `RULES` table, and it will not go below `QUALITY_FLOOR = 70` to hit them — a
 file that cannot fit its budget is reported instead of being mangled.
 
-Recommended follow-up when headroom drops below ~200 KB: migrate `public/img`
-to **WebP** (`quality ≈ 78`) and keep JPEGs only as fallback. That is worth
-roughly 40 % of the image payload and is a mechanical, repo-wide change
-(`normalize_art.py` already owns the encode step).
+WebP migration is **done** (`scripts/to_webp.py`): image payload fell from
+3.50 MB to 2.04 MB (−42 %) with no visible change at these display sizes. If
+headroom ever gets tight again, the next levers are: 384² dishes (still above
+the 140 px display size), and dropping the two 820-wide banners to 640.
 
 ## 6 · Level fixtures & parity
 

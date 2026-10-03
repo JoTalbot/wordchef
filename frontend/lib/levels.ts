@@ -74,6 +74,16 @@ const DISHES = [
   { emoji: "🍢", name: "Кебаб" },
   { emoji: "🥣", name: "Окрошка" },
   { emoji: "🥞", name: "Сырники" },
+  { emoji: "🍪", name: "Печенье" },
+  { emoji: "🥮", name: "Ватрушка" },
+  { emoji: "🍨", name: "Шербет" },
+  { emoji: "🍬", name: "Мармелад" },
+  { emoji: "🍭", name: "Леденцы" },
+  { emoji: "🍫", name: "Шоколад" },
+  { emoji: "🍿", name: "Попкорн" },
+  { emoji: "🍟", name: "Картошка" },
+  { emoji: "🍋", name: "Лимонад" },
+  { emoji: "☕", name: "Какао" },
 ];
 
 const KITCHENS = ["street", "bakery", "sushi", "space", "cyber", "ancient", "midnight"];

@@ -9,6 +9,10 @@ tool to reach for whenever a new batch of art lands oversized:
     python3 scripts/normalize_art.py            # report only
     python3 scripts/normalize_art.py --write    # rewrite files in place
 
+Formats: the shipped set is **WebP** (see `scripts/to_webp.py`); newly
+generated art usually arrives as JPEG, which this script keeps as JPEG. Both
+are handled — extension decides the encoder.
+
 Targets (see docs/art-pipeline.md):
 
     dish_* / guest_*   512²  q80   ≤ 60 KB   (displayed at 46–140 px)
@@ -50,6 +54,8 @@ RULES: list[tuple[str, int, int, int]] = [
 # everything else (banners, badges…): no resize, re-encode only if over budget
 DEFAULT: tuple[int, int, int] = (0, 82, 48 * 1024)
 
+ENCODERS = {".jpg": "JPEG", ".jpeg": "JPEG", ".webp": "WEBP", ".png": "PNG"}
+
 
 def target_for(path: Path) -> tuple[int, int, int]:
     for prefix, size, quality, budget in RULES:
@@ -58,12 +64,20 @@ def target_for(path: Path) -> tuple[int, int, int]:
     return DEFAULT
 
 
-def encode_under_budget(im: Image.Image, quality: int, budget: int) -> tuple[bytes, int]:
-    """Encode to JPEG in memory, stepping quality down until it fits `budget`."""
+def encode_under_budget(im: Image.Image, fmt: str, quality: int, budget: int) -> tuple[bytes, int]:
+    """Encode in memory, stepping quality down until it fits `budget`."""
     q = quality
     while True:
         buf = io.BytesIO()
-        im.save(buf, "JPEG", quality=q, optimize=True, progressive=True)
+        if fmt == "PNG":
+            im.save(buf, "PNG", optimize=True)  # quality is not a PNG knob
+            return buf.getvalue(), q
+        kwargs = {"quality": q, "optimize": True}
+        if fmt == "JPEG":
+            kwargs["progressive"] = True
+        else:
+            kwargs["method"] = 6
+        im.save(buf, fmt, **kwargs)
         if buf.tell() <= budget or q <= QUALITY_FLOOR:
             return buf.getvalue(), q
         q = max(QUALITY_FLOOR, q - 4)
@@ -74,10 +88,12 @@ def main() -> int:
     ap.add_argument("--write", action="store_true")
     args = ap.parse_args()
 
+    files = sorted([*IMG.glob("*.jpg"), *IMG.glob("*.webp"), *IMG.glob("*.png")])
     before = after = 0
     written = skipped = 0
 
-    for p in sorted(IMG.glob("*.jpg")):
+    for p in files:
+        fmt = ENCODERS[p.suffix.lower()]
         size, quality, budget = target_for(p)
         orig_bytes = p.stat().st_size
         with Image.open(p) as im:
@@ -89,7 +105,7 @@ def main() -> int:
             out = im.convert("RGB")
             if size:
                 out.thumbnail((size, size), Image.LANCZOS)
-            data, used_q = encode_under_budget(out, quality, budget)
+            data, used_q = encode_under_budget(out, fmt, quality, budget)
 
         # idempotency guard: no churn when the file is already at its best
         if len(data) >= orig_bytes * MIN_GAIN:
@@ -101,21 +117,22 @@ def main() -> int:
         note = "" if len(data) <= budget else " (бюджет не достижим — пол качества)"
         if args.write:
             p.write_bytes(data)
-            after += p.stat().st_size
-            print(f"{p.name:26s} {w}×{h} {orig_bytes // 1024:>4}K → "
-                  f"{out.size[0]}×{out.size[1]} {p.stat().st_size // 1024:>3}K q{used_q}{note}")
+            new_bytes = p.stat().st_size
+            after += new_bytes
         else:
-            print(f"{p.name:26s} {w}×{h} {orig_bytes // 1024:>4}K → "
-                  f"{out.size[0]}×{out.size[1]} {len(data) // 1024:>3}K q{used_q}"
-                  f" (нужна запись){note}")
+            new_bytes = len(data)
+            after += new_bytes
+        print(f"{p.name:26s} {w}×{h} {orig_bytes // 1024:>4}K → "
+              f"{out.size[0]}×{out.size[1]} {new_bytes // 1024:>3}K q{used_q}{note}")
 
     print(f"\nк обработке: {written}, уже в норме: {skipped}")
-    if args.write and written:
+    if written:
         print(f"итого: {before // 1024} КБ → {after // 1024} КБ "
               f"(экономия {(before - after) // 1024} КБ)")
-        print("дальше: cd frontend && npm run build && pytest tests/frontend")
-    elif not args.write and written:
+    if not args.write and written:
         print("это отчёт — запусти с --write, чтобы применить")
+    elif args.write:
+        print("дальше: cd frontend && npm run build && pytest tests/frontend")
     return 0
 
 

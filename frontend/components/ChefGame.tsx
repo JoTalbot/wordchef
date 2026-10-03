@@ -9,58 +9,69 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GameClient from "./GameClient";
 import { classifyWord, generateLevel, type Level } from "../lib/levels";
+import { dishNote } from "../lib/dishNotes";
 
 type Screen = "home" | "level" | "grand" | "multi";
 
 const DISH_ART: Record<string, string> = {
-  "Салат": "img/dish_salad.jpg",
-  "Пицца": "img/dish_pizza.jpg",
-  "Суши": "img/dish_sushi.jpg",
-  "Лапша": "img/dish_noodles.jpg",
-  "Торт": "img/dish_cake.jpg",
-  "Рагу": "img/dish_ragout.jpg",
-  "Пельмени": "img/dish_pelmeni.jpg",
-  "Креветки": "img/dish_shrimp.jpg",
-  "Капкейк": "img/dish_cupcake.jpg",
-  "Сэндвич": "img/dish_sandwich.jpg",
-  "Суп": "img/dish_soup.jpg",
-  "Рулет": "img/dish_roll.jpg",
-  "Борщ": "img/dish_borsch.jpg",
-  "Шашлык": "img/dish_shashlik.jpg",
-  "Блины": "img/dish_bliny.jpg",
-  "Пирог": "img/dish_pirog.jpg",
-  "Пончик": "img/dish_donut.jpg",
-  "Вафли": "img/dish_waffles.jpg",
-  "Мороженое": "img/dish_icecream.jpg",
-  "Тако": "img/dish_taco.jpg",
-  "Плов": "img/dish_plov.jpg",
-  "Смузи": "img/dish_smoothie.jpg",
-  "Бургер": "img/dish_burger.jpg",
-  "Шаурма": "img/dish_shaurma.jpg",
-  "Фалафель": "img/dish_falafel.jpg",
-  "Омлет": "img/dish_omlet.jpg",
-  "Кулич": "img/dish_kulich.jpg",
-  "Гуляш": "img/dish_gulyash.jpg",
-  "Чебурек": "img/dish_cheburek.jpg",
-  "Хинкали": "img/dish_hinkali.jpg",
-  "Рамен": "img/dish_ramen.jpg",
-  "Буррито": "img/dish_burrito.jpg",
-  "Паэлья": "img/dish_paella.jpg",
-  "Штрудель": "img/dish_strudel.jpg",
-  "Чизкейк": "img/dish_cheesecake.jpg",
-  "Кебаб": "img/dish_kebab.jpg",
-  "Окрошка": "img/dish_okroshka.jpg",
-  "Сырники": "img/dish_syrniki.jpg",
+  "Салат": "img/dish_salad.webp",
+  "Пицца": "img/dish_pizza.webp",
+  "Суши": "img/dish_sushi.webp",
+  "Лапша": "img/dish_noodles.webp",
+  "Торт": "img/dish_cake.webp",
+  "Рагу": "img/dish_ragout.webp",
+  "Пельмени": "img/dish_pelmeni.webp",
+  "Креветки": "img/dish_shrimp.webp",
+  "Капкейк": "img/dish_cupcake.webp",
+  "Сэндвич": "img/dish_sandwich.webp",
+  "Суп": "img/dish_soup.webp",
+  "Рулет": "img/dish_roll.webp",
+  "Борщ": "img/dish_borsch.webp",
+  "Шашлык": "img/dish_shashlik.webp",
+  "Блины": "img/dish_bliny.webp",
+  "Пирог": "img/dish_pirog.webp",
+  "Пончик": "img/dish_donut.webp",
+  "Вафли": "img/dish_waffles.webp",
+  "Мороженое": "img/dish_icecream.webp",
+  "Тако": "img/dish_taco.webp",
+  "Плов": "img/dish_plov.webp",
+  "Смузи": "img/dish_smoothie.webp",
+  "Бургер": "img/dish_burger.webp",
+  "Шаурма": "img/dish_shaurma.webp",
+  "Фалафель": "img/dish_falafel.webp",
+  "Омлет": "img/dish_omlet.webp",
+  "Кулич": "img/dish_kulich.webp",
+  "Гуляш": "img/dish_gulyash.webp",
+  "Чебурек": "img/dish_cheburek.webp",
+  "Хинкали": "img/dish_hinkali.webp",
+  "Рамен": "img/dish_ramen.webp",
+  "Буррито": "img/dish_burrito.webp",
+  "Паэлья": "img/dish_paella.webp",
+  "Штрудель": "img/dish_strudel.webp",
+  "Чизкейк": "img/dish_cheesecake.webp",
+  "Кебаб": "img/dish_kebab.webp",
+  "Окрошка": "img/dish_okroshka.webp",
+  "Сырники": "img/dish_syrniki.webp",
+  "Печенье": "img/dish_pechenye.webp",
+  "Ватрушка": "img/dish_vatrushka.webp",
+  "Шербет": "img/dish_sherbet.webp",
+  "Мармелад": "img/dish_marmelad.webp",
+  "Леденцы": "img/dish_ledency.webp",
+  "Шоколад": "img/dish_shokolad.webp",
+  "Попкорн": "img/dish_popkorn.webp",
+  "Картошка": "img/dish_kartoshka.webp",
+  "Лимонад": "img/dish_limonad.webp",
+  "Какао": "img/dish_kakao.webp",
 };
 
 const GUEST_ART: Record<string, { img: string; nick: string }> = {
-  street: { img: "img/guest_street.jpg", nick: "Марко" },
-  bakery: { img: "img/guest_bakery.jpg", nick: "Бабушка Зита" },
-  sushi: { img: "img/guest_sushi.jpg", nick: "Юки" },
-  space: { img: "img/guest_space.jpg", nick: "Космо-шеф" },
-  cyber: { img: "img/guest_cyber.jpg", nick: "Нейро" },
-  ancient: { img: "img/guest_ancient.jpg", nick: "Мудрец" },
-  midnight: { img: "img/guest_midnight.jpg", nick: "Кот Борис" },
+  street: { img: "img/guest_street.webp", nick: "Марко" },
+  bakery: { img: "img/guest_bakery.webp", nick: "Бабушка Зита" },
+  sushi: { img: "img/guest_sushi.webp", nick: "Юки" },
+  space: { img: "img/guest_space.webp", nick: "Космо-шеф" },
+  cyber: { img: "img/guest_cyber.webp", nick: "Нейро" },
+  ancient: { img: "img/guest_ancient.webp", nick: "Мудрец" },
+  midnight: { img: "img/guest_midnight.webp", nick: "Кот Борис" },
 };
 
 function guestArt(kitchen: string) {
@@ -111,8 +122,28 @@ function guestLine(kitchen: string, levelNo: number): string {
   return lines[(Math.max(1, levelNo) - 1) % lines.length];
 }
 
+/** The guest reacts while the dish is being assembled (1/3 and 2/3 of the board). */
+const GUEST_PROGRESS: Record<string, [string, string]> = {
+  street: ["Уже пахнет! Неси сюда.", "Ещё чуть-чуть — и я поверю в тебя."],
+  bakery: ["Тесто поднялось — продолжай.", "Почти как у бабушки. Почти!"],
+  sushi: ["Рез чище, шеф.", "Ещё немного — и это уровень мастеров."],
+  space: ["Системы в норме, кухня летит.", "Орбита близко — добьём."],
+  cyber: ["[OK] прогресс зафиксирован.", "[WARN] ещё два слова до апгрейда."],
+  ancient: ["Слово к слову — и трапеза близка.", "Мудрость уже видна, шеф."],
+  midnight: ["Мур. Уже вкуснее.", "Ещё немного — и я останусь тут жить."],
+};
+
+function guestProgress(kitchen: string, found: number, total: number): string | null {
+  if (total <= 0) return null;
+  const ratio = found / total;
+  const pair = GUEST_PROGRESS[kitchen] ?? GUEST_PROGRESS.street;
+  if (ratio >= 2 / 3 && found < total) return pair[1];
+  if (ratio >= 1 / 3) return pair[0];
+  return null;
+}
+
 function dishArt(name: string): string {
-  return DISH_ART[name] ?? "img/dish_salad.jpg";
+  return DISH_ART[name] ?? "img/dish_salad.webp";
 }
 
 const KITCHEN_RU: Record<string, { name: string; emoji: string }> = {
@@ -165,10 +196,10 @@ export default function ChefGame() {
 
   return (
     <div className="wc-shell">
-      <div className="wc-splash" aria-hidden style={{ backgroundImage: "url(img/splash.jpg)" }} />
+      <div className="wc-splash" aria-hidden style={{ backgroundImage: "url(img/splash.webp)" }} />
       <div className="wc-top">
         <div className="wc-logo">WORD CHEF</div>
-        <div className="wc-pill"><img className="wc-coin" src="img/coins.jpg" alt="" /> {coins}</div>
+        <div className="wc-pill"><img className="wc-coin" src="img/coins.webp" alt="" /> {coins}</div>
       </div>
 
       {screen === "home" && (
@@ -231,9 +262,9 @@ function HomeScreen({
   return (
     <div>
       <div className="wc-hero">
-        <img src="img/hero.jpg" alt="" />
+        <img src="img/hero.webp" alt="" />
         <div className="wc-hero-title">
-          <img className="wc-avatar-chip" src="img/chef_avatar.jpg" alt="" />
+          <img className="wc-avatar-chip" src="img/chef_avatar.webp" alt="" />
           Готовь слова — корми гостей!
         </div>
       </div>
@@ -257,7 +288,7 @@ function HomeScreen({
         </button>
         <button
           className="wc-btn wc-banner-btn"
-          style={{ backgroundImage: "url(img/grandtour.jpg)" }}
+          style={{ backgroundImage: "url(img/grandtour.webp)" }}
           onClick={onGrand}
         >
           <span>🌀 Гранд Тур</span>
@@ -265,18 +296,18 @@ function HomeScreen({
         </button>
         <button
           className="wc-btn wc-banner-btn"
-          style={{ backgroundImage: "url(img/mode_chaos.jpg)" }}
+          style={{ backgroundImage: "url(img/mode_chaos.webp)" }}
           onClick={onMulti}
         >
           <span>
-            <img className="wc-inline-icon" src="img/ui_trophy.jpg" alt="" /> Мультиплеер
+            <img className="wc-inline-icon" src="img/ui_trophy.webp" alt="" /> Мультиплеер
           </span>
           <small>Quick Cook · Chaos Kitchen</small>
         </button>
       </div>
 
       <div className="wc-card">
-        <div className="wc-banner-strip" style={{ backgroundImage: "url(img/grand_map.jpg)" }}>
+        <div className="wc-banner-strip" style={{ backgroundImage: "url(img/grand_map.webp)" }}>
           <span>🗺 Карта кухонь</span>
         </div>
         {kitchens.map(([id, info], i) => {
@@ -285,7 +316,7 @@ function HomeScreen({
           return (
             <div key={id} className={`wc-map-row ${unlocked ? "" : "locked"}`}>
               <div className="wc-map-emoji">
-                <img src={`img/kitchen_${id}.jpg`} alt="" className={unlocked ? "" : "locked"} />
+                <img src={`img/kitchen_${id}.webp`} alt="" className={unlocked ? "" : "locked"} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 800 }}>{info.name}</div>
@@ -295,7 +326,7 @@ function HomeScreen({
               </div>
               <img
                 className="wc-medal"
-                src={levelNo >= from + 20 ? "img/ach_gold.jpg" : unlocked ? "img/ach_silver.jpg" : "img/ach_bronze.jpg"}
+                src={levelNo >= from + 20 ? "img/ach_gold.webp" : unlocked ? "img/ach_silver.webp" : "img/ach_bronze.webp"}
                 alt=""
                 style={{ opacity: unlocked ? 1 : 0.45 }}
               />
@@ -510,7 +541,7 @@ function LevelScreen({
           </span>
         </div>
         <button className="wc-tool" onClick={doHint} title={`Подсказка · ${HINT_COST} 🪙`} aria-label="Подсказка">
-          <img src="img/ui_hint.jpg" alt="" />
+          <img src="img/ui_hint.webp" alt="" />
         </button>
       </div>
 
@@ -527,13 +558,15 @@ function LevelScreen({
             </span>
           </span>
           <span className="wc-bonus-jar">
-            <img className="wc-jar-img" src="img/bonus_jar.jpg" alt="" /> {bonusFound.length}
+            <img className="wc-jar-img" src="img/bonus_jar.webp" alt="" /> {bonusFound.length}
           </span>
         </div>
         <div className="wc-bar">
           <div style={{ width: `${(found.length / Math.max(1, boardWords.length)) * 100}%` }} />
         </div>
-        <div className="wc-guest-say">«{guestLine(level.kitchen, levelNo)}»</div>
+        <div className="wc-guest-say">
+          «{guestProgress(level.kitchen, found.length, boardWords.length) ?? guestLine(level.kitchen, levelNo)}»
+        </div>
       </div>
 
       <div className={`wc-grid ${shake ? "wc-shake" : ""}`}
@@ -583,7 +616,7 @@ function LevelScreen({
               top: centers[i].y,
               // picked letters become golden ingredients
               ...(current.includes(i)
-                ? { backgroundImage: "url(img/ui_gold_tile.jpg)", backgroundSize: "cover" }
+                ? { backgroundImage: "url(img/ui_gold_tile.webp)", backgroundSize: "cover" }
                 : null),
             }}
           >
@@ -600,7 +633,7 @@ function LevelScreen({
 
       {done && (
         <div className="wc-overlay">
-          <div className="wc-modal" style={{ backgroundImage: "url(img/celebrate.jpg)" }}>
+          <div className="wc-modal" style={{ backgroundImage: "url(img/celebrate.webp)" }}>
             <div className="confetti">
               {["#ff7a2f", "#37b24d", "#3f97d4", "#f2c14e", "#e03131"].map((c, i) => (
                 <i key={i} style={{
@@ -609,13 +642,16 @@ function LevelScreen({
                 }} />
               ))}
             </div>
-            <div className="wc-banner-strip" style={{ backgroundImage: "url(img/recipe_book.jpg)" }}>
+            <div className="wc-banner-strip" style={{ backgroundImage: "url(img/recipe_book.webp)" }}>
               <span>📖 Новый рецепт записан!</span>
             </div>
             <img className="big-img" src={dishArt(level.dish.name)} alt="" />
             <div style={{ fontSize: 24, fontWeight: 900 }}>{level.dish.name} готов!</div>
+            {dishNote(level.dish.name) && (
+              <div className="wc-recipe-note">«{dishNote(level.dish.name)}»</div>
+            )}
             <div className="wc-stars">
-              <img className="wc-medal big" src="img/ach_gold.jpg" alt="" />
+              <img className="wc-medal big" src="img/ach_gold.webp" alt="" />
               ⭐⭐⭐
             </div>
             <div style={{ fontWeight: 800 }}>

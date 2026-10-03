@@ -245,6 +245,16 @@ button {
   line-height: 1.35;
 }
 
+/* recipe note on the "dish is ready" screen */
+.wc-recipe-note {
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.75;
+  max-width: 280px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
 .wc-bonus-jar {
   display: inline-flex;
   align-items: center;

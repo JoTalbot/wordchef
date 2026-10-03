@@ -251,7 +251,7 @@ export default function GameClient() {
           </button>
         </div>
         <div className="panel">
-          <div className="gc-banner" style={{ backgroundImage: "url(img/howto.jpg)" }} />
+          <div className="gc-banner" style={{ backgroundImage: "url(img/howto.webp)" }} />
           <h2>КАК ГОТОВИТЬ</h2>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
             🍳 Тапай буквы и собирай <b style={{ color: 'var(--text)' }}>блюдо</b> (слово) под заказ гостя.<br />
@@ -276,7 +276,7 @@ export default function GameClient() {
           <h1>WORD CHEF</h1>
           <div className="tagline">СБОР СМЕНЫ</div>
         </div>
-        <div className="gc-banner" style={{ backgroundImage: "url(img/lobby_banner.jpg)" }} />
+        <div className="gc-banner" style={{ backgroundImage: "url(img/lobby_banner.webp)" }} />
         <div className="panel">
           <h2>РЕЖИМ ИГРЫ</h2>
           <div className="select-grid">
@@ -284,7 +284,7 @@ export default function GameClient() {
               <button
                 key={m.id}
                 className={`select-btn mode-banner ${mode === (m.id === 'CHAOSS' ? 'CHAOS_KITCHEN' : m.id) ? 'active' : ''}`}
-                style={{ backgroundImage: `url(img/${m.id === 'CHAOSS' ? 'mode_chaos' : 'mode_quick'}.jpg)` }}
+                style={{ backgroundImage: `url(img/${m.id === 'CHAOSS' ? 'mode_chaos' : 'mode_quick'}.webp)` }}
                 onClick={() => setMode(m.id === 'CHAOSS' ? 'CHAOS_KITCHEN' : m.id)}
               >
                 <div className="title">{m.title}</div>
@@ -319,7 +319,7 @@ export default function GameClient() {
           <h1>СМЕНА ОКОНЧЕНА</h1>
           <div className="tagline">{MODE_RU[match?.mode ?? ''] ?? match?.mode}</div>
         </div>
-        <div className="gc-banner" style={{ backgroundImage: "url(img/results_banner.jpg)" }} />
+        <div className="gc-banner" style={{ backgroundImage: "url(img/results_banner.webp)" }} />
         <div className="panel">
           <h2>ИТОГИ</h2>
           {board.map((row: BoardRow) => (
@@ -365,7 +365,7 @@ export default function GameClient() {
   return (
     <div
       className="shell gc-shell-bg"
-      style={{ backgroundImage: "linear-gradient(rgba(22, 13, 8, 0.84), rgba(22, 13, 8, 0.84)), url(img/service_bg.jpg)" }}
+      style={{ backgroundImage: "linear-gradient(rgba(22, 13, 8, 0.84), rgba(22, 13, 8, 0.84)), url(img/service_bg.webp)" }}
     >
       {toasts.map((t) => (
         <div key={t.id} className="toast">{t.text}</div>
@@ -377,7 +377,7 @@ export default function GameClient() {
 
       <div className="hud">
         <div className="hud-card heat">
-          <div className="label"><img className="gc-flame" src="img/combo_flame.jpg" alt="" /> ЖАР</div>
+          <div className="label"><img className="gc-flame" src="img/combo_flame.webp" alt="" /> ЖАР</div>
           <div className="value">{me?.heat ?? 0}</div>
         </div>
         <div className="hud-card combo">
@@ -394,7 +394,7 @@ export default function GameClient() {
         <div className="customer">
           <img
             className="gc-customer"
-            src={`img/guest_${["street", "bakery", "sushi", "space", "cyber", "ancient", "midnight"][(match?.round_no ?? 1) % 7]}.jpg`}
+            src={`img/guest_${["street", "bakery", "sushi", "space", "cyber", "ancient", "midnight"][(match?.round_no ?? 1) % 7]}.webp`}
             alt=""
           />
           <div className="customer-name">
@@ -448,7 +448,7 @@ export default function GameClient() {
             disabled={busy || (me?.spice_charges ?? 0) <= 0}
             onClick={() => setSpiceArmed((s) => !s)}
           >
-            <img className="gc-spice" src="img/spice.jpg" alt="" /> ПРИПРАВА {me?.spice_charges ?? 0}
+            <img className="gc-spice" src="img/spice.webp" alt="" /> ПРИПРАВА {me?.spice_charges ?? 0}
           </button>
           <button className="btn" disabled={busy || composedWord.length > 3 || composedWord.length < 2} onClick={() => void prep()}>
             ЗАГОТОВКА
@@ -477,7 +477,7 @@ export default function GameClient() {
 
       <div className="panel">
         <h2>
-          <img className="gc-inline-icon" src="img/ui_trophy.jpg" alt="" /> ТАБЛИЦА
+          <img className="gc-inline-icon" src="img/ui_trophy.webp" alt="" /> ТАБЛИЦА
         </h2>
         {(match?.leaderboard ?? []).map((row: BoardRow) => (
           <div key={row.player_id} className={`board-row ${row.player_id === playerId ? 'me' : ''}`}>
@@ -488,7 +488,7 @@ export default function GameClient() {
         ))}
         {chaosFeed.length > 0 && (
           <div style={{ marginTop: 10 }}>
-            <div className="gc-banner slim" style={{ backgroundImage: "url(img/chaos_feed.jpg)" }} />
+            <div className="gc-banner slim" style={{ backgroundImage: "url(img/chaos_feed.webp)" }} />
             <h2>ХАОС-ЛЕНТА</h2>
             {chaosFeed.map((line, i) => (
               <div key={i} style={{ fontSize: 12, color: 'var(--accent2)', padding: '2px 0' }}>⚡ {line}</div>
@@ -499,7 +499,7 @@ export default function GameClient() {
 
       <div className="row">
         <button className="btn small" disabled={busy || (me?.golden ?? 0) < 1} onClick={() => void ringBell()}>
-          <img className="gc-inline-icon" src="img/ui_bell.jpg" alt="" /> звон в хаос-колокол (1⭐)
+          <img className="gc-inline-icon" src="img/ui_bell.webp" alt="" /> звон в хаос-колокол (1⭐)
         </button>
         <button
           className="btn small"

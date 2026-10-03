@@ -1,5 +1,7 @@
 # 🍳 WORD CHEF
 
+> 🇬🇧 English (this file) · 🇷🇺 [Русская версия](README.ru.md)
+
 **Cook words. Serve dishes. Ride the heat.**
 
 Word Chef is an original multiplayer/web word-cooking game where players are
