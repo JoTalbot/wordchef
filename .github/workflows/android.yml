@@ -72,14 +72,14 @@ jobs:
 
       - name: Create CI signing keystore
         run: |
-          keytool -genkeypair -v \\
-            -keystore keystore.jks \\
-            -storepass wordchef \\
-            -keypass wordchef \\
-            -alias wordchef \\
-            -keyalg RSA \\
-            -keysize 2048 \\
-            -validity 10000 \\
+          keytool -genkeypair -v \
+            -keystore keystore.jks \
+            -storepass wordchef \
+            -keypass wordchef \
+            -alias wordchef \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
             -dname "CN=Word Chef, OU=Android, O=Word Chef, L=Kyiv, ST=Kyiv, C=UA"
 
       - name: Build signed release APK
