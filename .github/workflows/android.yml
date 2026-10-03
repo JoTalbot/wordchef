@@ -89,11 +89,26 @@ jobs:
           WC_KEY_PASS: wordchef
         run: gradle assembleRelease --no-daemon
 
-      - name: Verify and align release APK
+      - name: Align and re-sign release APK
+        env:
+          WC_KEYSTORE_PASS: wordchef
+          WC_KEY_ALIAS: wordchef
+          WC_KEY_PASS: wordchef
         run: |
           BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
-          "$BUILD_TOOLS/zipalign" -f -p 4 app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/wordchef-v1.4.0.apk
-          "$BUILD_TOOLS/apksigner" verify --verbose --min-sdk-version 26 app/build/outputs/apk/release/wordchef-v1.4.0.apk
+          INPUT="app/build/outputs/apk/release/app-release.apk"
+          OUTPUT="app/build/outputs/apk/release/wordchef-v1.4.0.apk"
+          test -x "$BUILD_TOOLS/zipalign"
+          test -x "$BUILD_TOOLS/apksigner"
+          test -s "$INPUT"
+          "$BUILD_TOOLS/zipalign" -f -p 4 "$INPUT" "$OUTPUT"
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks keystore.jks \
+            --ks-pass pass:"$WC_KEYSTORE_PASS" \
+            --key-pass pass:"$WC_KEY_PASS" \
+            --ks-key-alias "$WC_KEY_ALIAS" \
+            "$OUTPUT"
+          "$BUILD_TOOLS/apksigner" verify --verbose --min-sdk-version 26 "$OUTPUT"
 
       - name: Verify WebView assets in APK
         run: |
@@ -110,4 +125,6 @@ jobs:
 
       - name: Upload APK to v1.4.0 release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: gh release upload v1.4.0 app/build/outputs/apk/release/wordchef-v1.4.0.apk --repo "$GITHUB_REPOSITORY" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v1.4.0 app/build/outputs/apk/release/wordchef-v1.4.0.apk --repo "${GITHUB_REPOSITORY}" --clobber
