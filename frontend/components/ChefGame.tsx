@@ -293,86 +293,146 @@ function HomeScreen({
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
   const kitchens = Object.entries(KITCHEN_RU);
+  const stageLevel = ((levelNo - 1) % 20) + 1;
+  const stageProgress = Math.round((stageLevel / 20) * 100);
+  const currentKitchen = Math.min(kitchens.length - 1, Math.floor((levelNo - 1) / 20));
+  const currentKitchenInfo = KITCHEN_RU[preview.kitchen] ?? KITCHEN_RU.street;
+
   return (
-    <div>
-      <div className="wc-hero">
+    <div className="wc-home-screen">
+      <section className="wc-hero" aria-label="Главный экран Word Chef">
         <img src="img/hero.webp" alt="" />
         <div className="wc-hero-title">
-          <img className="wc-avatar-chip" src="img/chef_avatar.webp" alt="" />
-          Готовь слова — корми гостей!
-        </div>
-      </div>
-      <div className="wc-card">
-        <div className="wc-dish-hero">
-          <img className="wc-dish-img" src={dishArt(preview.dish.name)} alt="" />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 900, fontSize: 20 }}>
-              Уровень {levelNo} · {preview.dish.name}
+          <div className="wc-home-title-row">
+            <div className="wc-home-title-copy">
+              <span className="wc-home-eyebrow">КАМПАНИЯ · WORD CHEF</span>
+              <h1>Готовь слова — корми гостей!</h1>
             </div>
-            <div style={{ opacity: 0.75, marginTop: 2 }}>
-              Собери слова из букв — и блюдо будет готово!
-            </div>
-            <div className="wc-bar">
-              <div style={{ width: `${Math.min(100, ((levelNo - 1) % 20) * 5 + 5)}%` }} />
-            </div>
+            <img className="wc-home-avatar" src="img/chef_avatar.webp" alt="" />
           </div>
         </div>
-        <button className="wc-btn green" onClick={onPlay}>
-          ▶ Играть
+      </section>
+
+      <section className="wc-card wc-home-current" aria-labelledby="wc-next-order-title">
+        <div className="wc-current-top">
+          <div className="wc-current-copy">
+            <span className="wc-home-kicker">СЛЕДУЮЩИЙ ЗАКАЗ</span>
+            <h2 id="wc-next-order-title">Уровень {levelNo}</h2>
+            <span className="wc-kitchen-chip">
+              <span aria-hidden="true">{currentKitchenInfo.emoji}</span>
+              {currentKitchenInfo.name}
+            </span>
+          </div>
+          <img className="wc-current-dish-art" src={dishArt(preview.dish.name)} alt={preview.dish.name} />
+        </div>
+        <div className="wc-current-order-name">
+          <span>Сегодня готовим</span>
+          <strong>{preview.dish.name}</strong>
+        </div>
+        <div className="wc-home-progress-copy">
+          <span>Прогресс кухни</span>
+          <strong>{stageLevel} / 20</strong>
+        </div>
+        <div
+          className="wc-bar wc-home-progress"
+          role="progressbar"
+          aria-label={`Прогресс: ${currentKitchenInfo.name}`}
+          aria-valuemin={0}
+          aria-valuemax={20}
+          aria-valuenow={stageLevel}
+          aria-valuetext={`Уровень ${stageLevel} из 20`}
+        >
+          <div style={{ width: `${stageProgress}%` }} />
+        </div>
+        <button type="button" className="wc-btn green wc-main-cta" onClick={onPlay}>
+          <span className="wc-main-cta-title"><span aria-hidden="true">▶</span> Играть</span>
+          <span className="wc-cta-subtitle">Продолжить кампанию</span>
         </button>
+      </section>
+
+      <section className="wc-home-modes" aria-label="Игровые режимы">
         <button
-          className="wc-btn wc-banner-btn"
+          type="button"
+          className="wc-mode-card"
           style={{ backgroundImage: "url(img/grandtour.webp)" }}
           onClick={onGrand}
         >
-          <span>🌀 Гранд Тур</span>
-          <small>бесконечный режим{grandBest > 0 ? ` · рекорд ${grandBest}` : ""}</small>
+          <span className="wc-mode-icon" aria-hidden="true">🌀</span>
+          <span className="wc-mode-copy">
+            <strong>Гранд Тур</strong>
+            <small>{grandBest > 0 ? `Рекорд · ${grandBest} заказов` : "Бесконечный режим"}</small>
+          </span>
+          <span className="wc-mode-arrow" aria-hidden="true">→</span>
         </button>
         <button
-          className="wc-btn wc-banner-btn"
+          type="button"
+          className="wc-mode-card"
           style={{ backgroundImage: "url(img/mode_chaos.webp)" }}
           onClick={onMulti}
         >
-          <span>
-            <img className="wc-inline-icon" src="img/ui_trophy.webp" alt="" /> Мультиплеер
+          <span className="wc-mode-icon wc-mode-trophy">
+            <img src="img/ui_trophy.webp" alt="" />
           </span>
-          <small>Quick Cook · Chaos Kitchen</small>
+          <span className="wc-mode-copy">
+            <strong>Мультиплеер</strong>
+            <small>Quick Cook · Chaos Kitchen</small>
+          </span>
+          <span className="wc-mode-arrow" aria-hidden="true">→</span>
         </button>
-      </div>
+      </section>
 
-      <div className="wc-card">
-        <div className="wc-banner-strip" style={{ backgroundImage: "url(img/grand_map.webp)" }}>
-          <span>🗺 Карта кухонь</span>
+      <section className="wc-card wc-kitchen-card" aria-labelledby="wc-kitchen-map-title">
+        <div className="wc-kitchen-heading">
+          <div>
+            <span className="wc-home-kicker">ПУТЬ ШЕФА</span>
+            <h2 id="wc-kitchen-map-title">Карта кухонь</h2>
+          </div>
+          <span className="wc-kitchen-stage">Кухня {currentKitchen + 1} / {kitchens.length}</span>
         </div>
-        {kitchens.map(([id, info], i) => {
-          const from = i * 20 + 1;
-          const unlocked = levelNo >= from;
-          return (
-            <div key={id} className={`wc-map-row ${unlocked ? "" : "locked"}`}>
-              <div className="wc-map-emoji">
-                <img src={`img/kitchen_${id}.webp`} alt="" className={unlocked ? "" : "locked"} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 800 }}>{info.name}</div>
-                <div style={{ opacity: 0.7, fontSize: 13 }}>
-                  Уровни {from}–{from + 19}
+        <div className="wc-banner-strip wc-kitchen-banner" style={{ backgroundImage: "url(img/grand_map.webp)" }}>
+          <span>От уличной кухни до полуночной</span>
+        </div>
+        <div className="wc-kitchen-list" role="list">
+          {kitchens.map(([id, info], i) => {
+            const from = i * 20 + 1;
+            const to = from + 19;
+            const unlocked = levelNo >= from;
+            const completed = levelNo >= from + 20;
+            const currentStage = levelNo >= from && levelNo < from + 20;
+            return (
+              <div
+                key={id}
+                role="listitem"
+                aria-current={currentStage ? "step" : undefined}
+                className={`wc-map-row ${currentStage ? "current" : completed ? "completed" : !unlocked ? "locked" : ""}`}
+              >
+                <div className="wc-map-emoji">
+                  <img src={`img/kitchen_${id}.webp`} alt="" className={!unlocked ? "locked" : ""} />
+                </div>
+                <div className="wc-map-copy">
+                  <strong>{info.name}</strong>
+                  <span>Уровни {from}–{to}</span>
+                </div>
+                <div className="wc-map-state">
+                  <img
+                    className="wc-medal"
+                    src={completed ? "img/ach_gold.webp" : unlocked ? "img/ach_silver.webp" : "img/ach_bronze.webp"}
+                    alt=""
+                    style={{ opacity: unlocked ? 1 : 0.45 }}
+                  />
+                  {currentStage ? (
+                    <span className="wc-map-badge">СЕЙЧАС</span>
+                  ) : completed ? (
+                    <span className="wc-map-check" aria-label="Кухня пройдена">✓</span>
+                  ) : !unlocked ? (
+                    <span className="wc-map-lock" aria-label="Кухня закрыта">🔒</span>
+                  ) : null}
                 </div>
               </div>
-              <img
-                className="wc-medal"
-                src={levelNo >= from + 20 ? "img/ach_gold.webp" : unlocked ? "img/ach_silver.webp" : "img/ach_bronze.webp"}
-                alt=""
-                style={{ opacity: unlocked ? 1 : 0.45 }}
-              />
-              {levelNo >= from && levelNo < from + 20 && (
-                <div className="wc-pill" style={{ padding: "4px 10px", fontSize: 13 }}>
-                  сейчас
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
@@ -765,15 +825,14 @@ function LevelScreen({
       {done && (
         <div className="wc-overlay">
           <div
-            className="wc-modal"
+            className={`wc-modal wc-win-modal ${grand ? "grand" : ""}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="wc-completion-title"
             aria-describedby="wc-completion-reward"
             tabIndex={-1}
-            style={{ backgroundImage: "url(img/celebrate.webp)" }}
           >
-            <div className="confetti">
+            <div className="confetti" aria-hidden="true">
               {["#ff7a2f", "#37b24d", "#3f97d4", "#f2c14e", "#e03131"].map((c, i) => (
                 <i key={i} style={{
                   left: `${8 + i * 18}%`, background: c,
@@ -781,32 +840,51 @@ function LevelScreen({
                 }} />
               ))}
             </div>
-            <div className="wc-banner-strip" style={{ backgroundImage: "url(img/recipe_book.webp)" }}>
-              <span>📖 Новый рецепт записан!</span>
+            <div className="wc-win-stamp"><img className="wc-win-book" src="img/recipe_book.webp" alt="" /> ЗАКАЗ ВЫПОЛНЕН</div>
+            <img className="wc-win-medal" src="img/ach_gold.webp" alt="" />
+            <h2 id="wc-completion-title" className="wc-win-title">Блюдо готово!</h2>
+            <p className="wc-win-subtitle">
+              {grand ? "Еще один гость накормлен — жар не спадает!" : "Рецепт добавлен в книгу вашей кухни."}
+            </p>
+            <div className="wc-win-recipe-card">
+              <img className="wc-win-dish" src={dishArt(level.dish.name)} alt={level.dish.name} />
+              <div className="wc-win-recipe-copy">
+                <span className="wc-home-kicker">НОВАЯ ЗАПИСЬ</span>
+                <strong>{level.dish.name}</strong>
+                <p className="wc-recipe-note">
+                  «{dishNote(level.dish.name) ?? "Блюдо приготовлено. Можно подавать к столу!"}»
+                </p>
+              </div>
             </div>
-            <img className="big-img" src={dishArt(level.dish.name)} alt="" />
-            <div id="wc-completion-title" style={{ fontSize: 24, fontWeight: 900 }}>{level.dish.name} готов!</div>
-            {dishNote(level.dish.name) && (
-              <div className="wc-recipe-note">«{dishNote(level.dish.name)}»</div>
-            )}
-            <div className="wc-stars">
-              <img className="wc-medal big" src="img/ach_gold.webp" alt="" />
-              ⭐⭐⭐
+            <div id="wc-completion-reward" className="wc-win-stats">
+              <div className="wc-win-reward">
+                <img className="wc-coin" src="img/coins.webp" alt="" />
+                <strong>+{30 + levelNo}</strong>
+                <span>монет</span>
+              </div>
+              <div className="wc-win-bonus">
+                <img className="wc-jar-img" src="img/bonus_jar.webp" alt="" />
+                <strong>{bonusFound.length}</strong>
+                <span>бонусных слов</span>
+              </div>
             </div>
-            <div id="wc-completion-reward" style={{ fontWeight: 800 }}>
-              +{30 + levelNo} 🪙 · бонусных слов: {bonusFound.length}
+            <div className="wc-stars" aria-label="Награда: три звезды">
+              <span aria-hidden="true">⭐⭐⭐</span>
             </div>
-            <button
-              className="wc-btn green"
-              onClick={() => {
-                setDone(false);
-                if (grand) flash("Готовим следующий заказ!");
-                onNext();
-              }}
-            >
-              {grand ? "🌀 Следующий заказ" : "▶ Дальше"}
-            </button>
-            <button className="wc-btn ghost" onClick={onHome}>На карту кухонь</button>
+            <div className="wc-win-actions">
+              <button
+                type="button"
+                className="wc-btn green"
+                onClick={() => {
+                  setDone(false);
+                  if (grand) flash("Готовим следующий заказ!");
+                  onNext();
+                }}
+              >
+                {grand ? "🌀 Следующий заказ" : "▶ Следующий уровень"}
+              </button>
+              <button type="button" className="wc-btn ghost" onClick={onHome}>🗺 На карту кухонь</button>
+            </div>
           </div>
         </div>
       )}
