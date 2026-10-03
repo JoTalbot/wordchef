@@ -70,22 +70,40 @@ jobs:
         with:
           gradle-version: "8.7"
 
-      - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+      - name: Create CI signing keystore
+        run: |
+          keytool -genkeypair -v \\
+            -keystore keystore.jks \\
+            -storepass wordchef \\
+            -keypass wordchef \\
+            -alias wordchef \\
+            -keyalg RSA \\
+            -keysize 2048 \\
+            -validity 10000 \\
+            -dname "CN=Word Chef, OU=Android, O=Word Chef, L=Kyiv, ST=Kyiv, C=UA"
+
+      - name: Build signed release APK
+        env:
+          WC_KEYSTORE_PASS: wordchef
+          WC_KEY_ALIAS: wordchef
+          WC_KEY_PASS: wordchef
+        run: gradle assembleRelease --no-daemon
+
+      - name: Verify and align release APK
+        run: |
+          zipalign -f -p 4 app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/wordchef-v1.4.0.apk
+          apksigner verify --verbose --min-sdk-version 26 app/build/outputs/apk/release/wordchef-v1.4.0.apk
 
       - name: Verify WebView assets in APK
         run: |
-          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -E "assets/www/index.html|assets/www/_next/" | head -20
-          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -q "assets/www/index.html"
-
-      - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/wordchef-v1.4.0.apk
+          unzip -l app/build/outputs/apk/release/wordchef-v1.4.0.apk | grep -E "assets/www/index.html|assets/www/_next/" | head -20
+          unzip -l app/build/outputs/apk/release/wordchef-v1.4.0.apk | grep -q "assets/www/index.html"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: wordchef-v1.4.0-apk
-          path: android/app/build/outputs/apk/debug/wordchef-v1.4.0.apk
+          path: android/app/build/outputs/apk/release/wordchef-v1.4.0.apk
           if-no-files-found: error
           retention-days: 30
 
