@@ -21,7 +21,7 @@ from wordchef_prolepsis.bridge import WordChefRuntime
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Word Chef API", version="1.1.0",
+    app = FastAPI(title="Word Chef API", version="1.2.7",
                   description="Server-authoritative multiplayer word-cooking")
     store = Store(DB_PATH)
     runtime = WordChefRuntime(PROLEPSIS_ROOT)
