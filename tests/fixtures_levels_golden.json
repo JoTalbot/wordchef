@@ -152,8 +152,8 @@
   ],
   "bonus": [],
   "dish": {
-   "emoji": "🥣",
-   "name": "Борщ"
+   "emoji": "🍩",
+   "name": "Пончик"
   },
   "kitchen": "midnight",
   "level_no": 1000,
@@ -350,8 +350,8 @@
   ],
   "bonus": [],
   "dish": {
-   "emoji": "🍜",
-   "name": "Лапша"
+   "emoji": "🍳",
+   "name": "Омлет"
   },
   "kitchen": "midnight",
   "level_no": 250,
@@ -526,8 +526,8 @@
    "терка"
   ],
   "dish": {
-   "emoji": "🥟",
-   "name": "Пельмени"
+   "emoji": "🍔",
+   "name": "Бургер"
   },
   "kitchen": "midnight",
   "level_no": 500,
@@ -642,8 +642,8 @@
    "платок"
   ],
   "dish": {
-   "emoji": "🍥",
-   "name": "Рулет"
+   "emoji": "🥧",
+   "name": "Пирог"
   },
   "kitchen": "midnight",
   "level_no": 999,

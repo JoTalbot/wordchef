@@ -35,6 +35,12 @@ const DISH_ART: Record<string, string> = {
   "Тако": "img/dish_taco.jpg",
   "Плов": "img/dish_plov.jpg",
   "Смузи": "img/dish_smoothie.jpg",
+  "Бургер": "img/dish_burger.jpg",
+  "Шаурма": "img/dish_shaurma.jpg",
+  "Фалафель": "img/dish_falafel.jpg",
+  "Омлет": "img/dish_omlet.jpg",
+  "Кулич": "img/dish_kulich.jpg",
+  "Гуляш": "img/dish_gulyash.jpg",
 };
 
 const GUEST_ART: Record<string, { img: string; nick: string }> = {
@@ -49,6 +55,50 @@ const GUEST_ART: Record<string, { img: string; nick: string }> = {
 
 function guestArt(kitchen: string) {
   return GUEST_ART[kitchen] ?? GUEST_ART.street;
+}
+
+/** One flavour line per guest per level — stable per level, so replays read the same. */
+const GUEST_LINES: Record<string, string[]> = {
+  street: [
+    "Слышал, у тебя тут лучшая кухня в квартале. Не подведи!",
+    "Я проголодался ещё на прошлом уровне.",
+    "Готовь быстрее — у меня перерыв всего на обед.",
+  ],
+  bakery: [
+    "Внучек, главное — не пересуши тесто.",
+    "Слово — как дрожжи: дай ему подняться.",
+    "Сладкое блюдо — и хмурый день светлее.",
+  ],
+  sushi: [
+    "Точность важнее спешки. Хотя спешка тоже не повредит.",
+    "Режь чисто: лишняя буква — лишний рис.",
+    "Короткое слово — острый вкус.",
+  ],
+  space: [
+    "Гравитация тут слабая, а вот аппетит — нет.",
+    "На орбите суп не прольётся. Проверим?",
+    "Собери слово из звёзд-букв, пока топливо не кончилось.",
+  ],
+  cyber: [
+    "Оптимизирую вкус до 100%. Твой ход, шеф.",
+    "Ошибка 404: блюдо не найдено.",
+    "Расклад посчитан. Попробуй меня обогнать.",
+  ],
+  ancient: [
+    "В начале было Слово. В конце — ужин.",
+    "Мудрость — в специях, терпение — в варке.",
+    "Ищи слово там, где его не видно.",
+  ],
+  midnight: [
+    "Мяу. Рыбу я уже съел, остальное — твоё.",
+    "Ночью вкус острее, а слова — тише.",
+    "Мур. Продолжай, я слушаю ухом.",
+  ],
+};
+
+function guestLine(kitchen: string, levelNo: number): string {
+  const lines = GUEST_LINES[kitchen] ?? GUEST_LINES.street;
+  return lines[(Math.max(1, levelNo) - 1) % lines.length];
 }
 
 function dishArt(name: string): string {
@@ -208,7 +258,9 @@ function HomeScreen({
           style={{ backgroundImage: "url(img/mode_chaos.jpg)" }}
           onClick={onMulti}
         >
-          <span>🏆 Мультиплеер</span>
+          <span>
+            <img className="wc-inline-icon" src="img/ui_trophy.jpg" alt="" /> Мультиплеер
+          </span>
           <small>Quick Cook · Chaos Kitchen</small>
         </button>
       </div>
@@ -447,7 +499,9 @@ function LevelScreen({
             {grand ? "🌀 Гранд Тур" : `Уровень ${levelNo}`} · {level.dish.name}
           </span>
         </div>
-        <button className="wc-tool" onClick={doHint}>💡</button>
+        <button className="wc-tool" onClick={doHint} title={`Подсказка · ${HINT_COST} 🪙`} aria-label="Подсказка">
+          <img src="img/ui_hint.jpg" alt="" />
+        </button>
       </div>
 
       <div className="wc-card" style={{ marginTop: 10 }}>
@@ -469,6 +523,7 @@ function LevelScreen({
         <div className="wc-bar">
           <div style={{ width: `${(found.length / Math.max(1, boardWords.length)) * 100}%` }} />
         </div>
+        <div className="wc-guest-say">«{guestLine(level.kitchen, levelNo)}»</div>
       </div>
 
       <div className={`wc-grid ${shake ? "wc-shake" : ""}`}
@@ -513,7 +568,14 @@ function LevelScreen({
           <div
             key={`${letter}-${i}`}
             className={`wc-tile ${current.includes(i) ? "on" : ""}`}
-            style={{ left: centers[i].x, top: centers[i].y }}
+            style={{
+              left: centers[i].x,
+              top: centers[i].y,
+              // picked letters become golden ingredients
+              ...(current.includes(i)
+                ? { backgroundImage: "url(img/ui_gold_tile.jpg)", backgroundSize: "cover" }
+                : null),
+            }}
           >
             {letter}
           </div>

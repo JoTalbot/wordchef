@@ -437,7 +437,9 @@ export default function GameClient() {
       </div>
 
       <div className="panel">
-        <h2>STANDINGS</h2>
+        <h2>
+          <img className="gc-inline-icon" src="img/ui_trophy.jpg" alt="" /> STANDINGS
+        </h2>
         {(match?.leaderboard ?? []).map((row: BoardRow) => (
           <div key={row.player_id} className={`board-row ${row.player_id === playerId ? 'me' : ''}`}>
             <div className="pos">#{row.position}</div>
@@ -458,7 +460,7 @@ export default function GameClient() {
 
       <div className="row">
         <button className="btn small" disabled={busy || (me?.golden ?? 0) < 1} onClick={() => void ringBell()}>
-          🔔 ring the chaos bell (1⭐)
+          <img className="gc-inline-icon" src="img/ui_bell.jpg" alt="" /> ring the chaos bell (1⭐)
         </button>
         <button
           className="btn small"

@@ -108,6 +108,12 @@ DISHES = [
     {"emoji": "🌮", "name": "Тако"},
     {"emoji": "🍚", "name": "Плов"},
     {"emoji": "🥤", "name": "Смузи"},
+    {"emoji": "🍔", "name": "Бургер"},
+    {"emoji": "🌯", "name": "Шаурма"},
+    {"emoji": "🧆", "name": "Фалафель"},
+    {"emoji": "🍳", "name": "Омлет"},
+    {"emoji": "🍞", "name": "Кулич"},
+    {"emoji": "🍛", "name": "Гуляш"},
 ]
 
 KITCHENS = ["street", "bakery", "sushi", "space", "cyber", "ancient", "midnight"]

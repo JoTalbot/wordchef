@@ -214,6 +214,36 @@ button {
   box-shadow: var(--shadow);
   font-size: 22px;
 }
+.wc-tool img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* small artwork used inline inside text/buttons */
+.wc-inline-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  vertical-align: -4px;
+}
+.gc-inline-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  vertical-align: -3px;
+}
+
+/* guest flavour line under the level progress bar */
+.wc-guest-say {
+  margin-top: 8px;
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.72;
+  line-height: 1.35;
+}
 
 .wc-bonus-jar {
   display: inline-flex;
