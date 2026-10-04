@@ -3065,3 +3065,177 @@ button:focus-visible,
   .wc-game-screen .wc-tile{width:62px!important;height:62px!important;margin:-31px 0 0 -31px;}
   .wc-game-screen .wc-tile-letter{font-size:32px!important;}
 }
+
+/* ═══ REFERENCE #2 COMPOSITION OVERRIDE ═══ */
+@media (max-width:700px){
+  .wc-game-screen{
+    padding:0 14px max(10px,env(safe-area-inset-bottom));
+    background:
+      radial-gradient(circle at 50% 15%,rgba(190,118,42,.18),transparent 28%),
+      linear-gradient(180deg,#241109 0,#3a1c0f 20%,#24130b 100%);
+    font-family:Georgia,"Times New Roman",serif;
+  }
+
+  /* compact top bar, title becomes the hero ribbon */
+  .wc-game-screen .wc-level-header{
+    height:54px;
+    margin:0 -14px;
+    padding:5px 14px;
+    background:linear-gradient(180deg,#32180d,#1b0b06);
+    clip-path:none;
+    border-bottom:1px solid #8c5a25;
+    box-shadow:0 3px 10px rgba(0,0,0,.45);
+  }
+  .wc-game-screen .wc-level-header:after{display:none}
+  .wc-game-screen .wc-level-back{
+    width:42px;height:42px;margin-top:0;border-radius:12px;
+    background:linear-gradient(180deg,#5a311b,#2a1309);
+  }
+  .wc-game-screen .wc-level-badge{
+    margin-top:7px;font-size:10px;letter-spacing:1px;
+  }
+  .wc-game-screen .wc-level-coins{
+    margin-top:3px;height:40px;min-width:70px;
+  }
+
+  .wc-game-screen .wc-dish-heading{
+    z-index:8;
+    width:calc(100% - 54px);
+    min-height:68px;
+    margin:-5px auto 10px;
+    font-size:35px;
+    letter-spacing:0;
+    background:linear-gradient(180deg,#5b3119,#2b150b 55%,#170b07);
+    border:2px solid #b47a32;
+    border-radius:8px;
+    box-shadow:0 5px 0 #160a05,0 8px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,238,182,.38);
+  }
+  .wc-game-screen .wc-dish-heading:before,
+  .wc-game-screen .wc-dish-heading:after{
+    width:46px;height:38px;
+    border-color:#a96e2c;
+  }
+  .wc-game-screen .wc-dish-heading:before{left:-34px}
+  .wc-game-screen .wc-dish-heading:after{right:-34px}
+
+  /* reference order card */
+  .wc-game-screen .wc-game-status{
+    min-height:124px;
+    margin:0 2px 13px;
+    padding:12px 13px;
+    grid-template-columns:76px 1fr 53px;
+    border-radius:21px;
+    background:linear-gradient(180deg,#fbf4e9,#d8c9b5);
+    box-shadow:0 5px 0 #76563d,0 9px 18px rgba(0,0,0,.35),inset 0 2px 0 #fff;
+  }
+
+  /* big wooden crossword, but shorter like reference */
+  .wc-game-screen .wc-grid-scroll{
+    min-height:285px;
+    max-height:285px;
+    margin:0 1px;
+    padding:18px 8px;
+    border-radius:18px;
+    background:
+      linear-gradient(rgba(43,20,10,.25),rgba(24,11,6,.3)),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 2px,transparent 2px 14px),
+      linear-gradient(145deg,#684025,#3d2114);
+    box-shadow:0 8px 0 #1a0c07,0 12px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,224,168,.2);
+  }
+  .wc-game-screen .wc-grid{
+    gap:6px!important;
+    transform:scale(.72);
+  }
+  .wc-game-screen .wc-cell{
+    width:54px;height:54px;
+    border-radius:11px;
+    background:linear-gradient(145deg,#24130b,#4d2b17);
+    border:2px solid #b27a31;
+    box-shadow:inset 0 2px 0 rgba(255,225,145,.14),0 3px 0 #1b0c07;
+  }
+
+  /* word prompt */
+  .wc-game-screen .wc-word-entry{margin:10px 6px 0}
+  .wc-game-screen .wc-wordbar{
+    min-height:58px;
+    border-radius:18px;
+    background:linear-gradient(180deg,#f4eee5,#bcae9c);
+    border:2px solid #cdbfae;
+    box-shadow:0 4px 0 #6d5039,0 7px 12px rgba(0,0,0,.32),inset 0 2px 0 #fff;
+  }
+  .wc-game-screen .wc-wordbar-placeholder{
+    color:#fff8ef;
+    font-size:19px;
+    text-shadow:0 2px 3px rgba(75,49,31,.45);
+  }
+
+  /* reference plate zone */
+  .wc-game-screen .wc-cooking-stage{
+    min-height:420px;
+    margin:27px -1px 0;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    top:0;
+    width:min(72vw,400px);
+    background:
+      radial-gradient(circle,#f0e9dc 0 56%,#d2c2a8 57% 63%,#b9873d 64% 67%,#efe0be 68% 73%,#70451e 74% 76%,#351b0e 77%);
+    border:3px solid #d5ab5b;
+    box-shadow:0 10px 0 #30150b,0 17px 27px rgba(0,0,0,.5),inset 0 3px 0 #fff;
+  }
+  .wc-game-screen .wc-cooking-dish-art{
+    width:54%;height:54%;left:23%;top:23%;
+    opacity:1!important;
+  }
+  .wc-game-screen .wc-wheel{
+    top:18px;
+  }
+  .wc-game-screen .wc-tile{
+    width:67px!important;height:67px!important;
+    margin:-33.5px 0 0 -33.5px;
+    border:2px solid #d9aa53;
+    background:radial-gradient(circle at 34% 22%,#fff9e9 0 10%,#e9dfce 11% 50%,#bca98c 72%,#68431f 100%);
+    box-shadow:0 7px 0 #63340f,0 10px 14px rgba(0,0,0,.42),inset 0 2px 0 #fff;
+  }
+  .wc-game-screen .wc-tile-letter{
+    font-size:36px!important;
+    color:#513019;
+    text-shadow:0 2px 0 #fff9e8,0 3px 2px rgba(54,27,9,.4);
+  }
+
+  /* keep the cooking progress under the plate, not floating over it */
+  .wc-game-screen .wc-cook-progress{
+    right:50%;bottom:13px;
+    transform:translateX(50%) scale(.95);
+  }
+
+  /* bottom dock exactly like reference: bright / wide / readable */
+  .wc-game-screen .wc-wheel-tools{
+    position:relative;
+    bottom:auto;
+    margin:0 0 2px;
+    padding:8px 4px;
+    gap:8px;
+    border-radius:20px;
+    background:linear-gradient(180deg,rgba(51,25,12,.96),rgba(24,11,6,.98));
+    border:2px solid #80572e;
+  }
+  .wc-game-screen .wc-action-button{
+    min-height:64px;
+    border-radius:17px;
+    font-size:14px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
+
+@media(max-width:390px){
+  .wc-game-screen .wc-dish-heading{font-size:31px;min-height:62px}
+  .wc-game-screen .wc-game-status{min-height:116px}
+  .wc-game-screen .wc-grid-scroll{min-height:260px;max-height:260px}
+  .wc-game-screen .wc-cooking-stage{min-height:395px}
+  .wc-game-screen .wc-cooking-plate{width:76vw}
+  .wc-game-screen .wc-tile{width:62px!important;height:62px!important;margin:-31px 0 0 -31px}
+  .wc-game-screen .wc-tile-letter{font-size:33px!important}
+  .wc-game-screen .wc-action-button{min-height:60px;font-size:12px}
+}
