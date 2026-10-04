@@ -795,7 +795,7 @@ function LevelScreen({
 
       <div className="wc-grid-scroll" role="region" aria-label="Кроссворд блюда" tabIndex={0}>
         <div
-          className={`wc-grid ${shake ? "wc-shake" : ""}`}
+          className={`wc-grid ${shake ? "wc-shake" : ""} ${grid.rows >= 6 ? "wc-grid-tall" : ""}`}
           role="group"
           aria-label="Буквенная доска заказа"
           style={{ gridTemplateColumns: `repeat(${grid.cols}, 38px)` }}
