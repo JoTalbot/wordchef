@@ -3477,3 +3477,308 @@ button:focus-visible,
     transform: scale(.46);
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORD CHEF PRO MOBILE UI
+   Premium culinary board: tighter rhythm, richer materials, clear hierarchy.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width:700px){
+  .wc-game-screen{
+    min-height:100dvh;
+    padding:0 12px max(8px,env(safe-area-inset-bottom))!important;
+    background:
+      radial-gradient(ellipse at 50% -5%,rgba(208,153,67,.22),transparent 34%),
+      radial-gradient(circle at 8% 44%,rgba(154,93,37,.12),transparent 25%),
+      linear-gradient(180deg,#251107 0%,#3b1c0d 42%,#211008 100%)!important;
+    color:#3a2114;
+  }
+
+  /* Header: compact, premium, less wasted vertical space. */
+  .wc-game-screen .wc-level-header{
+    height:58px!important;
+    margin:0 -12px!important;
+    padding:6px 12px!important;
+    background:linear-gradient(180deg,#4a2713 0%,#211006 100%)!important;
+    border-bottom:1px solid #b47a32!important;
+    box-shadow:0 5px 16px rgba(0,0,0,.45),inset 0 -1px rgba(255,219,145,.16)!important;
+  }
+  .wc-game-screen .wc-level-back{
+    width:46px!important;height:46px!important;
+    border-radius:14px!important;
+    border:1px solid #a56d2c!important;
+    background:linear-gradient(145deg,#63371b,#2b1308)!important;
+    box-shadow:inset 0 1px rgba(255,239,188,.25),0 3px 0 #160a05!important;
+    font-size:26px!important;
+  }
+  .wc-game-screen .wc-level-badge{
+    margin-top:5px!important;
+    min-width:132px;
+    padding:8px 18px!important;
+    border:1px solid #765027!important;
+    border-radius:24px!important;
+    background:linear-gradient(180deg,#3b1d0e,#1d0c06)!important;
+    box-shadow:inset 0 1px rgba(255,231,168,.14)!important;
+    color:#f3d89b!important;
+    font-weight:800;
+    letter-spacing:1.2px!important;
+  }
+  .wc-game-screen .wc-level-coins{
+    height:42px!important;
+    min-width:78px!important;
+    padding:0 11px!important;
+    border:1px solid #bd8436!important;
+    border-radius:22px!important;
+    background:linear-gradient(180deg,#8b5b22,#3e210d)!important;
+    box-shadow:inset 0 1px rgba(255,246,207,.3),0 3px 0 #211006!important;
+  }
+  .wc-game-screen .wc-level-coins .wc-coin{width:26px!important;height:26px!important}
+  .wc-game-screen .wc-hint-action{
+    width:42px!important;height:42px!important;
+    border-radius:50%!important;
+    border:2px solid #e0b04e!important;
+    background:radial-gradient(circle at 35% 28%,#fff0ad,#c98b2c 52%,#63330f 100%)!important;
+    box-shadow:0 4px 0 #311609,0 6px 10px rgba(0,0,0,.35)!important;
+  }
+
+  /* Dish ribbon: a proper title plate instead of a floating text blob. */
+  .wc-game-screen .wc-dish-heading{
+    width:calc(100% - 58px)!important;
+    min-height:64px!important;
+    margin:-2px auto 10px!important;
+    padding:8px 20px!important;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    z-index:5;
+    font-size:34px!important;
+    line-height:1!important;
+    color:#ffe9ad!important;
+    background:
+      linear-gradient(180deg,rgba(115,61,24,.98),rgba(45,20,9,.98) 72%,rgba(25,10,5,.98))!important;
+    border:2px solid #aa702c!important;
+    border-radius:10px!important;
+    box-shadow:0 5px 0 #160a05,0 9px 18px rgba(0,0,0,.45),inset 0 1px rgba(255,241,194,.28)!important;
+    text-shadow:0 2px 0 #5d3414,0 3px 5px rgba(0,0,0,.4)!important;
+  }
+  .wc-game-screen .wc-dish-heading:before,
+  .wc-game-screen .wc-dish-heading:after{
+    content:""!important;
+    width:42px!important;height:34px!important;
+    top:13px!important;
+    border-color:#9c6426!important;
+    opacity:.9;
+  }
+
+  /* Guest order card: cream ceramic/linen, clean information hierarchy. */
+  .wc-game-screen .wc-game-status{
+    min-height:118px!important;
+    margin:0 1px 11px!important;
+    padding:11px 12px!important;
+    grid-template-columns:72px minmax(0,1fr) 52px!important;
+    gap:10px!important;
+    border-radius:22px!important;
+    background:
+      linear-gradient(180deg,#fffaf0 0%,#f1e5d2 54%,#d9c8b2 100%)!important;
+    border:2px solid #d0b98f!important;
+    box-shadow:0 5px 0 #6f4b2e,0 10px 18px rgba(0,0,0,.28),inset 0 2px #fff!important;
+  }
+  .wc-game-screen .wc-guest{
+    width:66px!important;height:66px!important;
+    border-radius:17px!important;
+    border:2px solid #c28b39!important;
+    box-shadow:0 3px 0 #795127,0 5px 9px rgba(0,0,0,.18)!important;
+  }
+  .wc-game-screen .wc-progress-caption{
+    font-size:17px!important;
+    color:#55351f!important;
+  }
+  .wc-game-screen .wc-progress-caption strong{
+    font-size:22px!important;
+    color:#39200f!important;
+  }
+  .wc-game-screen .wc-bar{
+    height:15px!important;
+    margin-top:7px!important;
+    border:1px solid #75451e!important;
+    border-radius:10px!important;
+    background:#351708!important;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.45)!important;
+  }
+  .wc-game-screen .wc-bar>div{
+    background:linear-gradient(90deg,#b87a27,#f0bd53)!important;
+    box-shadow:0 0 8px rgba(236,174,64,.35)!important;
+  }
+  .wc-game-screen .wc-guest-say{
+    color:#74553d!important;
+    font-family:Georgia,"Times New Roman",serif!important;
+  }
+  .wc-game-screen .wc-bonus-jar{
+    width:50px!important;height:64px!important;
+  }
+
+  /* Crossword becomes a real cutting-board surface. */
+  .wc-game-screen .wc-grid-scroll{
+    min-height:232px!important;
+    max-height:232px!important;
+    margin:0 1px!important;
+    padding:12px 7px!important;
+    border-radius:19px!important;
+    background:
+      linear-gradient(rgba(54,26,13,.18),rgba(30,13,7,.34)),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 13px),
+      linear-gradient(145deg,#704529,#3a1d10)!important;
+    border:1px solid #8d5927!important;
+    box-shadow:0 7px 0 #180b06,0 12px 20px rgba(0,0,0,.42),inset 0 1px rgba(255,229,172,.2)!important;
+  }
+  .wc-game-screen .wc-grid{
+    gap:5px!important;
+    transform:scale(.70)!important;
+    transform-origin:center center!important;
+  }
+  .wc-game-screen .wc-cell{
+    width:52px!important;height:52px!important;
+    border-radius:10px!important;
+    border:2px solid #b57b2e!important;
+    background:linear-gradient(145deg,#26130a,#4b2917)!important;
+    box-shadow:inset 0 2px rgba(255,222,145,.12),0 3px 0 #1b0c06!important;
+    color:#ffe9ad!important;
+    font-size:24px!important;
+    font-weight:800!important;
+  }
+  .wc-game-screen .wc-cell.filled,
+  .wc-game-screen .wc-cell.hinted{
+    background:linear-gradient(145deg,#fff6df,#d8c5a5)!important;
+    color:#4b2a16!important;
+    text-shadow:0 1px #fff!important;
+  }
+
+  /* Selection prompt. */
+  .wc-game-screen .wc-word-entry{
+    margin:7px 5px 0!important;
+  }
+  .wc-game-screen .wc-wordbar{
+    min-height:55px!important;
+    border-radius:18px!important;
+    border:2px solid #d5c6b3!important;
+    background:linear-gradient(180deg,#fffdf8,#d8cbbc)!important;
+    box-shadow:0 4px 0 #6f4f36,0 8px 12px rgba(0,0,0,.25),inset 0 2px #fff!important;
+  }
+  .wc-game-screen .wc-wordbar-placeholder{
+    font-size:19px!important;
+    color:#fff!important;
+    text-shadow:0 2px 3px rgba(55,32,17,.55)!important;
+  }
+  .wc-game-screen .wc-wordbar-label{
+    font-size:11px!important;
+    font-weight:800!important;
+    color:#d6aa55!important;
+    letter-spacing:1.5px!important;
+    text-shadow:0 2px #2a1208!important;
+  }
+
+  /* Cooking zone: centered, compact and fully visible above Android navigation. */
+  .wc-game-screen .wc-cooking-stage{
+    min-height:305px!important;
+    height:305px!important;
+    margin:6px 0 0!important;
+    overflow:visible!important;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    top:0!important;
+    width:270px!important;
+    height:270px!important;
+    background:
+      radial-gradient(circle,#f6efe1 0 55%,#d8c8ae 56% 62%,#c09346 63% 67%,#f1dfb8 68% 72%,#71441d 73% 76%,#34190d 77%)!important;
+    border:3px solid #d7ad5c!important;
+    box-shadow:0 9px 0 #2b1309,0 15px 24px rgba(0,0,0,.45),inset 0 3px #fff!important;
+  }
+  .wc-game-screen .wc-cooking-dish-art{
+    width:51%!important;height:51%!important;
+    left:24.5%!important;top:24.5%!important;
+    filter:drop-shadow(0 7px 7px rgba(0,0,0,.35))!important;
+  }
+  .wc-game-screen .wc-wheel{
+    top:2px!important;
+  }
+  .wc-game-screen .wc-tile{
+    width:61px!important;height:61px!important;
+    margin:-30.5px 0 0 -30.5px!important;
+    border:2px solid #d7a94f!important;
+    background:radial-gradient(circle at 35% 24%,#fffdf3 0 10%,#eee4d3 12% 53%,#c2ae90 74%,#704720 100%)!important;
+    box-shadow:0 6px 0 #63350f,0 9px 13px rgba(0,0,0,.36),inset 0 2px #fff!important;
+  }
+  .wc-game-screen .wc-tile-letter{
+    font-family:Georgia,"Times New Roman",serif!important;
+    font-size:32px!important;
+    font-weight:700!important;
+    color:#513019!important;
+    text-shadow:0 2px #fffaf0,0 3px 2px rgba(54,27,9,.35)!important;
+  }
+  .wc-game-screen .wc-cook-progress{
+    bottom:9px!important;
+    right:50%!important;
+    transform:translateX(50%) scale(.9)!important;
+  }
+  .wc-game-screen .wc-cooking-caption{
+    bottom:-1px!important;
+    color:#f1d493!important;
+    font-size:12px!important;
+    letter-spacing:1.2px!important;
+    text-shadow:0 2px #261006!important;
+  }
+
+  /* Compact action dock, always inside the visible viewport. */
+  .wc-game-screen .wc-wheel-tools{
+    margin:2px 2px 0!important;
+    padding:5px!important;
+    gap:6px!important;
+    border-radius:17px!important;
+    border:1px solid #80552b!important;
+    background:linear-gradient(180deg,#482512,#211006)!important;
+    box-shadow:0 4px 0 #160a05,0 8px 15px rgba(0,0,0,.32)!important;
+  }
+  .wc-game-screen .wc-action-button{
+    min-height:47px!important;
+    border-radius:13px!important;
+    border:1px solid #8f602c!important;
+    background:linear-gradient(180deg,#5a3018,#2c1409)!important;
+    color:#f3d8a0!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    box-shadow:inset 0 1px rgba(255,239,193,.15)!important;
+  }
+  .wc-game-screen .wc-action-button.primary{
+    background:linear-gradient(180deg,#43bd61,#16823c)!important;
+    border-color:#70d985!important;
+    color:#fff!important;
+    box-shadow:0 3px 0 #07562a,inset 0 1px rgba(255,255,255,.3)!important;
+  }
+  .wc-game-screen .wc-action-icon{
+    font-size:15px!important;
+  }
+}
+
+@media(max-width:390px){
+  .wc-game-screen .wc-grid-scroll{
+    min-height:205px!important;
+    max-height:205px!important;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:285px!important;
+    height:285px!important;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    width:252px!important;height:252px!important;
+  }
+  .wc-game-screen .wc-tile{
+    width:57px!important;height:57px!important;
+    margin:-28.5px 0 0 -28.5px!important;
+  }
+  .wc-game-screen .wc-tile-letter{font-size:30px!important}
+  .wc-game-screen .wc-action-button{
+    min-height:44px!important;
+    font-size:10px!important;
+  }
+}
