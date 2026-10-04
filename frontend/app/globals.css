@@ -3782,3 +3782,103 @@ button:focus-visible,
     font-size:10px!important;
   }
 }
+
+
+/* ═══ FINAL PHONE VIEWPORT FIT ═══
+   Keep the complete play loop visible without sacrificing the premium look.
+*/
+@media (max-width:700px){
+  .wc-game-screen .wc-level-header{height:54px!important;padding:5px 12px!important}
+  .wc-game-screen .wc-level-back{width:44px!important;height:44px!important}
+  .wc-game-screen .wc-level-coins{height:40px!important}
+  .wc-game-screen .wc-dish-heading{
+    min-height:58px!important;
+    margin:-2px auto 7px!important;
+    font-size:32px!important;
+  }
+  .wc-game-screen .wc-game-status{
+    min-height:104px!important;
+    margin-bottom:8px!important;
+    padding:9px 11px!important;
+    grid-template-columns:68px minmax(0,1fr) 48px!important;
+  }
+  .wc-game-screen .wc-guest{width:62px!important;height:62px!important}
+  .wc-game-screen .wc-progress-caption{font-size:16px!important}
+  .wc-game-screen .wc-progress-caption strong{font-size:21px!important}
+  .wc-game-screen .wc-guest-say{font-size:11px!important}
+  .wc-game-screen .wc-grid-scroll{
+    min-height:200px!important;
+    max-height:200px!important;
+    padding:9px 6px!important;
+  }
+  .wc-game-screen .wc-grid{transform:scale(.64)!important}
+  .wc-game-screen .wc-cell{width:50px!important;height:50px!important}
+  .wc-game-screen .wc-word-entry{
+    margin:6px 4px 0!important;
+  }
+  .wc-game-screen .wc-wordbar{
+    min-height:52px!important;
+  }
+  .wc-game-screen .wc-wordbar-placeholder{font-size:18px!important}
+  .wc-game-screen .wc-wordbar-label{
+    bottom:-8px!important;
+    z-index:2!important;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:265px!important;
+    height:265px!important;
+    margin:9px 0 0!important;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    width:230px!important;
+    height:230px!important;
+    top:-1px!important;
+  }
+  .wc-game-screen .wc-cooking-dish-art{
+    width:50%!important;height:50%!important;
+    left:25%!important;top:25%!important;
+  }
+  .wc-game-screen .wc-wheel{
+    top:-3px!important;
+  }
+  .wc-game-screen .wc-tile{
+    width:54px!important;height:54px!important;
+    margin:-27px 0 0 -27px!important;
+  }
+  .wc-game-screen .wc-tile-letter{font-size:29px!important}
+  .wc-game-screen .wc-cook-progress{
+    bottom:8px!important;
+    transform:translateX(50%) scale(.82)!important;
+  }
+  .wc-game-screen .wc-cooking-caption{
+    bottom:-2px!important;
+    font-size:11px!important;
+  }
+  .wc-game-screen .wc-wheel-tools{
+    margin:1px 2px 0!important;
+    padding:4px!important;
+  }
+  .wc-game-screen .wc-action-button{
+    min-height:44px!important;
+    font-size:10px!important;
+  }
+}
+
+@media(max-width:390px){
+  .wc-game-screen .wc-grid-scroll{
+    min-height:185px!important;
+    max-height:185px!important;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:245px!important;
+    height:245px!important;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    width:214px!important;height:214px!important;
+  }
+  .wc-game-screen .wc-tile{
+    width:50px!important;height:50px!important;
+    margin:-25px 0 0 -25px!important;
+  }
+  .wc-game-screen .wc-tile-letter{font-size:27px!important}
+}
