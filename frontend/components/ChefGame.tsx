@@ -591,7 +591,7 @@ function LevelScreen({
   }, [found]);
 
   // ── wheel geometry ──
-  const size = typeof window !== "undefined" ? Math.min(270, window.innerWidth * 0.70) : 270;
+  const size = typeof window !== "undefined" ? Math.min(250, window.innerWidth * 0.66) : 250;
   const radius = size * 0.34;
   const centers = useMemo(() => {
     const n = wheel.length || 1;
