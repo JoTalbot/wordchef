@@ -3023,3 +3023,45 @@ button:focus-visible,
 .wc-game-screen .wc-cook-progress{transform:scale(.9)}.wc-game-screen .wc-reward-burst{top:18px}
 }
 @media(max-width:390px){.wc-game-screen{padding-left:8px;padding-right:8px}.wc-game-screen .wc-game-status{grid-template-columns:66px 1fr 45px;gap:7px}.wc-game-screen .wc-guest{width:63px;height:63px}.wc-game-screen .wc-progress-caption{font-size:13px}.wc-game-screen .wc-guest-say{font-size:11px}.wc-game-screen .wc-tile{width:64px!important;height:64px!important;margin:-32px 0 0 -32px}.wc-game-screen .wc-tile-letter{font-size:33px!important}.wc-game-screen .wc-cooking-stage{min-height:365px}.wc-game-screen .wc-cooking-plate{width:88vw}.wc-game-screen .wc-action-button{min-height:61px;font-size:13px}}
+
+/* FINAL REFERENCE PROPORTIONS */
+@media(max-width:700px){
+  .wc-game-screen{padding-bottom:max(12px,env(safe-area-inset-bottom));}
+  .wc-game-screen .wc-level-header{height:86px;}
+  .wc-game-screen .wc-dish-heading{margin:-27px auto 9px;min-height:52px;font-size:32px;}
+  .wc-game-screen .wc-game-status{min-height:104px;margin-bottom:10px;padding:10px 12px;}
+  .wc-game-screen .wc-grid-scroll{min-height:205px;max-height:225px;padding:12px 8px;margin-bottom:9px;}
+  .wc-game-screen .wc-grid{gap:6px!important;grid-auto-rows:48px;transform:scale(.76);}
+  .wc-game-screen .wc-cell{width:48px;height:48px;border-radius:10px;font-size:23px;}
+  .wc-game-screen .wc-word-entry{margin:8px 7px 0;}
+  .wc-game-screen .wc-wordbar{min-height:58px;border-radius:19px;}
+  .wc-game-screen .wc-wordbar-placeholder{font-size:19px;}
+  .wc-game-screen .wc-wordbar-label{bottom:-3px;}
+  .wc-game-screen .wc-cooking-stage{min-height:350px;margin:28px -2px 0;}
+  .wc-game-screen .wc-cooking-plate{
+    top:0;
+    width:min(68vw,430px);
+  }
+  .wc-game-screen .wc-cooking-dish-art{
+    width:52%;height:52%;left:24%;top:24%;
+    opacity:1!important;
+    filter:drop-shadow(0 8px 9px rgba(0,0,0,.42));
+  }
+  .wc-game-screen .wc-wheel{top:10px;}
+  .wc-game-screen .wc-tile{
+    width:68px!important;height:68px!important;
+    margin:-34px 0 0 -34px;
+  }
+  .wc-game-screen .wc-tile-letter{font-size:35px!important;}
+  .wc-game-screen .wc-cooking-caption{bottom:0;}
+  .wc-game-screen .wc-wheel-tools{margin-top:2px;position:sticky;}
+  .wc-game-screen .wc-action-button{min-height:62px;}
+}
+@media(max-width:390px){
+  .wc-game-screen .wc-game-status{min-height:98px;}
+  .wc-game-screen .wc-grid-scroll{min-height:190px;max-height:205px;}
+  .wc-game-screen .wc-cooking-stage{min-height:330px;}
+  .wc-game-screen .wc-cooking-plate{width:74vw;}
+  .wc-game-screen .wc-tile{width:62px!important;height:62px!important;margin:-31px 0 0 -31px;}
+  .wc-game-screen .wc-tile-letter{font-size:32px!important;}
+}
