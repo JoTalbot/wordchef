@@ -3974,3 +3974,21 @@ button:focus-visible,
   }
   .wc-game-screen .wc-tile-letter{font-size:27px!important}
 }
+
+
+/* FINAL WHEEL CENTER LOCK
+   The phone screenshot shows the wheel's visual center drifting left of the plate.
+   Lock both centers to the same optical axis instead of relying on inherited layout.
+*/
+@media (max-width:700px){
+  .wc-game-screen .wc-cooking-stage .wc-wheel{
+    left:calc(50% + 55px)!important;
+    transform:translateX(-50%)!important;
+    margin-left:0!important;
+  }
+}
+@media(max-width:390px){
+  .wc-game-screen .wc-cooking-stage .wc-wheel{
+    left:calc(50% + 46px)!important;
+  }
+}
