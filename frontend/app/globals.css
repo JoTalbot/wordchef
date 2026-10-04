@@ -2680,3 +2680,149 @@ button:focus-visible,
     font-size: 29px;
   }
 }
+
+
+/* ── final cooking scene composition: letters physically sit over dish ── */
+.wc-game-screen .wc-cooking-stage {
+  position: relative;
+  width: min(100%, 330px);
+  height: 306px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.wc-game-screen .wc-cooking-plate {
+  inset: 30px 28px 24px;
+  border-width: 4px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,250,226,.38), transparent 43%),
+    linear-gradient(145deg, #f4e1b8, #c3833e 53%, #713c18);
+  box-shadow:
+    0 9px 0 #4a220e,
+    0 15px 24px rgba(24,8,2,.3),
+    inset 0 3px 0 rgba(255,255,255,.72),
+    inset 0 -7px 16px rgba(75,30,7,.24);
+}
+
+.wc-game-screen .wc-cooking-dish-art {
+  width: 64%;
+  height: 64%;
+  z-index: 1;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 7px 7px rgba(54,22,5,.32)) saturate(1.15) contrast(1.04);
+}
+
+.wc-game-screen .wc-wheel {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  z-index: 8;
+  pointer-events: auto;
+}
+
+.wc-game-screen .wc-tile {
+  z-index: 12;
+  width: 62px;
+  height: 62px;
+  margin: -31px 0 0 -31px;
+  border-width: 3px;
+  background:
+    radial-gradient(circle at 31% 22%, rgba(255,255,255,.38), transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(255,227,166,.08), transparent 62%),
+    url(/img/ui_tile_wood.webp) center/cover;
+  box-shadow:
+    0 7px 0 #632b0e,
+    0 10px 16px rgba(29,8,2,.36),
+    inset 0 3px 0 rgba(255,248,221,.85),
+    inset 0 -4px 0 rgba(67,25,5,.22);
+  transition:
+    transform .12s cubic-bezier(.2,.9,.25,1.2),
+    filter .12s ease,
+    box-shadow .12s ease;
+}
+
+.wc-game-screen .wc-tile-letter {
+  color: #fff8e7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 900;
+  -webkit-text-stroke: .35px rgba(73,29,5,.72);
+  text-shadow:
+    0 2px 0 #552309,
+    0 3px 5px rgba(0,0,0,.48);
+}
+
+.wc-game-screen .wc-tile.on {
+  transform: scale(1.12) translateY(-5px);
+  border-color: #ffe38a;
+  box-shadow:
+    0 10px 0 #8b4d08,
+    0 15px 22px rgba(104,48,2,.38),
+    0 0 18px rgba(255,190,45,.34),
+    inset 0 3px 0 rgba(255,255,255,.9);
+}
+
+.wc-game-screen .wc-tile.on .wc-tile-letter {
+  color: #5b2b05;
+  -webkit-text-stroke: 0;
+  text-shadow: 0 1px 0 rgba(255,249,221,.9);
+}
+
+.wc-game-screen .wc-cooking-stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 58%;
+  height: 42%;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,185,49,.18), transparent 68%);
+  opacity: calc(.15 + var(--cook-progress, 0%) * .003);
+  transition: opacity .4s ease;
+}
+
+.wc-game-screen .wc-lightning-layer {
+  z-index: 15;
+}
+
+.wc-game-screen .wc-lightning-glow {
+  stroke: rgba(255,190,36,.96);
+  stroke-width: 11;
+  filter: blur(5px);
+}
+
+.wc-game-screen .wc-lightning-core {
+  stroke: #fff8c8;
+  stroke-width: 3.2;
+  filter: drop-shadow(0 0 5px #ffad19);
+}
+
+.wc-game-screen .wc-cooking-caption {
+  bottom: 3px;
+  z-index: 20;
+  padding: 4px 11px;
+  font-size: 9px;
+  background: rgba(45,19,7,.9);
+}
+
+@media (max-width:390px) {
+  .wc-game-screen .wc-cooking-stage {
+    height: 294px;
+  }
+  .wc-game-screen .wc-cooking-plate {
+    inset: 30px 25px 23px;
+  }
+  .wc-game-screen .wc-tile {
+    width: 59px;
+    height: 59px;
+    margin: -29.5px 0 0 -29.5px;
+  }
+  .wc-game-screen .wc-tile-letter {
+    font-size: 30px;
+  }
+}
