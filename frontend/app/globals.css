@@ -2390,3 +2390,82 @@ button:focus-visible,
     font-size: 27px;
   }
 }
+
+
+/* ── premium letter tiles, reference-inspired ───────────────────── */
+.wc-game-screen .wc-tile {
+  width: 62px;
+  height: 62px;
+  margin: -31px 0 0 -31px;
+  border-radius: 18px;
+  border: 3px solid #e2b45b;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.22), transparent 34%),
+    url(/img/ui_tile_wood.webp) center/cover;
+  box-shadow:
+    0 7px 0 #713713,
+    0 10px 16px rgba(34,13,4,.28),
+    inset 0 2px 0 rgba(255,255,255,.72),
+    inset 0 -3px 0 rgba(78,34,12,.22);
+  color: #f8e4bf;
+  font-size: 29px;
+  font-weight: 950;
+  letter-spacing: .01em;
+  text-shadow:
+    0 2px 0 #633014,
+    0 3px 4px rgba(0,0,0,.3);
+  transform: translateY(0);
+  transition: transform .1s ease, filter .1s ease, box-shadow .1s ease;
+}
+
+.wc-game-screen .wc-tile::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,238,188,.42);
+  pointer-events: none;
+}
+
+.wc-game-screen .wc-tile:hover {
+  filter: brightness(1.06);
+}
+
+.wc-game-screen .wc-tile:active {
+  transform: translateY(4px) scale(.97);
+  box-shadow:
+    0 3px 0 #713713,
+    0 5px 9px rgba(34,13,4,.22),
+    inset 0 2px 0 rgba(255,255,255,.55);
+}
+
+.wc-game-screen .wc-tile.on {
+  border-color: #ffd76b;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.34), transparent 36%),
+    url(/img/ui_gold_tile.webp) center/cover;
+  color: #633500;
+  text-shadow: 0 1px 0 rgba(255,255,255,.72);
+  box-shadow:
+    0 7px 0 #9a5a12,
+    0 11px 18px rgba(106,55,7,.28),
+    inset 0 2px 0 rgba(255,255,255,.82),
+    inset 0 -3px 0 rgba(120,67,7,.18);
+  transform: scale(1.08);
+}
+
+.wc-game-screen .wc-tile.used {
+  transform: scale(.88);
+  opacity: .42;
+  filter: saturate(.55);
+}
+
+@media (max-width:390px) {
+  .wc-game-screen .wc-tile {
+    width: 58px;
+    height: 58px;
+    margin: -29px 0 0 -29px;
+    border-radius: 17px;
+    font-size: 27px;
+  }
+}
