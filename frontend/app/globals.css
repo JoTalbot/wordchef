@@ -2826,3 +2826,159 @@ button:focus-visible,
     font-size: 30px;
   }
 }
+
+
+/* ── cooking progression / combo / reward polish ─────────────────── */
+.wc-game-screen .wc-cooking-plate {
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), filter .45s ease, box-shadow .45s ease;
+}
+.wc-game-screen .wc-cook-stage-0 {
+  filter: saturate(.82) brightness(.94);
+}
+.wc-game-screen .wc-cook-stage-1 {
+  filter: saturate(1.0) brightness(1);
+  box-shadow:
+    0 10px 0 #4b2410, 0 16px 28px rgba(24,8,2,.34),
+    0 0 18px rgba(255,177,45,.12), inset 0 3px 0 rgba(255,255,255,.72);
+}
+.wc-game-screen .wc-cook-stage-2 {
+  filter: saturate(1.12) brightness(1.04);
+  box-shadow:
+    0 10px 0 #4b2410, 0 18px 31px rgba(24,8,2,.36),
+    0 0 27px rgba(255,177,45,.25), inset 0 3px 0 rgba(255,255,255,.78);
+}
+.wc-game-screen .wc-cook-stage-3 {
+  filter: saturate(1.22) brightness(1.08);
+  box-shadow:
+    0 10px 0 #4b2410, 0 20px 35px rgba(24,8,2,.4),
+    0 0 38px rgba(255,193,55,.42), inset 0 3px 0 rgba(255,255,255,.86);
+}
+.wc-game-screen .wc-ingredient-glow {
+  position:absolute;
+  inset:16%;
+  z-index:2;
+  border-radius:50%;
+  pointer-events:none;
+  background:radial-gradient(circle, rgba(255,204,84,.28), transparent 65%);
+  opacity:.1;
+  transition:opacity .45s ease, transform .45s ease;
+}
+.wc-game-screen .wc-cook-stage-1 .wc-ingredient-glow { opacity:.28; }
+.wc-game-screen .wc-cook-stage-2 .wc-ingredient-glow { opacity:.46; transform:scale(1.08); }
+.wc-game-screen .wc-cook-stage-3 .wc-ingredient-glow { opacity:.68; transform:scale(1.15); }
+
+.wc-game-screen .wc-cook-ingredients {
+  position:absolute;
+  inset:20% 18%;
+  z-index:3;
+  pointer-events:none;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  opacity:.08;
+  transform:scale(.72);
+  transition:opacity .4s ease, transform .5s cubic-bezier(.2,.9,.25,1.2);
+  font-size:21px;
+  filter:drop-shadow(0 2px 3px rgba(48,18,3,.35));
+}
+.wc-game-screen .wc-cook-stage-1 .wc-cook-ingredients { opacity:.34; transform:scale(.84); }
+.wc-game-screen .wc-cook-stage-2 .wc-cook-ingredients { opacity:.62; transform:scale(.94); }
+.wc-game-screen .wc-cook-stage-3 .wc-cook-ingredients { opacity:.9; transform:scale(1); }
+
+.wc-game-screen .wc-cook-progress {
+  position:absolute;
+  right:18px;
+  bottom:16px;
+  z-index:14;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 9px;
+  border:1px solid rgba(255,226,143,.8);
+  border-radius:999px;
+  background:rgba(52,23,8,.82);
+  color:#ffe7a8;
+  box-shadow:0 3px 8px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15);
+  font-size:10px;
+  font-weight:900;
+}
+
+.wc-game-screen .wc-cook-celebrate {
+  animation:wc-dish-finish .95s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes wc-dish-finish {
+  0% { transform:scale(1); }
+  28% { transform:scale(1.08) rotate(-1deg); filter:brightness(1.3) saturate(1.25); }
+  55% { transform:scale(.98) rotate(1deg); }
+  78% { transform:scale(1.04); }
+  100% { transform:scale(1); }
+}
+
+.wc-game-screen .wc-cooking-caption {
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.wc-game-screen .wc-cooking-caption.wc-combo-hot {
+  background:linear-gradient(180deg, rgba(133,64,9,.96), rgba(57,23,5,.96));
+  box-shadow:0 0 16px rgba(255,169,35,.35), inset 0 1px 0 rgba(255,238,174,.22);
+  transform:translateX(-50%) scale(1.06);
+  color:#fff0bd;
+}
+.wc-game-screen .wc-reward-burst {
+  position:absolute;
+  left:50%;
+  top:12px;
+  z-index:30;
+  transform:translateX(-50%);
+  padding:7px 13px;
+  border:2px solid #f2c65f;
+  border-radius:999px;
+  background:linear-gradient(180deg, #fff3bd, #e99a27);
+  color:#6a3509;
+  box-shadow:0 5px 0 #8b4b10, 0 9px 16px rgba(46,15,2,.28), inset 0 2px 0 #fff;
+  font-size:11px;
+  font-weight:1000;
+  white-space:nowrap;
+  animation:wc-reward-pop 1s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes wc-reward-pop {
+  0% { opacity:0; transform:translate(-50%,10px) scale(.7); }
+  20% { opacity:1; transform:translate(-50%,0) scale(1.08); }
+  70% { opacity:1; transform:translate(-50%,-12px) scale(1); }
+  100% { opacity:0; transform:translate(-50%,-25px) scale(.96); }
+}
+
+.wc-game-screen .wc-cook-celebration {
+  position:absolute;
+  inset:0;
+  z-index:40;
+  pointer-events:none;
+}
+.wc-game-screen .wc-cook-celebration i {
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:7px;
+  height:18px;
+  border-radius:4px;
+  background:#ffd45f;
+  box-shadow:0 0 8px rgba(255,208,80,.8);
+  animation:wc-ingredient-burst .9s ease-out forwards;
+}
+.wc-game-screen .wc-cook-celebration i:nth-child(1){transform:rotate(0deg);animation-delay:.02s}
+.wc-game-screen .wc-cook-celebration i:nth-child(2){transform:rotate(60deg);animation-delay:.06s}
+.wc-game-screen .wc-cook-celebration i:nth-child(3){transform:rotate(120deg);animation-delay:.1s}
+.wc-game-screen .wc-cook-celebration i:nth-child(4){transform:rotate(180deg);animation-delay:.14s}
+.wc-game-screen .wc-cook-celebration i:nth-child(5){transform:rotate(240deg);animation-delay:.18s}
+.wc-game-screen .wc-cook-celebration i:nth-child(6){transform:rotate(300deg);animation-delay:.22s}
+@keyframes wc-ingredient-burst {
+  0% { opacity:0; margin:-8px 0 0 -3px; }
+  20% { opacity:1; }
+  100% { opacity:0; margin:-82px 0 0 -3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-game-screen .wc-cook-celebrate,
+  .wc-game-screen .wc-reward-burst,
+  .wc-game-screen .wc-cook-celebration i,
+  .wc-game-screen .wc-steam { animation:none; }
+}
