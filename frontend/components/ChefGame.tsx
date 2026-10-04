@@ -97,6 +97,38 @@ function lightningPath(a: { x: number; y: number }, b: { x: number; y: number },
   return points.join(" ");
 }
 
+function playGameTone(kind: "pick" | "word" | "bonus" | "finish" | "error") {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioCtx = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const notes: Record<typeof kind, number[]> = {
+      pick: [440],
+      word: [523.25, 659.25],
+      bonus: [659.25, 783.99, 987.77],
+      finish: [523.25, 659.25, 783.99, 1046.5],
+      error: [180, 140],
+    };
+    const sequence = notes[kind];
+    sequence.forEach((frequency, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = kind === "error" ? "sawtooth" : "sine";
+      osc.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + i * 0.07);
+      gain.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + i * 0.07 + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.07 + 0.16);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.07);
+      osc.stop(ctx.currentTime + i * 0.07 + 0.17);
+    });
+    window.setTimeout(() => void ctx.close(), 900);
+  } catch {
+    // Audio is decorative. The game remains fully playable when unavailable.
+  }
+}
+
 function guestArt(kitchen: string) {
   return GUEST_ART[kitchen] ?? GUEST_ART.street;
 }
@@ -470,12 +502,16 @@ function LevelScreen({
   const [hinted, setHinted] = useState<Record<string, boolean>>({});
   const [shake, setShake] = useState(false);
   const [done, setDone] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const [combo, setCombo] = useState(0);
+  const [rewardBurst, setRewardBurst] = useState("");
   const wheelRef = useRef<HTMLDivElement | null>(null);
   const dragging = useRef(false);
   const usedInSwipe = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     setFound([]); setBonusFound([]); setCurrent([]); setHinted({}); setDone(false);
+    setCelebrating(false); setCombo(0); setRewardBurst("");
     setWheel(generateLevel(levelNo).wheel);
   }, [levelNo]);
 
@@ -487,20 +523,39 @@ function LevelScreen({
     if (word.length < 2) return;
     const kind = classifyWord(level, word);
     if (kind === "board") {
-      if (found.includes(word)) { flash("Уже в блюде!"); }
-      else {
+      if (found.includes(word)) {
+        setCombo(0);
+        playGameTone("error");
+        flash("Уже в блюде!");
+      } else {
+        const nextCombo = combo + 1;
+        const comboMultiplier = Math.min(4, Math.max(1, Math.floor(nextCombo / 2) + 1));
+        const reward = 2 * word.length * comboMultiplier;
         setFound((f) => [...f, word]);
-        addCoins(2 * word.length);
-        flash(`+${2 * word.length} 🪙 · ${word}`);
+        setCombo(nextCombo);
+        setRewardBurst(`+${reward} 🪙${nextCombo >= 2 ? ` · COMBO ×${comboMultiplier}` : ""}`);
+        addCoins(reward);
+        playGameTone(nextCombo >= 3 ? "bonus" : "word");
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+          try { navigator.vibrate(nextCombo >= 3 ? [12, 25, 12] : 12); } catch {}
+        }
+        flash(`+${reward} 🪙 · ${word}${nextCombo >= 2 ? ` · ×${comboMultiplier}` : ""}`);
+        window.setTimeout(() => setRewardBurst(""), 1000);
       }
     } else if (kind === "bonus") {
       if (bonusFound.includes(word)) flash("Бонус уже найден");
       else {
         setBonusFound((b) => [...b, word]);
         addCoins(word.length);
+        setCombo((c) => c + 1);
+        setRewardBurst(`БОНУС +${word.length} 🪙`);
+        playGameTone("bonus");
         flash(`Бонусное слово ${word} · +${word.length} 🪙`);
+        window.setTimeout(() => setRewardBurst(""), 1000);
       }
     } else {
+      setCombo(0);
+      playGameTone("error");
       setShake(true);
       window.setTimeout(() => setShake(false), 300);
       flash("Такого слова нет в этом заказе");
@@ -510,7 +565,12 @@ function LevelScreen({
 
   useEffect(() => {
     if (!done && boardWords.length > 0 && boardWords.every((w) => found.includes(w))) {
-      setDone(true);
+      setCelebrating(true);
+      playGameTone("finish");
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        try { navigator.vibrate([18, 35, 18, 55, 28]); } catch {}
+      }
+      window.setTimeout(() => setDone(true), 1050);
       const reward = 30 + levelNo;
       addCoins(reward);
       if (grand) onGrandComplete?.();
@@ -777,20 +837,27 @@ function LevelScreen({
         className="wc-cooking-stage"
         style={{ ["--cook-progress" as string]: `${found.length / Math.max(1, boardWords.length) * 100}%` }}
       >
-        <div className="wc-cooking-plate" aria-hidden="true">
+        <div className={`wc-cooking-plate wc-cook-stage-${Math.min(3, found.length)} ${celebrating ? "wc-cook-celebrate" : ""}`} aria-label={`Приготовление ${found.length} из ${boardWords.length}`}>
           <div className="wc-plate-rim" />
+          <div className="wc-ingredient-glow" />
           <img
             className="wc-cooking-dish-art"
             src={dishArt(level.dish.name)}
             alt=""
             style={{
-              opacity: 0.2 + (found.length / Math.max(1, boardWords.length)) * 0.8,
-              transform: `scale(${0.78 + (found.length / Math.max(1, boardWords.length)) * 0.22})`,
+              opacity: 0.35 + (found.length / Math.max(1, boardWords.length)) * 0.65,
+              transform: `scale(${0.74 + (found.length / Math.max(1, boardWords.length)) * 0.26})`,
             }}
           />
+          <div className="wc-cook-ingredients" aria-hidden="true">
+            <span>🥬</span><span>🍅</span><span>🥒</span><span>🧅</span><span>✨</span>
+          </div>
           <span className="wc-steam wc-steam-a" />
           <span className="wc-steam wc-steam-b" />
           <span className="wc-steam wc-steam-c" />
+          <div className="wc-cook-progress">
+            <span>🍳</span><strong>{found.length}/{boardWords.length}</strong>
+          </div>
         </div>
         <div
           className="wc-wheel"
@@ -838,11 +905,15 @@ function LevelScreen({
             </div>
           ))}
         </div>
-        <div className="wc-cooking-caption" aria-hidden="true">
-          <span>🍳</span>
-          <strong>{found.length === 0 ? "Собираем ингредиенты" : found.length < boardWords.length ? "Блюдо готовится" : "Подаём!"}</strong>
+        <div className={`wc-cooking-caption ${combo >= 2 ? "wc-combo-hot" : ""}`} aria-live="polite">
+          <span>🔥</span>
+          <strong>{combo >= 2 ? `КОМБО ×${Math.min(4, Math.floor(combo / 2) + 1)}` : found.length === boardWords.length ? "ГОТОВО!" : "ГОТОВИМ"}</strong>
           <span>{found.length}/{boardWords.length}</span>
         </div>
+        {rewardBurst && <div className="wc-reward-burst" aria-live="polite">{rewardBurst}</div>}
+        {celebrating && <div className="wc-cook-celebration" aria-hidden="true">
+          <i /><i /><i /><i /><i /><i />
+        </div>}
       </div>
 
       <div className="wc-wheel-tools" role="group" aria-label="Действия со словом">
