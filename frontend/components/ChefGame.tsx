@@ -793,7 +793,7 @@ function LevelScreen({
         </span>
       </section>
 
-      <div className="wc-grid-scroll" role="region" aria-label="Кроссворд блюда" tabIndex={0}>
+      <div className={`wc-grid-scroll ${grid.rows >= 6 ? "wc-grid-scroll-tall" : ""}`} role="region" aria-label="Кроссворд блюда" tabIndex={0}>
         <div
           className={`wc-grid ${shake ? "wc-shake" : ""} ${grid.rows >= 6 ? "wc-grid-tall" : ""}`}
           role="group"
