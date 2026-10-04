@@ -3313,3 +3313,130 @@ button:focus-visible,
     font-size:31px!important;
   }
 }
+
+
+/* FINAL SCREENSHOT FIT: home hero + complete Android letter wheel */
+@media (max-width:700px){
+  /* Home: keep the chef portrait a portrait, not a giant oval invading the campaign card. */
+  .wc-home-screen .wc-hero{
+    overflow:hidden;
+  }
+  .wc-home-screen .wc-hero > img{
+    display:block;
+    width:100%!important;
+    height:220px!important;
+    min-height:220px!important;
+    object-fit:cover!important;
+    object-position:center 48%!important;
+  }
+  .wc-home-screen .wc-hero-title{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    min-height:96px;
+    padding:42px 16px 14px!important;
+    background:linear-gradient(180deg,transparent 0%,rgba(35,18,9,.18) 20%,rgba(35,18,9,.94) 100%)!important;
+    z-index:3;
+  }
+  .wc-home-screen .wc-home-title-row{
+    width:100%;
+    align-items:center!important;
+    gap:10px;
+  }
+  .wc-home-screen .wc-home-title-copy{
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .wc-home-screen .wc-home-eyebrow{
+    display:block;
+    margin-bottom:5px;
+    font-size:9px;
+  }
+  .wc-home-screen .wc-hero-title h1{
+    max-width:270px;
+    font-size:27px!important;
+    line-height:1.02!important;
+  }
+  .wc-home-screen .wc-home-avatar{
+    display:block!important;
+    flex:0 0 58px!important;
+    width:58px!important;
+    min-width:58px!important;
+    max-width:58px!important;
+    height:58px!important;
+    min-height:58px!important;
+    max-height:58px!important;
+    aspect-ratio:1/1!important;
+    object-fit:cover!important;
+    border-radius:50%!important;
+    border:2px solid #f4c35d!important;
+  }
+
+  /* Gameplay: the wheel must fit above the Android navigation bar on the tested viewport. */
+  .wc-game-screen .wc-word-entry{
+    margin-top:2px!important;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:320px!important;
+    margin-top:7px!important;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    width:min(58vw,286px)!important;
+  }
+  .wc-game-screen .wc-wheel{
+    top:-2px!important;
+  }
+  .wc-game-screen .wc-tile{
+    width:56px!important;
+    height:56px!important;
+    margin:-28px 0 0 -28px!important;
+  }
+  .wc-game-screen .wc-tile-letter{
+    font-size:30px!important;
+  }
+  .wc-game-screen .wc-cooking-caption{
+    bottom:3px!important;
+  }
+}
+@media (max-width:390px){
+  .wc-home-screen .wc-hero > img{
+    height:205px!important;
+    min-height:205px!important;
+  }
+  .wc-home-screen .wc-hero-title{
+    min-height:92px;
+    padding:39px 14px 12px!important;
+  }
+  .wc-home-screen .wc-hero-title h1{
+    max-width:235px;
+    font-size:24px!important;
+  }
+  .wc-home-screen .wc-home-avatar{
+    flex-basis:52px!important;
+    width:52px!important;
+    min-width:52px!important;
+    max-width:52px!important;
+    height:52px!important;
+    min-height:52px!important;
+    max-height:52px!important;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:300px!important;
+    margin-top:4px!important;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    width:61vw!important;
+  }
+  .wc-game-screen .wc-wheel{
+    top:-5px!important;
+  }
+  .wc-game-screen .wc-tile{
+    width:52px!important;
+    height:52px!important;
+    margin:-26px 0 0 -26px!important;
+  }
+  .wc-game-screen .wc-tile-letter{
+    font-size:28px!important;
+  }
+}
