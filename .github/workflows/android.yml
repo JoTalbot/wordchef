@@ -126,6 +126,8 @@ jobs:
 
       - name: Create GitHub release v1.4.3
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: gh release view v1.4.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create v1.4.3 --repo "$GITHUB_REPOSITORY" --title "Word Chef v1.4.3" --generate-notes
 
       - name: Upload APK to v1.4.3 release
