@@ -510,6 +510,9 @@ function LevelScreen({
   const usedInSwipe = useRef<Set<number>>(new Set());
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
     setFound([]); setBonusFound([]); setCurrent([]); setHinted({}); setDone(false);
     setCelebrating(false); setCombo(0); setRewardBurst("");
     setWheel(generateLevel(levelNo).wheel);
@@ -845,8 +848,8 @@ function LevelScreen({
             src={dishArt(level.dish.name)}
             alt=""
             style={{
-              opacity: 0.35 + (found.length / Math.max(1, boardWords.length)) * 0.65,
-              transform: `scale(${0.74 + (found.length / Math.max(1, boardWords.length)) * 0.26})`,
+              opacity: 0.88 + (found.length / Math.max(1, boardWords.length)) * 0.12,
+              transform: `scale(${0.92 + (found.length / Math.max(1, boardWords.length)) * 0.08})`,
             }}
           />
           <div className="wc-cook-ingredients" aria-hidden="true">
