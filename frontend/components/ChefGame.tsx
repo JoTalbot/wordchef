@@ -80,6 +80,23 @@ const GUEST_ART: Record<string, { img: string; nick: string }> = {
   midnight: { img: "img/guest_midnight.webp", nick: "Кот Борис" },
 };
 
+function lightningPath(a: { x: number; y: number }, b: { x: number; y: number }, seed: number): string {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len;
+  const ny = dx / len;
+  const steps = 5;
+  const points = ["M " + a.x.toFixed(1) + " " + a.y.toFixed(1)];
+  for (let i = 1; i < steps; i++) {
+    const t = i / steps;
+    const wobble = ((i * 17 + seed * 13) % 9 - 4) * Math.min(4.5, len / 28);
+    points.push("L " + (a.x + dx * t + nx * wobble).toFixed(1) + " " + (a.y + dy * t + ny * wobble).toFixed(1));
+  }
+  points.push("L " + b.x.toFixed(1) + " " + b.y.toFixed(1));
+  return points.join(" ");
+}
+
 function guestArt(kitchen: string) {
   return GUEST_ART[kitchen] ?? GUEST_ART.street;
 }
@@ -749,42 +766,77 @@ function LevelScreen({
         </span>
       </div>
 
+
       <div
-        className="wc-wheel"
-        ref={wheelRef}
-        style={{ width: size, height: size }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        className="wc-cooking-stage"
+        style={{ ["--cook-progress" as string]: `${found.length / Math.max(1, boardWords.length) * 100}%` }}
       >
-        {wheel.map((letter, i) => (
-          <div
-            key={`${letter}-${i}`}
-            role="button"
-            tabIndex={0}
-            aria-label={`Буква ${letter}, плитка ${i + 1}`}
-            aria-pressed={current.includes(i)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                e.stopPropagation();
-                pickTile(i);
-              }
-            }}
-            className={`wc-tile ${current.includes(i) ? "on" : ""}`}
+        <div className="wc-cooking-plate" aria-hidden="true">
+          <div className="wc-plate-rim" />
+          <img
+            className="wc-cooking-dish-art"
+            src={dishArt(level.dish.name)}
+            alt=""
             style={{
-              left: centers[i].x,
-              top: centers[i].y,
-              // picked letters become golden ingredients
-              ...(current.includes(i)
-                ? { backgroundImage: "url(img/ui_gold_tile.webp)", backgroundSize: "cover" }
-                : null),
+              opacity: 0.2 + (found.length / Math.max(1, boardWords.length)) * 0.8,
+              transform: `scale(${0.78 + (found.length / Math.max(1, boardWords.length)) * 0.22})`,
             }}
-          >
-            {letter}
-          </div>
-        ))}
+          />
+          <span className="wc-steam wc-steam-a" />
+          <span className="wc-steam wc-steam-b" />
+          <span className="wc-steam wc-steam-c" />
+        </div>
+        <div
+          className="wc-wheel"
+          ref={wheelRef}
+          style={{ width: size, height: size }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+        >
+          {current.length >= 2 && (
+            <svg className="wc-lightning-layer" viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+              {current.slice(1).map((idx, n) => {
+                const from = centers[current[n]];
+                const to = centers[idx];
+                if (!from || !to) return null;
+                const d = lightningPath(from, to, n);
+                return (
+                  <g key={`spark-${current[n]}-${idx}`}>
+                    <path className="wc-lightning-glow" d={d} />
+                    <path className="wc-lightning-core" d={d} />
+                  </g>
+                );
+              })}
+            </svg>
+          )}
+          {wheel.map((letter, i) => (
+            <div
+              key={`${letter}-${i}`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Буква ${letter}, плитка ${i + 1}`}
+              aria-pressed={current.includes(i)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  pickTile(i);
+                }
+              }}
+              className={`wc-tile ${current.includes(i) ? "on" : ""}`}
+              style={{ left: centers[i].x, top: centers[i].y }}
+            >
+              <span className="wc-tile-letter">{letter}</span>
+            </div>
+          ))}
+        </div>
+        <div className="wc-cooking-caption" aria-hidden="true">
+          <span>🍳</span>
+          <strong>{found.length === 0 ? "Собираем ингредиенты" : found.length < boardWords.length ? "Блюдо готовится" : "Подаём!"}</strong>
+          <span>{found.length}/{boardWords.length}</span>
+        </div>
       </div>
 
       <div className="wc-wheel-tools" role="group" aria-label="Действия со словом">
