@@ -9,18 +9,25 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import androidx.webkit.WebViewAssetLoader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
+
+import android.net.Uri;
 
 /**
  * Word Chef WebView shell over the packaged Next.js export.
  *
- * Keep the packaged export under a dedicated virtual /assets/ path.
- * Next.js emits root-relative /_next and /img URLs, so expose those
- * directories explicitly through the same local HTTPS origin.
+ * The frontend is packaged under APK assets/www. Android's built-in
+ * AssetsPathHandler maps to the APK asset root, not a subdirectory, so
+ * requests are served explicitly from assets/www while keeping the
+ * appassets.androidplatform.net HTTPS origin used by WebView.
  */
 public class MainActivity extends Activity {
+    private static final String ASSET_HOST = "appassets.androidplatform.net";
+    private static final String ASSET_ROOT = "www/";
+
     private WebView web;
-    private WebViewAssetLoader assetLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,28 +44,13 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
 
-        assetLoader = new WebViewAssetLoader.Builder()
-                .addPathHandler(
-                        "/assets/",
-                        new WebViewAssetLoader.AssetsPathHandler(this)
-                )
-                .addPathHandler(
-                        "/_next/",
-                        new WebViewAssetLoader.AssetsPathHandler(this)
-                )
-                .addPathHandler(
-                        "/img/",
-                        new WebViewAssetLoader.AssetsPathHandler(this)
-                )
-                .build();
-
         web.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(
                     WebView view,
                     WebResourceRequest request
             ) {
-                return assetLoader.shouldInterceptRequest(request.getUrl());
+                return servePackagedAsset(request.getUrl());
             }
 
             @Override
@@ -67,14 +59,71 @@ public class MainActivity extends Activity {
                     WebView view,
                     String url
             ) {
-                return assetLoader.shouldInterceptRequest(
-                        android.net.Uri.parse(url)
-                );
+                return servePackagedAsset(Uri.parse(url));
             }
         });
 
         web.setBackgroundColor(0xFFFFF6E9);
-        web.loadUrl("https://appassets.androidplatform.net/assets/index.html");
+        web.loadUrl("https://" + ASSET_HOST + "/assets/index.html");
+    }
+
+    /**
+     * Map the virtual HTTPS paths used by the WebView to APK assets/www.
+     *
+     * /assets/foo        -> assets/www/foo
+     * /_next/foo         -> assets/www/_next/foo
+     * /img/foo           -> assets/www/img/foo
+     */
+    private WebResourceResponse servePackagedAsset(Uri uri) {
+        if (uri == null || !ASSET_HOST.equals(uri.getHost())) {
+            return null;
+        }
+
+        String path = uri.getPath();
+        if (path == null || path.contains("..")) {
+            return null;
+        }
+
+        String relative;
+        if (path.startsWith("/assets/")) {
+            relative = path.substring("/assets/".length());
+        } else if (path.startsWith("/_next/")) {
+            relative = "_next/" + path.substring("/_next/".length());
+        } else if (path.startsWith("/img/")) {
+            relative = "img/" + path.substring("/img/".length());
+        } else {
+            return null;
+        }
+
+        if (relative.isEmpty() || relative.startsWith("/") || relative.contains("..")) {
+            return null;
+        }
+
+        String assetPath = ASSET_ROOT + relative;
+
+        try {
+            InputStream stream = getAssets().open(assetPath);
+            String mime = URLConnection.guessContentTypeFromName(assetPath);
+            if (mime == null) {
+                if (assetPath.endsWith(".js")) mime = "application/javascript";
+                else if (assetPath.endsWith(".css")) mime = "text/css";
+                else if (assetPath.endsWith(".html")) mime = "text/html";
+                else if (assetPath.endsWith(".json")) mime = "application/json";
+                else mime = "application/octet-stream";
+            }
+
+            String encoding = isTextAsset(mime) ? "UTF-8" : null;
+            return new WebResourceResponse(mime, encoding, stream);
+        } catch (IOException ignored) {
+            return null;
+        }
+    }
+
+    private boolean isTextAsset(String mime) {
+        return mime.startsWith("text/")
+                || mime.contains("javascript")
+                || mime.contains("json")
+                || mime.contains("xml");
     }
 
     @Override
