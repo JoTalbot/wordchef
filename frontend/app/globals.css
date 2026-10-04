@@ -3440,3 +3440,40 @@ button:focus-visible,
     font-size:28px!important;
   }
 }
+
+
+/* ── final reference parity: long boards + grand-tour header cleanup ───── */
+.wc-grand-screen .wc-level-badge::after {
+  content: none;
+}
+
+@media (max-width:700px) {
+  .wc-game-screen .wc-grid-scroll {
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Grand Tour can generate taller crossword trees. Keep the whole composition
+     visible instead of vertically centering an oversized grid and clipping both ends. */
+  .wc-game-screen .wc-grid-scroll:has(.wc-grid-tall) {
+    align-items: flex-start;
+  }
+
+  .wc-game-screen .wc-grid.wc-grid-tall {
+    transform: scale(.50);
+    transform-origin: center top;
+  }
+
+  .wc-game-screen .wc-grid.wc-grid-tall .wc-cell {
+    width: 54px;
+    height: 54px;
+  }
+}
+
+@media (max-width:390px) {
+  .wc-game-screen .wc-grid.wc-grid-tall {
+    transform: scale(.46);
+  }
+}
