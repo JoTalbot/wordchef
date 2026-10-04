@@ -88,7 +88,9 @@ public class MainActivity extends Activity {
         if (path.startsWith("/assets/")) {
             relative = path.substring("/assets/".length());
         } else if (path.startsWith("/_next/")) {
-            relative = "_next/" + path.substring("/_next/".length());
+            relative = "next/" + path.substring("/_next/".length());
+        } else if (path.startsWith("/next/")) {
+            relative = "next/" + path.substring("/next/".length());
         } else if (path.startsWith("/img/")) {
             relative = "img/" + path.substring("/img/".length());
         } else {
