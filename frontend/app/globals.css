@@ -3239,3 +3239,77 @@ button:focus-visible,
   .wc-game-screen .wc-tile-letter{font-size:33px!important}
   .wc-game-screen .wc-action-button{min-height:60px;font-size:12px}
 }
+
+
+/* FINAL DEVICE FIT: keep the complete cooking wheel visible on common Android viewports */
+@media (max-width:700px){
+  .wc-game-screen .wc-grid-scroll{
+    min-height:220px;
+    max-height:220px;
+    padding:12px 8px;
+    margin-bottom:6px;
+  }
+  .wc-game-screen .wc-grid{
+    transform:scale(.70);
+    transform-origin:center;
+  }
+  .wc-game-screen .wc-word-entry{
+    margin:5px 6px 0;
+  }
+  .wc-game-screen .wc-wordbar{
+    min-height:54px;
+  }
+  .wc-game-screen .wc-wordbar-label{
+    bottom:-1px;
+    font-size:11px;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:335px;
+    margin:16px -2px 0;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    top:0;
+    width:min(62vw,300px);
+  }
+  .wc-game-screen .wc-cooking-dish-art{
+    width:50%;
+    height:50%;
+    left:25%;
+    top:25%;
+  }
+  .wc-game-screen .wc-wheel{
+    top:7px;
+  }
+  .wc-game-screen .wc-tile{
+    width:62px!important;
+    height:62px!important;
+    margin:-31px 0 0 -31px;
+  }
+  .wc-game-screen .wc-tile-letter{
+    font-size:33px!important;
+  }
+  .wc-game-screen .wc-cook-progress{
+    bottom:8px;
+  }
+}
+@media (max-width:390px){
+  .wc-game-screen .wc-grid-scroll{
+    min-height:190px;
+    max-height:190px;
+  }
+  .wc-game-screen .wc-cooking-stage{
+    min-height:305px;
+    margin-top:12px;
+  }
+  .wc-game-screen .wc-cooking-plate{
+    width:64vw;
+  }
+  .wc-game-screen .wc-tile{
+    width:58px!important;
+    height:58px!important;
+    margin:-29px 0 0 -29px;
+  }
+  .wc-game-screen .wc-tile-letter{
+    font-size:31px!important;
+  }
+}
