@@ -3457,7 +3457,7 @@ button:focus-visible,
 
   /* Grand Tour can generate taller crossword trees. Keep the whole composition
      visible instead of vertically centering an oversized grid and clipping both ends. */
-  .wc-game-screen .wc-grid-scroll:has(.wc-grid-tall) {
+  .wc-game-screen .wc-grid-scroll-tall {
     align-items: flex-start;
   }
 
