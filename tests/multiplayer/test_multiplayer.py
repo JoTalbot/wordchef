@@ -33,7 +33,7 @@ class TestQuickCook:
             "player_ids": [alice["player_id"], bob["player_id"], carol["player_id"]],
             "rounds": 1, "seed": "qc-seed"}).json()
         mid = match["match_id"]
-        client.post(f"/api/matches/{mid}/start")
+        client.post(f"/api/matches/{mid}/start", json={"player_id": alice["player_id"]})
         trays = []
         for p in (alice, bob, carol):
             view = client.get(f"/api/matches/{mid}/players/{p['player_id']}").json()
