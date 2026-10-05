@@ -43,6 +43,10 @@ class CreateMatchBody(BaseModel):
     seed: str = Field(default="", max_length=128)
 
 
+class JoinMatchBody(BaseModel):
+    player_id: str = Field(min_length=1, max_length=64)
+
+
 class IntentBody(BaseModel):
     player_id: str = Field(min_length=1, max_length=64)
     action: str = Field(min_length=1, max_length=32)
@@ -124,6 +128,14 @@ def match_state(match_id: str, request: Request):
 def player_view(match_id: str, player_id: str, request: Request):
     try:
         return service(request).player_view(match_id, player_id)
+    except GameError as exc:
+        raise _err(exc)
+
+
+@router.post("/matches/{match_id}/join")
+def join_match(match_id: str, body: JoinMatchBody, request: Request):
+    try:
+        return service(request).join_match(match_id, body.player_id)
     except GameError as exc:
         raise _err(exc)
 
