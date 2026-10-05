@@ -116,6 +116,8 @@ class MatchState:
         data = dict(data)
         data["players"] = {pid: PlayerState.from_dict(p)
                            for pid, p in data.get("players", {}).items()}
+        if not data.get("host_player_id") and data.get("players"):
+            data["host_player_id"] = sorted(data["players"])[0]
         return MatchState(**data)
 
 
