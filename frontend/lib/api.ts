@@ -132,6 +132,11 @@ export const api = {
       body: JSON.stringify({ mode, player_ids, rounds, kitchen_id }),
     }),
 
+  joinMatch: (matchId: string, playerId: string) =>
+    json<MatchView>(`/api/matches/${matchId}/join`, {
+      method: 'POST', body: JSON.stringify({ player_id: playerId }),
+    }),
+
   startMatch: (matchId: string) =>
     json<MatchView>(`/api/matches/${matchId}/start`, { method: 'POST' }),
 
