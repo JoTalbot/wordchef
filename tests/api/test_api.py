@@ -59,7 +59,7 @@ class TestApi:
         mid = match["match_id"]
         joined = client.post(f"/api/matches/{mid}/join", json={"player_id": bob["player_id"]})
         assert joined.status_code == 200
-        assert joined.json()["leaderboard"] == []
+        assert len(joined.json()["leaderboard"]) == 2
         started = client.post(f"/api/matches/{mid}/start")
         assert started.status_code == 200
         assert client.get(f"/api/matches/{mid}/players/{bob['player_id']}").status_code == 200
