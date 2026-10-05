@@ -160,12 +160,45 @@ export default function GameClient() {
 
   async function createMatch() {
     if (!playerId) return;
-    const players = mode === 'SOLO' ? [playerId] : [playerId];
-    const view = await api.createMatch(mode, players, rounds, 'street');
-    setMatchId(view.match_id);
-    await api.startMatch(view.match_id);
-    setScreen('game');
-    setCompose([]);
+    try {
+      const view = await api.createMatch(mode, [playerId], rounds, 'street');
+      setMatchId(view.match_id);
+      setMatch(view);
+      setScreen('lobby');
+      say(mode === 'SOLO' ? 'Смена готова. Запускаем.' : 'Лобби создано. Передай код матча шефам.');
+      if (mode === 'SOLO') {
+        const started = await api.startMatch(view.match_id);
+        setMatch(started);
+        setScreen('game');
+        setCompose([]);
+      }
+    } catch (err) {
+      say(String(err instanceof Error ? err.message : err));
+    }
+  }
+
+  async function joinExistingMatch() {
+    if (!playerId || !matchId.trim()) return;
+    try {
+      const view = await api.joinMatch(matchId.trim(), playerId);
+      setMatch(view);
+      setScreen('lobby');
+      say('Ты вошёл в лобби. Ждём старта шефа.');
+    } catch (err) {
+      say(String(err instanceof Error ? err.message : err));
+    }
+  }
+
+  async function startLobbyMatch() {
+    if (!matchId) return;
+    try {
+      const started = await api.startMatch(matchId);
+      setMatch(started);
+      setScreen('game');
+      setCompose([]);
+    } catch (err) {
+      say(String(err instanceof Error ? err.message : err));
+    }
   }
 
   const order = me?.order ?? null;
@@ -300,12 +333,55 @@ export default function GameClient() {
               </button>
             ))}
           </div>
-          <button className="btn primary" style={{ width: '100%', marginTop: 14 }} onClick={() => void createMatch()}>
-            НАЧАТЬ СМЕНУ
-          </button>
-          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8, textAlign: 'center' }}>
-            Мультиплеер: после старта поделитесь кодом матча — шефы зайдут на ту же кухню.
-          </div>
+          {!matchId ? (
+            <>
+              <button className="btn primary" style={{ width: '100%', marginTop: 14 }} onClick={() => void createMatch()}>
+                СОЗДАТЬ ЛОББИ
+              </button>
+              <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8, textAlign: 'center' }}>
+                Для соло матч стартует сразу. Для мультиплеера сначала создаётся лобби.
+              </div>
+              {mode !== 'SOLO' ? (
+                <div style={{ marginTop: 14, borderTop: '1px solid var(--line)', paddingTop: 14 }}>
+                  <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 7, textAlign: 'center' }}>
+                    ИЛИ ВОЙТИ В ГОТОВЫЙ МАТЧ
+                  </div>
+                  <input
+                    className="field"
+                    placeholder="Код матча, например m_ab12cd"
+                    value={matchId}
+                    onChange={(e) => setMatchId(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && void joinExistingMatch()}
+                  />
+                  <button className="btn" style={{ width: '100%', marginTop: 8 }} onClick={() => void joinExistingMatch()}>
+                    ВОЙТИ В ЛОББИ
+                  </button>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <div className="panel" style={{ marginTop: 14, marginBottom: 0 }}>
+                <h2>ЛОББИ · {matchId}</h2>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10 }}>
+                  Передай этот код другим шефам. Сервер хранит состав матча и обновляет его через WebSocket.
+                </div>
+                {(match?.leaderboard ?? []).map((row: BoardRow) => (
+                  <div key={row.player_id} className="board-row">
+                    <div className="pos">👨‍🍳</div>
+                    <div className="who">{row.display_name}</div>
+                    <div className="pts">{row.player_id === playerId ? 'ты' : 'готов'}</div>
+                  </div>
+                ))}
+                <button className="btn primary" style={{ width: '100%', marginTop: 12 }} onClick={() => void startLobbyMatch()}>
+                  НАЧАТЬ СМЕНУ
+                </button>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8, textAlign: 'center' }}>
+                Шефы могут войти до старта. Максимум 8 игроков.
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
