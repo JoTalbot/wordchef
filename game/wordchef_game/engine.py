@@ -90,6 +90,7 @@ class MatchState:
     match_id: str
     mode: str                    # SOLO | QUICK_COOK | CHAOS_KITCHEN
     seed: str
+    host_player_id: str = ""
     kitchen_id: str = "street"
     rounds_total: int = DEFAULT_ROUNDS
     round_no: int = 0
@@ -102,6 +103,7 @@ class MatchState:
     def to_dict(self) -> dict:
         return {
             "match_id": self.match_id, "mode": self.mode, "seed": self.seed,
+            "host_player_id": self.host_player_id,
             "kitchen_id": self.kitchen_id, "rounds_total": self.rounds_total,
             "round_no": self.round_no, "round_active": self.round_active,
             "players": {pid: p.to_dict() for pid, p in self.players.items()},
@@ -148,7 +150,7 @@ def start_match(*, match_id: str, mode: str, seed: str, player_ids: list[str],
         for pid in player_ids
     }
     return MatchState(
-        match_id=match_id, mode=mode, seed=seed, kitchen_id=kitchen_id,
+        match_id=match_id, mode=mode, seed=seed, host_player_id=player_ids[0], kitchen_id=kitchen_id,
         rounds_total=rounds_total, players=players, created_at=now,
     )
 
