@@ -47,6 +47,10 @@ class JoinMatchBody(BaseModel):
     player_id: str = Field(min_length=1, max_length=64)
 
 
+class StartMatchBody(BaseModel):
+    player_id: str | None = Field(default=None, max_length=64)
+
+
 class IntentBody(BaseModel):
     player_id: str = Field(min_length=1, max_length=64)
     action: str = Field(min_length=1, max_length=32)
@@ -141,9 +145,9 @@ def join_match(match_id: str, body: JoinMatchBody, request: Request):
 
 
 @router.post("/matches/{match_id}/start")
-def start_match(match_id: str, request: Request):
+def start_match(match_id: str, body: StartMatchBody | None = None, request: Request = None):
     try:
-        return service(request).start_match(match_id)
+        return service(request).start_match(match_id, body.player_id if body else None)
     except GameError as exc:
         raise _err(exc)
 
