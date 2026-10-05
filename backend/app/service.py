@@ -168,9 +168,13 @@ class GameService:
             })
             return self.match_view(match_id)
 
-    def start_match(self, match_id: str) -> dict:
+    def start_match(self, match_id: str, player_id: str | None = None) -> dict:
         with self._lock(match_id):
             state = self._match(match_id)
+            if state.mode != "SOLO" and player_id and player_id != state.host_player_id:
+                raise GameError("not_host", "only the match host can start the lobby", 403)
+            if state.mode != "SOLO" and not player_id:
+                raise GameError("host_required", "player_id is required to start a multiplayer match", 400)
             if state.round_active:
                 raise GameError("already_started", "match already running")
             self._begin_round(state)
