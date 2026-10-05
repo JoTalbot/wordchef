@@ -48,7 +48,7 @@ class TestQuickCook:
             "player_ids": [alice["player_id"], bob["player_id"]],
             "rounds": 1, "seed": "qc2"}).json()
         mid = match["match_id"]
-        client.post(f"/api/matches/{mid}/start")
+        client.post(f"/api/matches/{mid}/start", json={"player_id": alice["player_id"]})
         # both players serve the same best word → identical scoring inputs
         word = None
         for p in (alice, bob):
@@ -140,3 +140,24 @@ class TestLobbyAuthority:
         started = client.post(f"/api/matches/{mid}/start", json={"player_id": alice["player_id"]})
         assert started.status_code == 200
         assert started.json()["round_active"] is True
+
+    def test_multiplayer_start_requires_host_identity(self, client):
+        alice = _register(client, "Alice")
+        match = client.post("/api/matches", json={
+            "mode": "QUICK_COOK", "player_ids": [alice["player_id"]],
+            "rounds": 1, "seed": "missing-host"}).json()
+        mid = match["match_id"]
+        missing = client.post(f"/api/matches/{mid}/start")
+        assert missing.status_code == 400
+
+    def test_join_is_idempotent_and_eighth_player_is_last(self, client):
+        players = [_register(client, f"P{i}") for i in range(9)]
+        match = client.post("/api/matches", json={
+            "mode": "QUICK_COOK", "player_ids": [players[0]["player_id"]],
+            "rounds": 1, "seed": "capacity"}).json()
+        mid = match["match_id"]
+        for p in players[1:8]:
+            assert client.post(f"/api/matches/{mid}/join", json={"player_id": p["player_id"]}).status_code == 200
+        assert client.post(f"/api/matches/{mid}/join", json={"player_id": players[7]["player_id"]}).status_code == 200
+        denied = client.post(f"/api/matches/{mid}/join", json={"player_id": players[8]["player_id"]})
+        assert denied.status_code == 409
