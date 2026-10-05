@@ -141,6 +141,33 @@ class GameService:
                                 "players": player_ids, "rounds": rounds})
         return self.match_view(match_id)
 
+    def join_match(self, match_id: str, player_id: str) -> dict:
+        """Join a lobby before its first round starts."""
+        with self._lock(match_id):
+            state = self._match(match_id)
+            if state.mode == "SOLO":
+                raise GameError("solo_match", "solo matches do not accept additional players", 409)
+            if state.round_active or state.round_no > 0:
+                raise GameError("match_started", "cannot join a match after it has started", 409)
+            if state.finished:
+                raise GameError("match_finished", "the match is over", 409)
+            if player_id in state.players:
+                return self.match_view(match_id)
+            if len(state.players) >= 8:
+                raise GameError("match_full", "match already has 8 players", 409)
+            player = self.store.get_player(player_id)
+            if not player:
+                raise GameError("unknown_player", "unknown player", 404)
+            state.players[player_id] = eng.PlayerState(
+                player_id=player_id, display_name=player["name"])
+            self._matches[match_id] = state
+            self._persist(state, status="lobby")
+            self.publish(match_id, {
+                "type": "PLAYER_JOINED", "player_id": player_id,
+                "display_name": player["name"], "player_count": len(state.players),
+            })
+            return self.match_view(match_id)
+
     def start_match(self, match_id: str) -> dict:
         with self._lock(match_id):
             state = self._match(match_id)
