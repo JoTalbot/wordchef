@@ -50,6 +50,22 @@ class TestApi:
         data = client.get("/api/dictionary/check", params={"word": "xqzv"}).json()
         assert data["is_word"] is False
 
+    def test_multiplayer_lobby_join_before_start(self, client):
+        alice = _register(client, "Alice")
+        bob = _register(client, "Bob")
+        match = client.post("/api/matches", json={
+            "mode": "QUICK_COOK", "player_ids": [alice["player_id"]],
+            "rounds": 1, "seed": "join-seed"}).json()
+        mid = match["match_id"]
+        joined = client.post(f"/api/matches/{mid}/join", json={"player_id": bob["player_id"]})
+        assert joined.status_code == 200
+        assert joined.json()["leaderboard"] == []
+        started = client.post(f"/api/matches/{mid}/start")
+        assert started.status_code == 200
+        assert client.get(f"/api/matches/{mid}/players/{bob['player_id']}").status_code == 200
+        late = client.post(f"/api/matches/{mid}/join", json={"player_id": alice["player_id"]})
+        assert late.status_code == 409
+
     def test_match_lifecycle(self, client):
         match, players = _match(client)
         mid = match["match_id"]
