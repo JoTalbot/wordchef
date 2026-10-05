@@ -147,6 +147,14 @@ export default function GameClient() {
     void refresh();
   }, [refresh]);
 
+  // Poll authoritative state while a lobby/game is open. WebSocket is the fast path;
+  // polling recovers state even when a reconnect happens after the event buffer was lost.
+  useEffect(() => {
+    if (!matchId || !playerId || (screen !== 'lobby' && screen !== 'game')) return;
+    const timer = setInterval(() => { void refresh(); }, 2500);
+    return () => clearInterval(timer);
+  }, [matchId, playerId, screen, refresh]);
+
   useEffect(() => {
     if (playerId) void api.progression(playerId).then(setProgress).catch(() => {});
   }, [playerId, screen]);
