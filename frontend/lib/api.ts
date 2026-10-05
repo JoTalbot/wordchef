@@ -163,17 +163,35 @@ export const api = {
 };
 
 export function subscribe(matchId: string, onEvent: (event: Record<string, unknown>) => void): () => void {
-  const ws = new WebSocket(wsUrl(`/api/ws/matches/${matchId}`));
-  ws.onmessage = (message) => {
-    try {
-      const data = JSON.parse(message.data);
-      if (data.type === 'EVENT' && data.event) onEvent(data.event);
-      if (data.type === 'SYNC' && Array.isArray(data.events)) {
-        for (const event of data.events) onEvent(event);
+  let ws: WebSocket | null = null;
+  let stopped = false;
+  let retry: ReturnType<typeof setTimeout> | null = null;
+
+  const connect = () => {
+    if (stopped) return;
+    ws = new WebSocket(wsUrl(`/api/ws/matches/${matchId}`));
+    ws.onmessage = (message) => {
+      try {
+        const data = JSON.parse(message.data);
+        if (data.type === 'EVENT' && data.event) onEvent(data.event);
+        if (data.type === 'SYNC' && Array.isArray(data.events)) {
+          for (const event of data.events) onEvent(event);
+        }
+      } catch {
+        /* ignore malformed frames */
       }
-    } catch {
-      /* ignore malformed frames */
-    }
+    };
+    ws.onclose = () => {
+      if (stopped) return;
+      retry = setTimeout(connect, 1200);
+    };
+    ws.onerror = () => ws?.close();
   };
-  return () => ws.close();
+
+  connect();
+  return () => {
+    stopped = true;
+    if (retry) clearTimeout(retry);
+    ws?.close();
+  };
 }
