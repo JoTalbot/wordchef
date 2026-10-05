@@ -123,3 +123,20 @@ class TestChaosKitchen:
         text = json.dumps(info).lower()
         for banned in ("pay", "price", "purchase", "gems", "subscription"):
             assert banned not in text.replace("pay_per", ""), "no monetization hooks"
+
+
+class TestLobbyAuthority:
+    def test_only_host_can_start_joined_lobby(self, client):
+        alice = _register(client, "Alice")
+        bob = _register(client, "Bob")
+        match = client.post("/api/matches", json={
+            "mode": "QUICK_COOK", "player_ids": [alice["player_id"]],
+            "rounds": 1, "seed": "host-seed"}).json()
+        mid = match["match_id"]
+        assert match["host_player_id"] == alice["player_id"]
+        assert client.post(f"/api/matches/{mid}/join", json={"player_id": bob["player_id"]}).status_code == 200
+        denied = client.post(f"/api/matches/{mid}/start", json={"player_id": bob["player_id"]})
+        assert denied.status_code == 403
+        started = client.post(f"/api/matches/{mid}/start", json={"player_id": alice["player_id"]})
+        assert started.status_code == 200
+        assert started.json()["round_active"] is True
