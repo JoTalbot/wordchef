@@ -145,7 +145,7 @@ def join_match(match_id: str, body: JoinMatchBody, request: Request):
 
 
 @router.post("/matches/{match_id}/start")
-def start_match(match_id: str, body: StartMatchBody | None = None, request: Request = None):
+def start_match(match_id: str, request: Request, body: StartMatchBody | None = None):
     try:
         return service(request).start_match(match_id, body.player_id if body else None)
     except GameError as exc:
