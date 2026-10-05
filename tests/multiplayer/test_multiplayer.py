@@ -67,7 +67,7 @@ class TestQuickCook:
             "mode": "SOLO", "player_ids": [alice["player_id"]],
             "rounds": 1, "seed": "ws-seed"}).json()
         mid = match["match_id"]
-        client.post(f"/api/matches/{mid}/start")
+        client.post(f"/api/matches/{mid}/start", json={"player_id": alice["player_id"]})
         with client.websocket_connect(f"/api/ws/matches/{mid}") as ws:
             frame = json.loads(ws.receive_text())
             assert frame["type"] == "SYNC"
@@ -92,7 +92,7 @@ class TestChaosKitchen:
             "player_ids": [p["player_id"] for p in players],
             "rounds": 2, "seed": "chaos-seed"}).json()
         mid = match["match_id"]
-        client.post(f"/api/matches/{mid}/start")
+        client.post(f"/api/matches/{mid}/start", json={"player_id": players[0]["player_id"]})
         view = client.get(f"/api/matches/{mid}/players/{players[0]['player_id']}").json()
         # ring the bell needs golden — none at start → rejected politely
         res = client.post(f"/api/matches/{mid}/intent", json={
