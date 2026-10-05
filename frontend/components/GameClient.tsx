@@ -167,7 +167,7 @@ export default function GameClient() {
       setScreen('lobby');
       say(mode === 'SOLO' ? 'Смена готова. Запускаем.' : 'Лобби создано. Передай код матча шефам.');
       if (mode === 'SOLO') {
-        const started = await api.startMatch(view.match_id);
+        const started = await api.startMatch(view.match_id, playerId);
         setMatch(started);
         setScreen('game');
         setCompose([]);
@@ -192,7 +192,7 @@ export default function GameClient() {
   async function startLobbyMatch() {
     if (!matchId) return;
     try {
-      const started = await api.startMatch(matchId);
+      const started = await api.startMatch(matchId, playerId);
       setMatch(started);
       setScreen('game');
       setCompose([]);
@@ -373,9 +373,15 @@ export default function GameClient() {
                     <div className="pts">{row.player_id === playerId ? 'ты' : 'готов'}</div>
                   </div>
                 ))}
-                <button className="btn primary" style={{ width: '100%', marginTop: 12 }} onClick={() => void startLobbyMatch()}>
-                  НАЧАТЬ СМЕНУ
-                </button>
+                {match?.host_player_id === playerId ? (
+                  <button className="btn primary" style={{ width: '100%', marginTop: 12 }} onClick={() => void startLobbyMatch()}>
+                    НАЧАТЬ СМЕНУ
+                  </button>
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, marginTop: 12 }}>
+                    Хост: {match?.leaderboard?.find((r) => r.player_id === match.host_player_id)?.display_name ?? 'шеф'}. Ждём старта.
+                  </div>
+                )}
               </div>
               <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8, textAlign: 'center' }}>
                 Шефы могут войти до старта. Максимум 8 игроков.
