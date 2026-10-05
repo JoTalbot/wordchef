@@ -80,6 +80,7 @@ export interface BoardRow {
 export interface MatchView {
   match_id: string;
   mode: string;
+  host_player_id: string;
   kitchen: string;
   round_no: number;
   rounds_total: number;
@@ -137,8 +138,8 @@ export const api = {
       method: 'POST', body: JSON.stringify({ player_id: playerId }),
     }),
 
-  startMatch: (matchId: string) =>
-    json<MatchView>(`/api/matches/${matchId}/start`, { method: 'POST' }),
+  startMatch: (matchId: string, playerId?: string) =>
+    json<MatchView>(`/api/matches/${matchId}/start`, { method: 'POST', body: JSON.stringify({ player_id: playerId }) }),
 
   matchState: (matchId: string) => json<MatchView>(`/api/matches/${matchId}`),
 
