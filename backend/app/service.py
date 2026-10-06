@@ -590,6 +590,7 @@ class GameService:
         state = self._match(match_id)
         return {
             "match_id": state.match_id, "mode": state.mode,
+            "host_player_id": state.host_player_id,
             "kitchen": state.kitchen_id, "round_no": state.round_no,
             "rounds_total": state.rounds_total,
             "round_active": state.round_active, "finished": state.finished,
