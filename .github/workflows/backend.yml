@@ -1,6 +1,7 @@
 name: WordChef backend
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
