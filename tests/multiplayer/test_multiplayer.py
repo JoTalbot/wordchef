@@ -164,20 +164,20 @@ class TestLobbyAuthority:
         assert started.status_code == 200
         assert started.json()["round_active"] is True
 
-        alice_view = client.get(f"/api/matches/{mid}/players/{alice['player_id']}").json()
-        bob_view = client.get(f"/api/matches/{mid}/players/{bob['player_id']}").json()
-        assert alice_view["order"]["tray"] == bob_view["order"]["tray"]
-
-        word = _valid_word(alice_view)
-        for p in (alice, bob):
-            res = client.post(f"/api/matches/{mid}/intent", json={
-                "player_id": p["player_id"],
-                "action": "SUBMIT_DISH",
-                "word": word,
-            })
-            assert res.status_code == 200
-            assert res.json()["accepted"] is True
-            assert res.json()["payload"]["execution"]["verified"] is True
+        for _ in range(3):
+            alice_view = client.get(f"/api/matches/{mid}/players/{alice['player_id']}").json()
+            bob_view = client.get(f"/api/matches/{mid}/players/{bob['player_id']}").json()
+            assert alice_view["order"]["tray"] == bob_view["order"]["tray"]
+            word = _valid_word(alice_view)
+            for p in (alice, bob):
+                res = client.post(f"/api/matches/{mid}/intent", json={
+                    "player_id": p["player_id"],
+                    "action": "SUBMIT_DISH",
+                    "word": word,
+                })
+                assert res.status_code == 200
+                assert res.json()["accepted"] is True
+                assert res.json()["payload"]["execution"]["verified"] is True
 
         final = client.get(f"/api/matches/{mid}").json()
         assert final["finished"] is True
