@@ -57,10 +57,11 @@ class TestApi:
             "mode": "QUICK_COOK", "player_ids": [alice["player_id"]],
             "rounds": 1, "seed": "join-seed"}).json()
         mid = match["match_id"]
+        assert match["host_player_id"] == alice["player_id"]
         joined = client.post(f"/api/matches/{mid}/join", json={"player_id": bob["player_id"]})
         assert joined.status_code == 200
         assert len(joined.json()["leaderboard"]) == 2
-        started = client.post(f"/api/matches/{mid}/start")
+        started = client.post(f"/api/matches/{mid}/start", json={"player_id": alice["player_id"]})
         assert started.status_code == 200
         assert client.get(f"/api/matches/{mid}/players/{bob['player_id']}").status_code == 200
         late = client.post(f"/api/matches/{mid}/join", json={"player_id": alice["player_id"]})
@@ -119,12 +120,7 @@ class TestApi:
                 view = client.get(f"/api/matches/{mid}/players/{p['player_id']}").json()
                 if not view.get("order"):
                     continue
-                try:
-                    word = _valid_word(view)
-                except StopIteration:
-                    client.post(f"/api/matches/{mid}/intent", json={
-                        "player_id": p["player_id"], "action": "SKIP"})
-                    continue
+                word = _valid_word(view)
                 client.post(f"/api/matches/{mid}/intent", json={
                     "player_id": p["player_id"], "action": "SUBMIT_DISH",
                     "word": word})
@@ -168,10 +164,7 @@ class TestApi:
                 view = client.get(f"/api/matches/{mid}/players/{p['player_id']}").json()
                 if not view.get("order"):
                     continue
-                try:
-                    word = _valid_word(view)
-                except StopIteration:
-                    continue
+                word = _valid_word(view)
                 client.post(f"/api/matches/{mid}/intent", json={
                     "player_id": p["player_id"], "action": "SUBMIT_DISH",
                     "word": word})
@@ -192,10 +185,7 @@ class TestLevels:
         res = client.post("/api/levels/complete", json={"level_no": 3, "words": words}).json()
         assert res["coins"] > 0
         assert res["execution"]["verified"] is True
-        # idempotent on replay
         res2 = client.post("/api/levels/complete", json={"level_no": 3, "words": words}).json()
         assert res2["already_done"] is True
-        # faked completion rejected
-        bad = client.post("/api/levels/complete",
-                          json={"level_no": 4, "words": ["ыыыы"]})
+        bad = client.post("/api/levels/complete", json={"level_no": 4, "words": ["ыыыы"]})
         assert bad.status_code == 422
