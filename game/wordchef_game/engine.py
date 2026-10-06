@@ -367,11 +367,20 @@ def submit_dish(state: MatchState, player_id: str, word: str, *,
             return state, Outcome(True, "SUBMIT_DISH", "streak_progress", player_id, payload)
 
     # Order served: deal the next ticket immediately (round stays hot).
-    rng = _stream(state, f"next:{player_id}:{player.dish_count}:{state.round_no}")
+    # QUICK_COOK keeps the ticket stream shared across all chefs.
+    shared = state.mode == "QUICK_COOK"
+    stream_key = (
+        f"next:shared:{player.dish_count}:{state.round_no}"
+        if shared else f"next:{player_id}:{player.dish_count}:{state.round_no}"
+    )
+    rng = _stream(state, stream_key)
     difficulty = _difficulty_for(player, order.difficulty, kitchen)
     next_order = make_order(
         rng, load_dictionary(),
-        order_id=f"{order.order_id}#next{player.dish_count}",
+        order_id=(
+            f"{order.order_id}#next{player.dish_count}"
+            if not shared else f"{state.match_id}-r{state.round_no}-shared#next{player.dish_count}"
+        ),
         difficulty=difficulty, profile=kitchen.letter_profile,
     )
     if player.tray_override:
