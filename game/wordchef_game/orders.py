@@ -8,19 +8,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 
+from .content import CONTENT
 from .dictionary import Dictionary
 from .flavor import FLAVORS, flavor_of, pairing_multiplier
 from .letters import LetterProfile, VOWELS, generate_tray
 from .rng import Rng
 
-KINDS = (
-    "SINGLE_WORD",      # any valid dish
-    "MIN_LENGTH",       # word of at least N letters
-    "CONTAINS_LETTER",  # word must contain a specific letter
-    "THEME",            # word from a themed menu
-    "STREAK",           # N dishes in a row inside one order window
-    "SPEED",            # one dish, harsh timer
-)
+KINDS = tuple(CONTENT["order_rules"])
 
 BASE_TIME_LIMIT = 30          # seconds
 MIN_TIME_LIMIT = 12
@@ -51,38 +45,17 @@ class Order:
     def from_dict(data: dict) -> "Order":
         data = dict(data)
         data["used_words"] = tuple(data.get("used_words") or ())
-        known = {f for f in Order.__dataclass_fields__}   # tolerate view extras
+        known = {f for f in Order.__dataclass_fields__}
         data = {k: v for k, v in data.items() if k in known}
         return Order(**data)
 
 
-# Themed menus — words are validated against the dictionary at generation time.
 THEMES: dict[str, tuple[str, ...]] = {
-    "street food": ("taco", "pizza", "burger", "fries", "kebab", "salsa",
-                    "wings", "roll", "wrap", "grill", "steam", "corn", "rice"),
-    "bakery": ("bread", "bun", "cake", "toast", "crust", "dough", "loaf",
-               "muffin", "scone", "tart", "waffle", "yeast"),
-    "sushi": ("tuna", "rice", "roll", "salmon", "eel", "miso", "tofu",
-              "soy", "ginger", "kelp", "octopus", "shrimp"),
-    "space": ("orbit", "comet", "star", "moon", "rocket", "solar", "nova",
-              "meteor", "alien", "lunar", "void", "pulsar", "quasar"),
-    "cyber": ("code", "data", "chip", "bot", "hack", "glitch", "pixel",
-              "vector", "cache", "server", "matrix", "stack", "script"),
-    "ancient": ("rune", "myth", "hero", "oracle", "sword", "temple", "pharaoh",
-                "empire", "glory", "omen", "pyramid", "chariot"),
-    "night market": ("soup", "noodle", "tea", "dumpling", "skewer", "broth",
-                     "wok", "spice", "chili", "pickle", "steam", "herb"),
+    theme: tuple(words) for theme, words in CONTENT["themes"].items()
 }
 
-# Hidden "Secret Menu" objectives — checked deterministically.
-SECRETS = (
-    "min_length_5",
-    "two_vowels",
-    "three_consonants",
-    "has_double",
-    "ends_vowel",
-    "no_rare_letters",
-)
+SECRETS = tuple(CONTENT["secrets"])
+
 
 
 def theme_words(theme: str, dictionary: Dictionary) -> list[str]:
