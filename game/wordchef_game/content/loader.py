@@ -36,6 +36,15 @@ def validate_content(data: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(data.get("content_id"), str) or not data["content_id"]:
         raise ContentError("content_id is required")
 
+    dictionaries = data.get("dictionaries")
+    if not isinstance(dictionaries, dict) or not dictionaries:
+        raise ContentError("dictionaries must be a non-empty object")
+    if any(not isinstance(name, str) or not name for name in dictionaries):
+        raise ContentError("dictionary ids must be non-empty strings")
+    if any(not isinstance(path, str) or not path or Path(path).is_absolute()
+           for path in dictionaries.values()):
+        raise ContentError("dictionary paths must be non-empty relative strings")
+
     kitchens = data.get("kitchens")
     if not isinstance(kitchens, list) or not kitchens:
         raise ContentError("kitchens must be a non-empty list")
@@ -76,6 +85,19 @@ def validate_content(data: dict[str, Any]) -> dict[str, Any]:
     dishes = data.get("dishes")
     if not isinstance(dishes, list):
         raise ContentError("dishes must be a list")
+    dish_ids = [dish.get("id") for dish in dishes]
+    if any(not isinstance(dish_id, str) or not dish_id for dish_id in dish_ids):
+        raise ContentError("every dish needs a non-empty id")
+    if len(dish_ids) != len(set(dish_ids)):
+        raise ContentError("dish ids must be unique")
+    kitchen_themes = {k["theme"] for k in kitchens}
+    for dish in dishes:
+        if not isinstance(dish.get("word"), str) or not dish["word"].isalpha():
+            raise ContentError("every dish needs an alphabetic word")
+        if dish.get("theme") not in themes or dish["theme"] not in kitchen_themes:
+            raise ContentError(f"dish {dish.get('id')!r} references an unknown theme")
+        if not isinstance(dish.get("base_reward"), int) or dish["base_reward"] < 0:
+            raise ContentError("dish base_reward must be a non-negative integer")
 
     return data
 
@@ -92,3 +114,22 @@ def content_digest() -> str:
 
 CONTENT = load_content()
 CONTENT_DIGEST = content_digest()
+
+
+def content_data_root() -> Path:
+    return PACK_PATH.parent.parent
+
+
+def dictionary_path(name: str = "default") -> Path:
+    dictionaries = load_content().get("dictionaries", {})
+    relative = dictionaries.get(name)
+    if not isinstance(relative, str) or not relative:
+        raise ContentError(f"unknown dictionary {name!r}")
+    path = content_data_root() / relative
+    if not path.is_file():
+        raise ContentError(f"dictionary {name!r} does not exist: {relative}")
+    return path
+
+
+def dishes_for_theme(theme: str) -> tuple[dict[str, Any], ...]:
+    return tuple(dish for dish in load_content()["dishes"] if dish["theme"] == theme)
