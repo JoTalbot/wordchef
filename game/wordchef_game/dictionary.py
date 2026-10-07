@@ -15,6 +15,8 @@ from collections import Counter, defaultdict
 from functools import lru_cache
 from pathlib import Path
 
+from .content import dictionary_path
+
 DATA_FILE = Path(__file__).parent / "data" / "dictionary.txt"
 
 MIN_WORD_LEN = 2
@@ -91,8 +93,8 @@ def signature(letters: str) -> tuple:
 
 
 @lru_cache(maxsize=1)
-def load_dictionary(path: str | None = None) -> Dictionary:
-    source = Path(path) if path else DATA_FILE
+def load_dictionary(path: str | None = None, *, name: str = "default") -> Dictionary:
+    source = Path(path) if path else dictionary_path(name)
     words = [line.strip().lower() for line in source.read_text(encoding="utf-8").splitlines()]
     words = [w for w in words if w and w.isalpha() and MIN_WORD_LEN <= len(w) <= MAX_WORD_LEN]
     return Dictionary(words)
