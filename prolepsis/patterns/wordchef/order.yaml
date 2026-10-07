@@ -25,7 +25,7 @@ events:
 
   ORDER_GENERATE:
     requires: []
-    facts: [match_id, player_id, order_id, kind, difficulty, tray,
+            time_limit, base_reward, flavor_request, theme, secret, content_digest]
             time_limit, base_reward, flavor_request, theme, secret]
     fact_types:
       content_digest: string
