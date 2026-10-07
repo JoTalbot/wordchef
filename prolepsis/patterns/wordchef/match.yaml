@@ -25,8 +25,9 @@ events:
 
   MATCH_CREATE:
     requires: []
-    facts: [match_id, mode, players, rounds_total, kitchen, seed_fingerprint]
+    facts: [match_id, mode, players, rounds_total, kitchen, seed_fingerprint, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       mode: string
       players: number
@@ -50,8 +51,9 @@ events:
 
   MATCH_FINISH:
     requires: [MATCH_CREATE]
-    facts: [match_id, winner_id, total_score, total_dishes, verified]
+    facts: [match_id, winner_id, total_score, total_dishes, verified, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       winner_id: string
       total_score: number
@@ -74,8 +76,9 @@ events:
 
   MATCH_VOIDED:
     requires: [MATCH_CREATE]
-    facts: [match_id, reason]
+    facts: [match_id, reason, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       reason: string
     unravels:
