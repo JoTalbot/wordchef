@@ -28,6 +28,7 @@ events:
     facts: [match_id, player_id, order_id, kind, difficulty, tray,
             time_limit, base_reward, flavor_request, theme, secret]
     fact_types:
+      content_digest: string
       match_id: string
       player_id: string
       order_id: string
@@ -61,8 +62,9 @@ events:
 
   ORDER_COMPLETE:
     requires: [ORDER_GENERATE]
-    facts: [order_id, satisfied, dishes, elapsed, bonus]
+    facts: [order_id, satisfied, dishes, elapsed, bonus, content_digest]
     fact_types:
+      content_digest: string
       order_id: string
       satisfied: number
       dishes: number
