@@ -222,7 +222,7 @@
   "dishes": [
     {
       "id": "street-taco",
-      "word": "taco",
+      "word": "bean",
       "theme": "street food",
       "base_reward": 55
     },
@@ -252,7 +252,7 @@
     },
     {
       "id": "ancient-rune",
-      "word": "rune",
+      "word": "stone",
       "theme": "ancient",
       "base_reward": 80
     },
