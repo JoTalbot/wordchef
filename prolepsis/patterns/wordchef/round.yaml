@@ -25,8 +25,9 @@ events:
 
   ROUND_START:
     requires: []
-    facts: [match_id, round_no, mode, kitchen, players, seed_fingerprint]
+    facts: [match_id, round_no, mode, kitchen, players, seed_fingerprint, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       round_no: number
       mode: string
@@ -50,8 +51,9 @@ events:
 
   ROUND_END:
     requires: [ROUND_START]
-    facts: [match_id, round_no, score_delta, dishes, combo_peak, heat_peak, chaos_events]
+    facts: [match_id, round_no, score_delta, dishes, combo_peak, heat_peak, chaos_events, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       round_no: number
       score_delta: number
