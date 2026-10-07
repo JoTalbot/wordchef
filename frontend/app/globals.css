@@ -4704,3 +4704,98 @@ button:focus-visible,
   .wc-game-screen .wc-wordbar-label{position:absolute!important;left:0!important;right:0!important;bottom:5px!important;top:auto!important;transform:none!important;text-align:center!important;z-index:5!important;pointer-events:none!important;}
   .wc-game-screen .wc-wordbar{padding-bottom:10px!important;}
 }
+
+
+/* ═══ v1.5.1 LAYOUT FIX: plate exactly centered, full-width crossword, slim chrome ═══
+   1) .wc-cooking-stage used to be a 330px box pinned to the left edge (margin:0),
+      so the letter plate sat left of center on wider phones — now it spans the
+      screen and the plate/wheel/caption land on the true center line.
+   2) Service blocks (header, ribbon, order card, word bar, dock) get much thinner;
+      the freed height is given to the crossword field.
+   3) The crossword board stretches to the full screen width (scale is computed in
+      ChefGame.tsx and passed via --wc-board-scale / --wc-board-box).            */
+/* the shell's own padding belongs to the home map, not to the game screen */
+.wc-shell:has(.wc-game-screen){padding:0!important}
+
+@media (max-width:700px){
+  /* — plate with letters: centered — */
+  .wc-game-screen .wc-cooking-stage{
+    width:100%!important;
+    margin:0 auto!important;
+  }
+
+  /* — slim top chrome — */
+  .wc-game-screen .wc-level-header{height:44px!important;min-height:0!important;padding:3px 10px!important;align-items:center!important}
+  .wc-game-screen .wc-level-back{width:36px!important;height:36px!important;margin-top:0!important;border-radius:11px!important;font-size:20px!important}
+  .wc-game-screen .wc-level-badge{height:32px!important;min-width:0!important;margin-top:0!important;padding:0 12px!important;border-radius:11px!important;font-size:11px!important;letter-spacing:1px!important}
+  .wc-game-screen:not(.wc-grand-screen) .wc-level-badge::before{font-size:18px!important;margin-right:6px!important}
+  .wc-game-screen .wc-level-coins{height:32px!important;min-width:70px!important;margin-top:0!important;border-radius:11px!important;font-size:15px!important}
+  .wc-game-screen .wc-level-coins .wc-coin{width:20px!important;height:20px!important}
+  .wc-game-screen .wc-hint-action{width:30px!important;height:30px!important;min-width:30px!important;top:4px!important;right:4px!important}
+  .wc-game-screen .wc-hint-action img{width:20px!important;height:20px!important}
+
+  .wc-game-screen .wc-dish-heading{min-height:44px!important;margin:5px 14px 6px!important;padding:6px 14px 7px!important;font-size:27px!important}
+  .wc-game-screen .wc-dish-heading:before{width:34px!important;height:30px!important;top:8px!important;left:-14px!important}
+  .wc-game-screen .wc-dish-heading:after{top:6px!important;right:10px!important;font-size:24px!important}
+
+  /* — slim order card — */
+  .wc-game-screen .wc-game-status{min-height:52px!important;margin:0 0 6px!important;padding:6px 8px!important;grid-template-columns:40px minmax(0,1fr) 38px!important;gap:7px!important;border-radius:15px!important}
+  .wc-game-screen .wc-guest{width:40px!important;height:40px!important;border-radius:11px!important}
+  .wc-game-screen .wc-progress-caption{font-size:11px!important}
+  .wc-game-screen .wc-progress-caption strong{font-size:14px!important}
+  .wc-game-screen .wc-game-status .wc-bar{height:7px!important;margin-top:2px!important}
+  .wc-game-screen .wc-guest-say{margin-top:2px!important;padding-top:0!important;font-size:9px!important;line-height:1.15!important}
+  .wc-game-screen .wc-bonus-jar{width:36px!important;height:40px!important}
+  .wc-game-screen .wc-bonus-jar .wc-jar-img{width:36px!important;height:36px!important}
+  .wc-game-screen .wc-bonus-count{width:22px!important;height:22px!important;font-size:11px!important;right:-3px!important;top:-4px!important}
+
+  /* — slim word bar — */
+  .wc-game-screen .wc-word-entry{margin:4px 0 2px!important;padding-bottom:0!important}
+  .wc-game-screen .wc-wordbar{min-height:42px!important;border-radius:12px!important;padding:2px 8px 14px!important}
+  .wc-game-screen .wc-wordbar-letters{min-height:24px!important;gap:3px!important}
+  .wc-game-screen .wc-wordbar-placeholder{font-size:12px!important}
+  .wc-game-screen .wc-wordbar-label{font-size:8px!important;bottom:4px!important}
+  .wc-game-screen .wc-word-chip{min-width:24px!important;height:24px!important;margin:1px!important;font-size:14px!important;border-radius:7px!important}
+
+  /* — slim action dock — */
+  .wc-game-screen .wc-wheel-tools{margin:2px 0 0!important;padding:3px!important;gap:4px!important;border-radius:14px!important}
+  .wc-game-screen .wc-action-button{min-height:36px!important;border-radius:11px!important;font-size:10px!important;padding:2px 3px!important}
+  .wc-game-screen .wc-action-icon{display:inline-block!important;vertical-align:-2px!important;margin:0 4px 0 0!important;font-size:14px!important}
+
+  /* — wide crossword field: full-bleed board, exact height, nothing clipped — */
+  .wc-game-screen .wc-grid-scroll{
+    height:var(--wc-board-box,220px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    max-width:none!important;
+    margin:0 -10px!important;
+    padding:6px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+    border-radius:16px!important;
+  }
+  .wc-game-screen .wc-grid{
+    flex:0 0 auto!important;
+    width:calc(100% / var(--wc-board-scale,.85))!important;
+    min-width:0!important;
+    min-height:0!important;
+    transform:scale(var(--wc-board-scale,.85))!important;
+    transform-origin:center center!important;
+    grid-auto-rows:var(--wc-cell,52px)!important;
+    gap:4px!important;
+    padding:10px!important;
+  }
+  .wc-game-screen .wc-cell{width:52px!important;height:52px!important;font-size:24px!important;border-radius:10px!important}
+
+  /* wheel box mirrors the inline size used for tile geometry (min(250, 66vw)) → ring concentric with plate */
+  .wc-game-screen .wc-cooking-stage .wc-wheel{width:min(250px,66vw)!important;height:min(250px,66vw)!important}
+}
+
+@media (max-width:390px){
+  .wc-game-screen .wc-grid-scroll{margin:0 -8px!important}
+  .wc-game-screen .wc-cooking-stage{min-height:264px!important;height:264px!important}
+  .wc-game-screen .wc-dish-heading{font-size:24px!important;margin:4px 10px 5px!important}
+  .wc-game-screen .wc-action-button{font-size:9px!important}
+}

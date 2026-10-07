@@ -716,6 +716,28 @@ function LevelScreen({
     return { minR, minC, rows: maxR - minR + 1, cols: maxC - minC + 1, cells };
   }, [level]);
 
+  // ── board fit: the crossword stretches to the full screen width,
+  //    scaling down only when it would not fit horizontally/vertically ──
+  const [boardScale, setBoardScale] = useState(0.85);
+  const [boardBoxH, setBoardBoxH] = useState(220);
+  useEffect(() => {
+    const compute = () => {
+      const CELL = 52, GAP = 4, PAD = 10;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const sidePad = vw <= 390 ? 8 : 10;
+      const availW = vw - sidePad * 2 - 12;
+      const maxH = Math.min(vh * 0.35, 284);
+      const cw = grid.cols * CELL + (grid.cols - 1) * GAP + PAD * 2;
+      const ch = grid.rows * CELL + (grid.rows - 1) * GAP + PAD * 2;
+      const s = Math.max(0.5, Math.min(1, availW / cw, maxH / ch));
+      setBoardScale(s);
+      setBoardBoxH(Math.min(340, Math.round(ch * s) + 12));
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, [grid.cols, grid.rows]);
+
   const cellState = (r: number, c: number) => {
     const list = grid.cells[`${r},${c}`];
     if (!list) return null;
@@ -725,7 +747,13 @@ function LevelScreen({
   };
 
   return (
-    <div className={grand ? "wc-game-screen wc-grand-screen" : "wc-game-screen"}>
+    <div
+      className={grand ? "wc-game-screen wc-grand-screen" : "wc-game-screen"}
+      style={{
+        ["--wc-board-scale" as string]: `${boardScale}`,
+        ["--wc-board-box" as string]: `${boardBoxH}px`,
+      }}
+    >
       <div className="wc-level-header">
         <button
           type="button"
@@ -798,7 +826,7 @@ function LevelScreen({
           className={`wc-grid ${shake ? "wc-shake" : ""} ${grid.rows >= 6 ? "wc-grid-tall" : ""}`}
           role="group"
           aria-label="Буквенная доска заказа"
-          style={{ gridTemplateColumns: `repeat(${grid.cols}, 38px)` }}
+          style={{ gridTemplateColumns: `repeat(${grid.cols}, var(--wc-cell, 52px))` }}
         >
           {Array.from({ length: grid.rows }).map((_, ri) =>
             Array.from({ length: grid.cols }).map((_, ci) => {
