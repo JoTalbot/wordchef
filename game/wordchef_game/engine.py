@@ -374,7 +374,11 @@ def submit_dish(state: MatchState, player_id: str, word: str, *,
         if shared else f"next:{player_id}:{player.dish_count}:{state.round_no}"
     )
     rng = _stream(state, stream_key)
-    difficulty = _difficulty_for(player, order.difficulty, kitchen)
+    # QUICK_COOK must keep the entire ticket stream identical for every chef.
+    # The current ticket's difficulty is already shared; deriving it again from
+    # each player's heat would make the next shared ticket diverge by score.
+    difficulty = order.difficulty if shared else _difficulty_for(
+        player, order.difficulty, kitchen)
     next_order = make_order(
         rng, load_dictionary(),
         order_id=(
