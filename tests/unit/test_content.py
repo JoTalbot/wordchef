@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 
-from wordchef_game.content import CONTENT, CONTENT_DIGEST, validate_content
+from wordchef_game.content import CONTENT, CONTENT_DIGEST, dictionary_path, dishes_for_theme, validate_content
+from wordchef_game.dictionary import load_dictionary
 from wordchef_game.kitchens import KITCHENS
 from wordchef_game.orders import KINDS, SECRETS, THEMES
 
@@ -47,3 +48,26 @@ def test_content_rejects_duplicate_kitchen_ids() -> None:
         assert "kitchen ids must be unique" in str(exc)
     else:
         raise AssertionError("duplicate kitchen id was accepted")
+
+
+def test_content_dictionaries_and_dishes_are_real_runtime_data() -> None:
+    assert dictionary_path("default").name == "dictionary.txt"
+    assert dictionary_path("ru").name == "words_ru.txt"
+    assert len(load_dictionary()) > 1000
+    assert len(load_dictionary(name="ru")) > 1000
+    assert len(CONTENT["dishes"]) == 7
+    assert len({dish["id"] for dish in CONTENT["dishes"]}) == 7
+    for dish in CONTENT["dishes"]:
+        assert dish["word"] in load_dictionary()
+        assert dish in dishes_for_theme(dish["theme"])
+
+
+def test_content_rejects_duplicate_dish_ids() -> None:
+    broken = json.loads(json.dumps(CONTENT, ensure_ascii=False))
+    broken["dishes"].append(dict(broken["dishes"][0]))
+    try:
+        validate_content(broken)
+    except ValueError as exc:
+        assert "dish ids must be unique" in str(exc)
+    else:
+        raise AssertionError("duplicate dish id was accepted")
