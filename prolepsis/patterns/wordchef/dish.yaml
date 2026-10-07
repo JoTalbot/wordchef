@@ -44,7 +44,6 @@ events:
             valid, reason, score_delta, combo_before, combo_after,
             heat_before, heat_after, spice, golden_delta, flavor,
             prep_tokens, boost_applied, double_applied, content_digest]
-            prep_tokens, boost_applied, double_applied]
     fact_types:
       content_digest: string
       match_id: string
