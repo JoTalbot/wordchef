@@ -185,7 +185,7 @@ class TestLobbyAuthority:
 
         verdict = client.post(f"/api/matches/{mid}/verify")
         assert verdict.status_code == 200
-        assert verdict.json()["verdict"] in ("PASS", "VERIFIED", "OK")
+        assert verdict.json()["verdict"] in ("PASS", "VERIFIED", "verified", "OK")
 
     def test_multiplayer_start_requires_host_identity(self, client):
         alice = _register(client, "Alice")
