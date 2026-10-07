@@ -428,7 +428,10 @@ class GameService:
 
         replay = eng.start_match(
             match_id=match_id, mode=state.mode, seed=state.seed,
-            # Replay must preserve the original lobby order because it is part of the\n            # deterministic stream context. Sorting player IDs changes RNG inputs\n            # for multiplayer matches even though the player set is identical.\n            player_ids=list(state.players),
+            # Replay must preserve the original lobby order because it is part of the
+            # deterministic stream context. Sorting player IDs changes RNG inputs
+            # for multiplayer matches even though the player set is identical.
+            player_ids=list(state.players),
             kitchen_id=state.kitchen_id, rounds_total=state.rounds_total,
             display_names={pid: p.display_name for pid, p in state.players.items()},
         )
