@@ -255,6 +255,7 @@ export default function ChefGame() {
   const [shopOwned, setShopOwned] = useState<Record<string, number>>({});
   const [dailyQuestDate, setDailyQuestDate] = useState("");
   const [dailyQuestClaimed, setDailyQuestClaimed] = useState<Record<string, boolean>>({});
+  const [dailyQuestBase, setDailyQuestBase] = useState({ levels: 0, words: 0, bonusWords: 0 });
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -281,7 +282,19 @@ export default function ChefGame() {
       const date = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
       setDailyQuestDate(date);
       const rawClaimed = window.localStorage.getItem("wc_daily_quest_claimed");
-      setDailyQuestClaimed(rawClaimed ? JSON.parse(rawClaimed) : {});
+      const rawBase = window.localStorage.getItem("wc_daily_quest_base");
+      const savedDate = window.localStorage.getItem("wc_daily_quest_date");
+      const base = rawBase ? JSON.parse(rawBase) : { levels: load("wc_stat_levels", 0), words: load("wc_stat_words", 0), bonusWords: load("wc_stat_bonus_words", 0) };
+      if (savedDate !== date) {
+        setDailyQuestClaimed({});
+        setDailyQuestBase({ levels: chefStats.levels, words: chefStats.words, bonusWords: chefStats.bonusWords });
+        window.localStorage.setItem("wc_daily_quest_claimed", "{}");
+        window.localStorage.setItem("wc_daily_quest_base", JSON.stringify({ levels: chefStats.levels, words: chefStats.words, bonusWords: chefStats.bonusWords }));
+        window.localStorage.setItem("wc_daily_quest_date", date);
+      } else {
+        setDailyQuestClaimed(rawClaimed ? JSON.parse(rawClaimed) : {});
+        setDailyQuestBase(base);
+      }
     } catch { setDailyQuestDate(""); setDailyQuestClaimed({}); }
     try {
       const savedTheme = window.localStorage.getItem("wc_theme") ?? "classic";
@@ -311,8 +324,8 @@ export default function ChefGame() {
     save("wc_best_daily_streak", bestDailyStreak);
     try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); } catch {}
     try { window.localStorage.setItem("wc_shop_owned", JSON.stringify(shopOwned)); } catch {}
-    try { window.localStorage.setItem("wc_daily_quest_claimed", JSON.stringify(dailyQuestClaimed)); } catch {}
-  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, dailyQuestClaimed, storageReady]);
+    try { window.localStorage.setItem("wc_daily_quest_claimed", JSON.stringify(dailyQuestClaimed)); window.localStorage.setItem("wc_daily_quest_base", JSON.stringify(dailyQuestBase)); window.localStorage.setItem("wc_daily_quest_date", dailyQuestDate); } catch {}
+  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, dailyQuestClaimed, dailyQuestBase, dailyQuestDate, storageReady]);
 
 
   const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
@@ -661,9 +674,9 @@ function HomeScreen({
         <div className="wc-kitchen-heading"><div><span className="wc-home-kicker">СЕГОДНЯ</span><h2 id="wc-quests-title">Квесты шефа</h2></div><span className="wc-quest-date">{dailyQuestDate || "..."}</span></div>
         <div className="wc-quests-grid">
           {[
-            ["level","🍽️","Заказ дня",1,chefStats.levels,30],
-            ["words","🔤","Поварская разминка",5,chefStats.words,25],
-            ["bonus","⭐","Секретный ингредиент",1,chefStats.bonusWords,35],
+            ["level","🍽️","Заказ дня",1,Math.max(0,chefStats.levels-dailyQuestBase.levels),30],
+            ["words","🔤","Поварская разминка",5,Math.max(0,chefStats.words-dailyQuestBase.words),25],
+            ["bonus","⭐","Секретный ингредиент",1,Math.max(0,chefStats.bonusWords-dailyQuestBase.bonusWords),35],
           ].map(([id,icon,name,target,progress,reward]) => {
             const key=String(id); const done=Number(progress)>=Number(target); const claimed=!!dailyQuestClaimed[key];
             return <div className={`wc-quest ${done ? "done" : ""} ${claimed ? "claimed" : ""}`} key={key}>
