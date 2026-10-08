@@ -4862,3 +4862,28 @@ button:focus-visible,
   .wc-achievements-grid{grid-template-columns:1fr;gap:7px}
   .wc-achievement{min-height:58px}
 }
+
+/* v1.9 chef profile statistics */
+.wc-chef-stats-card { overflow:hidden; }
+.wc-chef-rank {
+  padding:7px 10px; border-radius:999px; font-size:.76rem; font-weight:900;
+  background:rgba(255,255,255,.12); white-space:nowrap;
+}
+.wc-chef-stats-grid {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin-top:14px;
+}
+.wc-chef-stat {
+  min-height:78px; padding:11px 8px; border:2px solid rgba(255,255,255,.12);
+  border-radius:15px; background:rgba(0,0,0,.08); display:flex;
+  flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:4px;
+}
+.wc-chef-stat strong { font-size:1.35rem; line-height:1; }
+.wc-chef-stat span { font-size:.65rem; line-height:1.2; opacity:.72; }
+@media(max-width:700px){
+  .wc-chef-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .wc-chef-stat { min-height:68px; }
+}
+@media(max-width:380px){
+  .wc-chef-rank { font-size:.68rem; padding:6px 8px; }
+  .wc-chef-stat strong { font-size:1.18rem; }
+}
