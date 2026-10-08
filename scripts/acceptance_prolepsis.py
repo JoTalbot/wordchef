@@ -190,19 +190,40 @@ def acceptance_platform_server(tmp: Path) -> None:
         status, version = http("GET", f"{base}/v1/version")
         check("platform version", status == 200 and "server" in version, str(version))
 
-        # async execution of a game dish workflow through the HTTP protocol
+        # async execution of a real game dish workflow through the HTTP protocol.
+        # Build the exact authoritative payload used by the game bridge rather than
+        # hand-writing a plausible-looking claim. This keeps HTTP acceptance aligned
+        # with the in-process surface and binds the execution to the canonical pack.
         source = str(ROOT / "prolepsis" / "patterns" / "wordchef" / "dish.yaml")
-        payload = {
-            "match_id": "srv", "player_id": "alice", "order_id": "o1",
-            "word": "flour", "word_len": 5, "tray": "tulrfuo", "elapsed": 5,
-            "valid": 1, "reason": "ok", "score_delta": 324,
-            "combo_before": 0, "combo_after": 1, "heat_before": 0, "heat_after": 1,
-            "spice": 0, "golden_delta": 0, "flavor": "classic", "secret_hit": 0,
-            "kitchen": "street", "order_snapshot": "{}", "claimed_result": "{}",
-            "prep_tokens": 0, "boost_applied": 0, "double_applied": 0,
-        }
+        from wordchef_game.engine import start_match, start_round, submit_dish
+        from wordchef_game.dictionary import load_dictionary
+        from wordchef_game.orders import check_order
+        from wordchef_game.content import CONTENT_DIGEST
+        from wordchef_prolepsis.ops import op_submit_dish
+
+        d = load_dictionary()
+        game_state = start_match(
+            match_id="srv", mode="SOLO", seed="acceptance-http",
+            player_ids=["alice"], now=1000.0,
+        )
+        game_state = start_round(game_state, now=1000.0)
+        srv_player = game_state.players["alice"]
+        srv_order = srv_player.order
+        srv_word = next(w for w in d.words if check_order(srv_order, w, d)[0])
+        game_state, srv_outcome = submit_dish(
+            game_state, "alice", srv_word, now=1005.0,
+        )
+        _, events, request_id = op_submit_dish(
+            state=game_state, player=game_state.players["alice"],
+            order=srv_order, outcome=srv_outcome,
+            score_total=game_state.players["alice"].score, counter=1,
+        )
+        events = [
+            {**event, "payload": {**event["payload"], "content_digest": CONTENT_DIGEST}}
+            for event in events
+        ]
         status, queued = http("POST", f"{base}/v1/executions", {
-            "source": source, "request_id": "acceptance-async-1",
+            "source": source, "request_id": request_id,
             "agent_id": "wordchef-acceptance",
             "capabilities": ["weave.artifact"],
             "events": [{"type": "DISH_SUBMIT", "payload": payload}],
