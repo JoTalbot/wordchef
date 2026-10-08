@@ -427,7 +427,7 @@ export default function ChefGame() {
           hintCost={Math.max(10, HINT_COST - (shopOwned.sharpKnife ?? 0) * 5)}
           rewardBonus={(shopOwned.goldenPan ?? 0) * 10}
           wordRewardMultiplier={1 + (shopOwned.comboApron ?? 0) * 0.25}
-          bonusReward={shopOwned.chefCharm ?? 0} * 2
+          bonusReward={(shopOwned.chefCharm ?? 0) * 2}
         />
       )}
       {screen === "grand" && (
