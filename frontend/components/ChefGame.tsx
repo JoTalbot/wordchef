@@ -379,10 +379,9 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats,
 }: {
   levelNo: number; grandBest: number; themeId: string;
-  chefStats: { words: number; bonusWords: number; levels: number; hints: number };
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
 }) {
