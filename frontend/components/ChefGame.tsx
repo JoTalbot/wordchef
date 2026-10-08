@@ -626,6 +626,23 @@ function HomeScreen({
         </div>
       </section>
 
+      <section className="wc-card wc-rank-card" aria-labelledby="wc-rank-title">
+        <div className="wc-kitchen-heading">
+          <div>
+            <span className="wc-home-kicker">ПРОГРЕСС</span>
+            <h2 id="wc-rank-title">Ранг шефа</h2>
+          </div>
+          <span className="wc-rank-badge">{levelNo >= 100 ? "👑 Легенда" : levelNo >= 75 ? "💎 Мастер" : levelNo >= 50 ? "🔥 Гранд-шеф" : levelNo >= 30 ? "🥇 Шеф-мастер" : levelNo >= 15 ? "🥘 Шеф" : levelNo >= 5 ? "🍳 Повар" : "🥄 Ученик"}</span>
+        </div>
+        <div className="wc-rank-progress">
+          <div className="wc-rank-level"><strong>Уровень {levelNo}</strong><span>{levelNo >= 100 ? "Максимальный ранг кампании" : `${Math.max(0, levelNo % 5)} / 5 до следующего ранга`}</span></div>
+          <div className="wc-bar"><div style={{ width: `${levelNo >= 100 ? 100 : ((levelNo % 5) / 5) * 100}%` }} /></div>
+        </div>
+        <div className="wc-rank-milestones">
+          <span>🥄 1</span><span>🍳 5</span><span>🥘 15</span><span>🔥 30</span><span>💎 75</span><span>👑 100</span>
+        </div>
+      </section>
+
       <section className="wc-card wc-chef-stats-card" aria-labelledby="wc-chef-stats-title">
         <div className="wc-kitchen-heading">
           <div>
