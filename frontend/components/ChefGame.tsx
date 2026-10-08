@@ -252,6 +252,7 @@ export default function ChefGame() {
   const [dailyStreak, setDailyStreak] = useState(0);
   const [bestDailyStreak, setBestDailyStreak] = useState(0);
   const [lastCompletionDate, setLastCompletionDate] = useState("");
+  const [shopOwned, setShopOwned] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -268,6 +269,10 @@ export default function ChefGame() {
     setDailyStreak(load("wc_daily_streak", 0));
     setBestDailyStreak(load("wc_best_daily_streak", 0));
     try { setLastCompletionDate(window.localStorage.getItem("wc_last_completion_date") ?? ""); } catch { setLastCompletionDate(""); }
+    try {
+      const rawShop = window.localStorage.getItem("wc_shop_owned");
+      setShopOwned(rawShop ? JSON.parse(rawShop) : {});
+    } catch { setShopOwned({}); }
     try {
       const savedTheme = window.localStorage.getItem("wc_theme") ?? "classic";
       setThemeId(getWordChefTheme(savedTheme).id);
@@ -295,7 +300,8 @@ export default function ChefGame() {
     save("wc_daily_streak", dailyStreak);
     save("wc_best_daily_streak", bestDailyStreak);
     try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); } catch {}
-  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, storageReady]);
+    try { window.localStorage.setItem("wc_shop_owned", JSON.stringify(shopOwned)); } catch {}
+  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, storageReady]);
 
 
   const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
@@ -362,6 +368,15 @@ export default function ChefGame() {
           chefStats={chefStats}
           dailyStreak={dailyStreak}
           bestDailyStreak={bestDailyStreak}
+          coins={coins}
+          shopOwned={shopOwned}
+          onShopPurchase={(id, cost) => {
+            if (shopOwned[id]) return;
+            if (coins < cost) { flash(`Нужно ещё ${cost - coins} 🪙`); return; }
+            setCoins((value) => value - cost);
+            setShopOwned((owned) => ({ ...owned, [id]: true }));
+            flash("Улучшение куплено! 👨‍🍳");
+          }}
         />
       )}
       {screen === "level" && (
@@ -377,6 +392,8 @@ export default function ChefGame() {
           onBonusFound={() => updateChefStats("bonusWords")}
           onHintUsed={() => updateChefStats("hints")}
           onLevelComplete={recordLevelComplete}
+          hintCost={shopOwned.sharpKnife ? 20 : HINT_COST}
+          rewardBonus={shopOwned.goldenPan ? 10 : 0}
         />
       )}
       {screen === "grand" && (
@@ -411,12 +428,13 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase,
 }: {
   levelNo: number; grandBest: number; themeId: string;
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
-  dailyStreak: number; bestDailyStreak: number;
+  dailyStreak: number; bestDailyStreak: number; coins: number; shopOwned: Record<string, boolean>;
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
+  onShopPurchase: (id: string, cost: number) => void;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
   const kitchens = Object.entries(KITCHEN_RU);
@@ -593,6 +611,37 @@ function HomeScreen({
         </div>
       </section>
 
+      <section className="wc-card wc-shop-card" aria-labelledby="wc-shop-title">
+        <div className="wc-kitchen-heading">
+          <div>
+            <span className="wc-home-kicker">МАГАЗИН ШЕФА</span>
+            <h2 id="wc-shop-title">Улучшения кухни</h2>
+          </div>
+          <span className="wc-shop-balance">🪙 {coins}</span>
+        </div>
+        <p className="wc-shop-note">Покупки сохраняются навсегда и реально меняют игру.</p>
+        <div className="wc-shop-grid">
+          {[
+            ["sharpKnife", "🔪", "Острый нож", "Подсказки стоят 20 вместо 25", 80],
+            ["goldenPan", "🍳", "Золотая сковорода", "Каждый завершённый заказ даёт +10 монет", 140],
+            ["comboApron", "🧤", "Фартук комбо", "Награды за слова получают +25%", 220],
+            ["chefCharm", "✨", "Талисман шефа", "Бонусные слова дают +2 дополнительные монеты", 180],
+          ].map(([id, icon, name, desc, cost]) => {
+            const owned = !!shopOwned[String(id)];
+            return (
+              <div className={`wc-shop-item ${owned ? "owned" : ""}`} key={String(id)}>
+                <span className="wc-shop-icon" aria-hidden="true">{String(icon)}</span>
+                <div className="wc-shop-copy"><strong>{String(name)}</strong><small>{String(desc)}</small></div>
+                <button type="button" className="wc-shop-buy" disabled={owned || coins < Number(cost)}
+                  onClick={() => onShopPurchase(String(id), Number(cost))}>
+                  {owned ? "✓ Куплено" : `🪙 ${cost}`}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="wc-card wc-kitchen-card" aria-labelledby="wc-kitchen-map-title">
         <div className="wc-kitchen-heading">
           <div>
@@ -650,12 +699,13 @@ function HomeScreen({
 }
 
 function LevelScreen({
-  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash, onWordFound, onBonusFound, onHintUsed, onLevelComplete,
+  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash, onWordFound, onBonusFound, onHintUsed, onLevelComplete, hintCost = HINT_COST, rewardBonus = 0,
 }: {
   levelNo: number; coins: number;
   addCoins: (n: number) => void; spendCoins: (n: number) => void;
   onNext: () => void; onHome: () => void; onGrandComplete?: () => void; grand?: boolean;
   onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
+  hintCost?: number; rewardBonus?: number;
   flash: (m: string) => void;
 }) {
   const level = useMemo<Level>(() => generateLevel(levelNo), [levelNo]);
@@ -697,7 +747,7 @@ function LevelScreen({
       } else {
         const nextCombo = combo + 1;
         const comboMultiplier = Math.min(4, Math.max(1, Math.floor(nextCombo / 2) + 1));
-        const reward = 2 * word.length * comboMultiplier;
+        const reward = Math.floor(2 * word.length * comboMultiplier * (rewardBonus > 0 ? 1.25 : 1));
         setFound((f) => [...f, word]);
         onWordFound?.();
         setCombo(nextCombo);
@@ -715,7 +765,7 @@ function LevelScreen({
       else {
         setBonusFound((b) => [...b, word]);
         onBonusFound?.();
-        addCoins(word.length);
+        addCoins(word.length + rewardBonusForBonusWord());
         setCombo((c) => c + 1);
         setRewardBurst(`БОНУС +${word.length} 🪙`);
         playGameTone("bonus");
@@ -842,18 +892,20 @@ function LevelScreen({
     return () => window.removeEventListener("keydown", onKey);
   }, [current, wheel, pickTile, submitWord]);
 
+  const rewardBonusForBonusWord = () => rewardBonus > 0 ? 2 : 0;
+
   const doHint = () => {
     const target = remaining.find((word) =>
       [...word].some((_, i) => !hinted[`${word}:${i}`]),
     );
     if (!target) { flash("Все доступные буквы уже открыты"); return; }
-    if (coins < HINT_COST) { flash(`Мало монет — нужно ${HINT_COST} 🪙`); return; }
+    if (coins < hintCost) { flash(`Мало монет — нужно ${hintCost} 🪙`); return; }
 
     const nextIdx = [...target].findIndex((_, i) => !hinted[`${target}:${i}`]);
     setHinted((h) => ({ ...h, [`${target}:${nextIdx}`]: true }));
-    spendCoins(HINT_COST);
+    spendCoins(hintCost);
     onHintUsed?.();
-    flash(`Открыта буква «${target[nextIdx]}» · −${HINT_COST} 🪙`);
+    flash(`Открыта буква «${target[nextIdx]}» · −${hintCost} 🪙`);
   };
 
   const doShuffle = () => setWheel((w) => {
@@ -943,8 +995,8 @@ function LevelScreen({
           type="button"
           className="wc-hint-action"
           onClick={doHint}
-          title={`Открыть букву · ${HINT_COST} монет`}
-          aria-label={`Открыть букву за ${HINT_COST} монет`}
+          title={`Открыть букву · ${hintCost} монет`}
+          aria-label={`Открыть букву за ${hintCost} монет`}
         >
           <img src="img/ui_hint.webp" alt="" />
           <span>{HINT_COST}</span>
@@ -1187,7 +1239,7 @@ function LevelScreen({
             <div id="wc-completion-reward" className="wc-win-stats">
               <div className="wc-win-reward">
                 <img className="wc-coin" src="img/coins.webp" alt="" />
-                <strong>+{30 + levelNo}</strong>
+                <strong>+{30 + levelNo + rewardBonus}</strong>
                 <span>монет</span>
               </div>
               <div className="wc-win-bonus">
