@@ -790,7 +790,7 @@ function LevelScreen({
         try { navigator.vibrate([18, 35, 18, 55, 28]); } catch {}
       }
       window.setTimeout(() => setDone(true), 1050);
-      const reward = 30 + levelNo;
+      const reward = 30 + levelNo + rewardBonus;
       addCoins(reward);
       onLevelComplete?.();
       if (grand) onGrandComplete?.();
