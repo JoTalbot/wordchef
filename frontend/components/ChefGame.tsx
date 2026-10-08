@@ -403,6 +403,7 @@ export default function ChefGame() {
           }}
           dailyQuestDate={dailyQuestDate}
           dailyQuestClaimed={dailyQuestClaimed}
+          dailyQuestBase={dailyQuestBase}
           onClaimQuest={(id, reward) => {
             if (dailyQuestClaimed[id]) return;
             setDailyQuestClaimed((claimed) => ({ ...claimed, [id]: true }));
@@ -469,7 +470,7 @@ function HomeScreen({
   dailyStreak: number; bestDailyStreak: number; coins: number; shopOwned: Record<string, number>; dailyQuestDate: string; dailyQuestClaimed: Record<string, boolean>;
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
   onShopPurchase: (id: string, cost: number) => void; onClaimQuest: (id: string, reward: number) => void;
-  dailyQuestDate: string; dailyQuestClaimed: Record<string, boolean>;
+  dailyQuestBase: { levels: number; words: number; bonusWords: number };
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
   const kitchens = Object.entries(KITCHEN_RU);
