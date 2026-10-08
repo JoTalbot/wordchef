@@ -491,6 +491,22 @@ function HomeScreen({
         </div>
       </section>
 
+      <section className="wc-card wc-chef-stats-card" aria-labelledby="wc-chef-stats-title">
+        <div className="wc-kitchen-heading">
+          <div>
+            <span className="wc-home-kicker">ПРОФИЛЬ</span>
+            <h2 id="wc-chef-stats-title">Статистика шефа</h2>
+          </div>
+          <span className="wc-chef-rank">{levelNo >= 50 ? "👑 Гранд-шеф" : levelNo >= 20 ? "🔥 Шеф" : levelNo >= 5 ? "🍳 Повар" : "🥄 Ученик"}</span>
+        </div>
+        <div className="wc-chef-stats-grid">
+          <div className="wc-chef-stat"><strong>{'{'}Math.max(0, levelNo - 1){'}'}</strong><span>уровней пройдено</span></div>
+          <div className="wc-chef-stat"><strong>{'{'}grandBest{'}'}</strong><span>рекорд Гранд Тура</span></div>
+          <div className="wc-chef-stat"><strong>{'{'}currentKitchen + 1{'}'}</strong><span>текущая кухня</span></div>
+          <div className="wc-chef-stat"><strong>{'{'}themeId === "classic" ? "1" : "2+"{'}'}</strong><span>доступные темы</span></div>
+        </div>
+      </section>
+
       <section className="wc-card wc-kitchen-card" aria-labelledby="wc-kitchen-map-title">
         <div className="wc-kitchen-heading">
           <div>
