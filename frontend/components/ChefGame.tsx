@@ -345,10 +345,10 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange,
 }: {
-  levelNo: number; grandBest: number;
-  onPlay: () => void; onGrand: () => void; onMulti: () => void;
+  levelNo: number; grandBest: number; themeId: string;
+  onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
   const kitchens = Object.entries(KITCHEN_RU);
