@@ -4833,3 +4833,32 @@ button:focus-visible,
   .wc-theme-grid { gap: 7px; }
   .wc-theme-option { min-height: 64px; border-radius: 13px; }
 }
+
+
+/* v1.8 chef achievement milestones */
+.wc-achievements-card { overflow:hidden; }
+.wc-achievements-score {
+  min-width:48px; text-align:center; padding:7px 10px; border-radius:999px;
+  background:rgba(255,255,255,.12); font-weight:900; font-size:.82rem;
+}
+.wc-achievements-grid {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:14px;
+}
+.wc-achievement {
+  display:flex; align-items:center; gap:10px; min-height:66px; padding:10px;
+  border:2px solid rgba(255,255,255,.12); border-radius:15px;
+  background:rgba(0,0,0,.08); opacity:.52; filter:grayscale(.65);
+}
+.wc-achievement > span { font-size:1.65rem; line-height:1; }
+.wc-achievement div { min-width:0; display:flex; flex-direction:column; gap:3px; }
+.wc-achievement strong { font-size:.78rem; }
+.wc-achievement small { font-size:.66rem; line-height:1.2; opacity:.72; }
+.wc-achievement.unlocked {
+  opacity:1; filter:none; border-color:rgba(255,211,92,.62);
+  background:linear-gradient(135deg,rgba(255,211,92,.16),rgba(255,255,255,.08));
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+@media(max-width:520px){
+  .wc-achievements-grid{grid-template-columns:1fr;gap:7px}
+  .wc-achievement{min-height:58px}
+}
