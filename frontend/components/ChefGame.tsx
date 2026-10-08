@@ -297,6 +297,11 @@ export default function ChefGame() {
     try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); } catch {}
   }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, storageReady]);
 
+
+  const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
+    setChefStats((stats) => ({ ...stats, [key]: stats[key] + amount }));
+  }, []);
+
   const recordLevelComplete = useCallback(() => {
     updateChefStats("levels");
     const today = new Date().toISOString().slice(0, 10);
@@ -309,10 +314,6 @@ export default function ChefGame() {
     setBestDailyStreak((best) => Math.max(best, next));
     setLastCompletionDate(today);
   }, [dailyStreak, lastCompletionDate, updateChefStats]);
-  const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
-    setChefStats((stats) => ({ ...stats, [key]: stats[key] + amount }));
-  }, []);
-
   const flash = useCallback((msg: string) => {
     setToast(msg);
     if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
