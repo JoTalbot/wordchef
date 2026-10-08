@@ -4958,3 +4958,14 @@ button:focus-visible,
 .wc-shop-buy:disabled { opacity:.52; cursor:not-allowed; }
 .wc-shop-item.owned .wc-shop-buy { background:rgba(74,222,128,.14); color:var(--accent2); }
 @media(max-width:600px){ .wc-shop-grid { grid-template-columns:1fr; } }
+
+
+/* v1.13 quests */
+.wc-quests-card{overflow:hidden;background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(255,255,255,.05))}
+.wc-quest-date{font-size:.68rem;font-weight:800;opacity:.65}
+.wc-quests-grid{display:grid;gap:8px;margin-top:14px}
+.wc-quest{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px;padding:9px;border:1px solid rgba(255,255,255,.12);border-radius:13px;background:rgba(0,0,0,.07)}
+.wc-quest.done{border-color:rgba(255,211,92,.42)}.wc-quest.claimed{opacity:.72}.wc-quest-icon{font-size:1.35rem;text-align:center}
+.wc-quest-copy{min-width:0;display:flex;flex-direction:column;gap:2px}.wc-quest-copy strong{font-size:.76rem}.wc-quest-copy small{font-size:.64rem;opacity:.68}
+.wc-quest .wc-shop-buy{grid-column:auto;min-width:86px;padding:0 8px}
+@media(max-width:520px){.wc-quest{grid-template-columns:30px minmax(0,1fr)}.wc-quest .wc-shop-buy{grid-column:2}}
