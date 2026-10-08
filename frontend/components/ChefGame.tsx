@@ -256,6 +256,7 @@ export default function ChefGame() {
   const [dailyQuestDate, setDailyQuestDate] = useState("");
   const [dailyQuestClaimed, setDailyQuestClaimed] = useState<Record<string, boolean>>({});
   const [dailyQuestBase, setDailyQuestBase] = useState({ levels: 0, words: 0, bonusWords: 0 });
+  const [achievementClaimed, setAchievementClaimed] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -271,6 +272,7 @@ export default function ChefGame() {
     setDailyStreak(load("wc_daily_streak", 0));
     setBestDailyStreak(load("wc_best_daily_streak", 0));
     try { setLastCompletionDate(window.localStorage.getItem("wc_last_completion_date") ?? ""); } catch { setLastCompletionDate(""); }
+    try { setAchievementClaimed(JSON.parse(window.localStorage.getItem("wc_achievement_claimed") ?? "{}")); } catch { setAchievementClaimed({}); }
     try {
       const rawShop = window.localStorage.getItem("wc_shop_owned");
       const parsed = rawShop ? JSON.parse(rawShop) : {};
@@ -321,10 +323,25 @@ export default function ChefGame() {
     save("wc_stat_hints", chefStats.hints);
     save("wc_daily_streak", dailyStreak);
     save("wc_best_daily_streak", bestDailyStreak);
-    try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); } catch {}
+    try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); window.localStorage.setItem("wc_achievement_claimed", JSON.stringify(achievementClaimed)); } catch {}
     try { window.localStorage.setItem("wc_shop_owned", JSON.stringify(shopOwned)); } catch {}
     try { window.localStorage.setItem("wc_daily_quest_claimed", JSON.stringify(dailyQuestClaimed)); window.localStorage.setItem("wc_daily_quest_base", JSON.stringify(dailyQuestBase)); window.localStorage.setItem("wc_daily_quest_date", dailyQuestDate); } catch {}
-  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, dailyQuestClaimed, dailyQuestBase, dailyQuestDate, storageReady]);
+  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, dailyQuestClaimed, dailyQuestBase, dailyQuestDate, achievementClaimed, storageReady]);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    const achievements = [
+      ["first", levelNo >= 2, 25],
+      ["hot", levelNo >= 10, 75],
+      ["pro", levelNo >= 50, 200],
+      ["grand", grandBest >= 1, 100],
+    ] as const;
+    const newlyUnlocked = achievements.filter(([id, unlocked]) => unlocked && !achievementClaimed[id]);
+    if (newlyUnlocked.length === 0) return;
+    setAchievementClaimed((claimed) => Object.fromEntries([...Object.entries(claimed), ...newlyUnlocked.map(([id]) => [id, true])]));
+    setCoins((value) => value + newlyUnlocked.reduce((sum, [, , reward]) => sum + reward, 0));
+    flash(`🏆 Достижения: +${newlyUnlocked.reduce((sum, [, , reward]) => sum + reward, 0)} 🪙`);
+  }, [storageReady, levelNo, grandBest, achievementClaimed, flash]);
 
 
   const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
@@ -404,6 +421,7 @@ export default function ChefGame() {
           dailyQuestDate={dailyQuestDate}
           dailyQuestClaimed={dailyQuestClaimed}
           dailyQuestBase={dailyQuestBase}
+          achievementClaimed={achievementClaimed}
           onClaimQuest={(id, reward) => {
             if (dailyQuestClaimed[id]) return;
             setDailyQuestClaimed((claimed) => ({ ...claimed, [id]: true }));
@@ -463,14 +481,14 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase, dailyQuestDate, dailyQuestClaimed, dailyQuestBase, onClaimQuest,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase, dailyQuestDate, dailyQuestClaimed, dailyQuestBase, onClaimQuest, achievementClaimed,
 }: {
   levelNo: number; grandBest: number; themeId: string;
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
   dailyStreak: number; bestDailyStreak: number; coins: number; shopOwned: Record<string, number>; dailyQuestDate: string; dailyQuestClaimed: Record<string, boolean>;
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
   onShopPurchase: (id: string, cost: number) => void; onClaimQuest: (id: string, reward: number) => void;
-  dailyQuestBase: { levels: number; words: number; bonusWords: number };
+  dailyQuestBase: { levels: number; words: number; bonusWords: number }; achievementClaimed: Record<string, boolean>;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
   const kitchens = Object.entries(KITCHEN_RU);
@@ -599,16 +617,16 @@ function HomeScreen({
         </div>
         <div className="wc-achievements-grid">
           <div className={`wc-achievement ${levelNo >= 2 ? "unlocked" : ""}`}>
-            <span>🍽️</span><div><strong>Первый заказ</strong><small>Заверши первый уровень</small></div>
+            <span>🍽️</span><div><strong>Первый заказ</strong><small>Заверши первый уровень · +25 🪙 {achievementClaimed.first ? "✓" : ""}</small></div>
           </div>
           <div className={`wc-achievement ${levelNo >= 10 ? "unlocked" : ""}`}>
-            <span>🔥</span><div><strong>Разогрел кухню</strong><small>Дойди до 10 уровня</small></div>
+            <span>🔥</span><div><strong>Разогрел кухню</strong><small>Дойди до 10 уровня · +75 🪙 {achievementClaimed.hot ? "✓" : ""}</small></div>
           </div>
           <div className={`wc-achievement ${levelNo >= 50 ? "unlocked" : ""}`}>
-            <span>👨‍🍳</span><div><strong>Шеф-профи</strong><small>Дойди до 50 уровня</small></div>
+            <span>👨‍🍳</span><div><strong>Шеф-профи</strong><small>Дойди до 50 уровня · +200 🪙 {achievementClaimed.pro ? "✓" : ""}</small></div>
           </div>
           <div className={`wc-achievement ${grandBest >= 1 ? "unlocked" : ""}`}>
-            <span>🏆</span><div><strong>Гранд Тур</strong><small>Заверши первый заказ в туре</small></div>
+            <span>🏆</span><div><strong>Гранд Тур</strong><small>Заверши первый заказ в туре · +100 🪙 {achievementClaimed.grand ? "✓" : ""}</small></div>
           </div>
         </div>
       </section>
