@@ -121,4 +121,4 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload v1.7.0 app/build/outputs/apk/release/wordchef-v1.6.0.apk --repo "${GITHUB_REPOSITORY}" --clobber
+        run: gh release upload v1.7.0 app/build/outputs/apk/release/wordchef-v1.7.0.apk --repo "${GITHUB_REPOSITORY}" --clobber
