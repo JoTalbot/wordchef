@@ -4899,3 +4899,27 @@ button:focus-visible,
   .wc-chef-rank { font-size:.68rem; padding:6px 8px; }
   .wc-chef-stat strong { font-size:1.18rem; }
 }
+
+
+/* v1.10 daily chef streak */
+.wc-daily-card {
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  overflow:hidden;
+  background:linear-gradient(135deg,rgba(255,170,55,.16),rgba(255,255,255,.06));
+}
+.wc-daily-copy { min-width:0; }
+.wc-daily-copy h2 { margin:3px 0 5px; }
+.wc-daily-copy p { margin:0; font-size:.78rem; line-height:1.35; opacity:.72; }
+.wc-daily-badges {
+  min-width:100px; padding:10px 12px; border-radius:16px; text-align:center;
+  background:rgba(0,0,0,.08); border:2px solid rgba(255,211,92,.28);
+  display:flex; flex-direction:column; gap:2px;
+}
+.wc-daily-badges strong { font-size:1.7rem; line-height:1; }
+.wc-daily-badges span { font-size:.66rem; font-weight:800; opacity:.75; }
+.wc-daily-badges small { font-size:.62rem; opacity:.62; }
+@media(max-width:520px){
+  .wc-daily-card { align-items:flex-start; }
+  .wc-daily-badges { min-width:82px; padding:9px 8px; }
+  .wc-daily-badges strong { font-size:1.45rem; }
+}
