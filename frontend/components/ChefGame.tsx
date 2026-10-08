@@ -536,10 +536,15 @@ function HomeScreen({
           <span className="wc-chef-rank">{levelNo >= 50 ? "👑 Гранд-шеф" : levelNo >= 20 ? "🔥 Шеф" : levelNo >= 5 ? "🍳 Повар" : "🥄 Ученик"}</span>
         </div>
         <div className="wc-chef-stats-grid">
-          <div className="wc-chef-stat"><strong>{chefStats.levels}</strong><span>уровней пройдено</span></div>
-          <div className="wc-chef-stat"><strong>{grandBest}</strong><span>рекорд Гранд Тура</span></div>
-          <div className="wc-chef-stat"><strong>{currentKitchen + 1}</strong><span>текущая кухня</span></div>
-          <div className="wc-chef-stat"><strong>{WORDCHEF_THEMES.length}</strong><span>доступные темы</span></div>
+          <div className="wc-chef-stat"><strong>{chefStats.levels}</strong><span>заказов приготовлено</span></div>
+          <div className="wc-chef-stat"><strong>{chefStats.words}</strong><span>слов собрано</span></div>
+          <div className="wc-chef-stat"><strong>{chefStats.bonusWords}</strong><span>бонусных слов</span></div>
+          <div className="wc-chef-stat"><strong>{chefStats.hints}</strong><span>подсказок использовано</span></div>
+        </div>
+        <div className="wc-chef-profile-note">
+          <span>🏆 Рекорд Гранд Тура: <strong>{grandBest}</strong></span>
+          <span>🍳 Кухня: <strong>{currentKitchen + 1}/{kitchens.length}</strong></span>
+          <span>🎨 Скинов: <strong>{WORDCHEF_THEMES.length}</strong></span>
         </div>
       </section>
 
