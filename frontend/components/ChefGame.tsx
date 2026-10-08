@@ -465,6 +465,32 @@ function HomeScreen({
         </button>
       </section>
 
+      <section className="wc-card wc-achievements-card" aria-labelledby="wc-achievements-title">
+        <div className="wc-kitchen-heading">
+          <div>
+            <span className="wc-home-kicker">ДОСТИЖЕНИЯ</span>
+            <h2 id="wc-achievements-title">Путь шефа</h2>
+          </div>
+          <span className="wc-achievements-score">
+            {Math.min(4, (levelNo >= 2 ? 1 : 0) + (levelNo >= 10 ? 1 : 0) + (levelNo >= 50 ? 1 : 0) + (grandBest >= 1 ? 1 : 0))} / 4
+          </span>
+        </div>
+        <div className="wc-achievements-grid">
+          <div className={`wc-achievement ${levelNo >= 2 ? "unlocked" : ""}`}>
+            <span>🍽️</span><div><strong>Первый заказ</strong><small>Заверши первый уровень</small></div>
+          </div>
+          <div className={`wc-achievement ${levelNo >= 10 ? "unlocked" : ""}`}>
+            <span>🔥</span><div><strong>Разогрел кухню</strong><small>Дойди до 10 уровня</small></div>
+          </div>
+          <div className={`wc-achievement ${levelNo >= 50 ? "unlocked" : ""}`}>
+            <span>👨‍🍳</span><div><strong>Шеф-профи</strong><small>Дойди до 50 уровня</small></div>
+          </div>
+          <div className={`wc-achievement ${grandBest >= 1 ? "unlocked" : ""}`}>
+            <span>🏆</span><div><strong>Гранд Тур</strong><small>Заверши первый заказ в туре</small></div>
+          </div>
+        </div>
+      </section>
+
       <section className="wc-card wc-kitchen-card" aria-labelledby="wc-kitchen-map-title">
         <div className="wc-kitchen-heading">
           <div>
