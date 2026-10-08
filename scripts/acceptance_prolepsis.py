@@ -226,7 +226,7 @@ def acceptance_platform_server(tmp: Path) -> None:
             "source": source, "request_id": request_id,
             "agent_id": "wordchef-acceptance",
             "capabilities": ["weave.artifact"],
-            "events": [{"type": "DISH_SUBMIT", "payload": payload}],
+            "events": events,
             "async": True,
         })
         check("async execution accepted (202 + id)", status == 202 and
@@ -268,10 +268,10 @@ def acceptance_platform_server(tmp: Path) -> None:
 
         # idempotency: the same request_id must not duplicate work
         status2, again = http("POST", f"{base}/v1/executions", {
-            "source": source, "request_id": "acceptance-async-1",
+            "source": source, "request_id": request_id,
             "agent_id": "wordchef-acceptance",
             "capabilities": ["weave.artifact"],
-            "events": [{"type": "DISH_SUBMIT", "payload": payload}],
+            "events": events,
         })
         check("idempotent request_id", again.get("execution_id") == execution_id)
 
