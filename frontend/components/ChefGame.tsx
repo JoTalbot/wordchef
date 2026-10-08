@@ -263,12 +263,11 @@ export default function ChefGame() {
     setCoins(load("wc_coins", 100));
     setLevelNo(load("wc_level", 1, 1));
     setGrandBest(load("wc_grand_best", 0));
-    setChefStats({
-      words: load("wc_stat_words", 0),
-      bonusWords: load("wc_stat_bonus_words", 0),
-      levels: load("wc_stat_levels", 0),
-      hints: load("wc_stat_hints", 0),
-    });
+    const loadedStats = {
+      words: load("wc_stat_words", 0), bonusWords: load("wc_stat_bonus_words", 0),
+      levels: load("wc_stat_levels", 0), hints: load("wc_stat_hints", 0),
+    };
+    setChefStats(loadedStats);
     setDailyStreak(load("wc_daily_streak", 0));
     setBestDailyStreak(load("wc_best_daily_streak", 0));
     try { setLastCompletionDate(window.localStorage.getItem("wc_last_completion_date") ?? ""); } catch { setLastCompletionDate(""); }
@@ -287,9 +286,9 @@ export default function ChefGame() {
       const base = rawBase ? JSON.parse(rawBase) : { levels: load("wc_stat_levels", 0), words: load("wc_stat_words", 0), bonusWords: load("wc_stat_bonus_words", 0) };
       if (savedDate !== date) {
         setDailyQuestClaimed({});
-        setDailyQuestBase({ levels: chefStats.levels, words: chefStats.words, bonusWords: chefStats.bonusWords });
+        setDailyQuestBase({ levels: loadedStats.levels, words: loadedStats.words, bonusWords: loadedStats.bonusWords });
         window.localStorage.setItem("wc_daily_quest_claimed", "{}");
-        window.localStorage.setItem("wc_daily_quest_base", JSON.stringify({ levels: chefStats.levels, words: chefStats.words, bonusWords: chefStats.bonusWords }));
+        window.localStorage.setItem("wc_daily_quest_base", JSON.stringify({ levels: loadedStats.levels, words: loadedStats.words, bonusWords: loadedStats.bonusWords }));
         window.localStorage.setItem("wc_daily_quest_date", date);
       } else {
         setDailyQuestClaimed(rawClaimed ? JSON.parse(rawClaimed) : {});
