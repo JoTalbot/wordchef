@@ -383,6 +383,7 @@ function HomeScreen({
 }: {
   levelNo: number; grandBest: number; themeId: string;
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
+  chefStats: { words: number; bonusWords: number; levels: number; hints: number };
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
@@ -535,10 +536,10 @@ function HomeScreen({
           <span className="wc-chef-rank">{levelNo >= 50 ? "👑 Гранд-шеф" : levelNo >= 20 ? "🔥 Шеф" : levelNo >= 5 ? "🍳 Повар" : "🥄 Ученик"}</span>
         </div>
         <div className="wc-chef-stats-grid">
-          <div className="wc-chef-stat"><strong>{'{'}Math.max(0, levelNo - 1){'}'}</strong><span>уровней пройдено</span></div>
-          <div className="wc-chef-stat"><strong>{'{'}grandBest{'}'}</strong><span>рекорд Гранд Тура</span></div>
-          <div className="wc-chef-stat"><strong>{'{'}currentKitchen + 1{'}'}</strong><span>текущая кухня</span></div>
-          <div className="wc-chef-stat"><strong>{'{'}themeId === "classic" ? "1" : "2+"{'}'}</strong><span>доступные темы</span></div>
+          <div className="wc-chef-stat"><strong>{chefStats.levels}</strong><span>уровней пройдено</span></div>
+          <div className="wc-chef-stat"><strong>{grandBest}</strong><span>рекорд Гранд Тура</span></div>
+          <div className="wc-chef-stat"><strong>{currentKitchen + 1}</strong><span>текущая кухня</span></div>
+          <div className="wc-chef-stat"><strong>{WORDCHEF_THEMES.length}</strong><span>доступные темы</span></div>
         </div>
       </section>
 
@@ -604,6 +605,7 @@ function LevelScreen({
   levelNo: number; coins: number;
   addCoins: (n: number) => void; spendCoins: (n: number) => void;
   onNext: () => void; onHome: () => void; onGrandComplete?: () => void; grand?: boolean;
+  onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
   onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
   flash: (m: string) => void;
 }) {
