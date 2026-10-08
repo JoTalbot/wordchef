@@ -249,6 +249,9 @@ export default function ChefGame() {
     levels: 0,
     hints: 0,
   }));
+  const [dailyStreak, setDailyStreak] = useState(0);
+  const [bestDailyStreak, setBestDailyStreak] = useState(0);
+  const [lastCompletionDate, setLastCompletionDate] = useState("");
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -262,6 +265,9 @@ export default function ChefGame() {
       levels: load("wc_stat_levels", 0),
       hints: load("wc_stat_hints", 0),
     });
+    setDailyStreak(load("wc_daily_streak", 0));
+    setBestDailyStreak(load("wc_best_daily_streak", 0));
+    try { setLastCompletionDate(window.localStorage.getItem("wc_last_completion_date") ?? ""); } catch { setLastCompletionDate(""); }
     try {
       const savedTheme = window.localStorage.getItem("wc_theme") ?? "classic";
       setThemeId(getWordChefTheme(savedTheme).id);
@@ -286,7 +292,23 @@ export default function ChefGame() {
     save("wc_stat_bonus_words", chefStats.bonusWords);
     save("wc_stat_levels", chefStats.levels);
     save("wc_stat_hints", chefStats.hints);
-  }, [chefStats, storageReady]);
+    save("wc_daily_streak", dailyStreak);
+    save("wc_best_daily_streak", bestDailyStreak);
+    try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); } catch {}
+  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, storageReady]);
+
+  const recordLevelComplete = useCallback(() => {
+    updateChefStats("levels");
+    const today = new Date().toISOString().slice(0, 10);
+    if (lastCompletionDate === today) return;
+    const previous = lastCompletionDate ? new Date(`${lastCompletionDate}T00:00:00Z`) : null;
+    const current = new Date(`${today}T00:00:00Z`);
+    const daysSinceLast = previous ? Math.round((current.getTime() - previous.getTime()) / 86400000) : Infinity;
+    const next = daysSinceLast === 1 ? dailyStreak + 1 : 1;
+    setDailyStreak(next);
+    setBestDailyStreak((best) => Math.max(best, next));
+    setLastCompletionDate(today);
+  }, [dailyStreak, lastCompletionDate, updateChefStats]);
   const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
     setChefStats((stats) => ({ ...stats, [key]: stats[key] + amount }));
   }, []);
@@ -330,6 +352,8 @@ export default function ChefGame() {
             try { window.localStorage.setItem("wc_theme", id); } catch {}
           }}
           chefStats={chefStats}
+          dailyStreak={dailyStreak}
+          bestDailyStreak={bestDailyStreak}
         />
       )}
       {screen === "level" && (
@@ -344,7 +368,7 @@ export default function ChefGame() {
           onWordFound={() => updateChefStats("words")}
           onBonusFound={() => updateChefStats("bonusWords")}
           onHintUsed={() => updateChefStats("hints")}
-          onLevelComplete={() => updateChefStats("levels")}
+          onLevelComplete={recordLevelComplete}
         />
       )}
       {screen === "grand" && (
@@ -361,7 +385,7 @@ export default function ChefGame() {
           onWordFound={() => updateChefStats("words")}
           onBonusFound={() => updateChefStats("bonusWords")}
           onHintUsed={() => updateChefStats("hints")}
-          onLevelComplete={() => updateChefStats("levels")}
+          onLevelComplete={recordLevelComplete}
         />
       )}
       {screen === "multi" && (
@@ -379,10 +403,11 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak,
 }: {
   levelNo: number; grandBest: number; themeId: string;
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
+  dailyStreak: number; bestDailyStreak: number;
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
@@ -523,6 +548,18 @@ function HomeScreen({
           <div className={`wc-achievement ${grandBest >= 1 ? "unlocked" : ""}`}>
             <span>🏆</span><div><strong>Гранд Тур</strong><small>Заверши первый заказ в туре</small></div>
           </div>
+        </div>
+      </section>
+
+      <section className="wc-card wc-daily-card" aria-labelledby="wc-daily-title">
+        <div className="wc-daily-copy">
+          <span className="wc-home-kicker">ЕЖЕДНЕВНЫЙ РИТМ</span>
+          <h2 id="wc-daily-title">🔥 Серия заказов</h2>
+          <p>Заверши хотя бы один заказ сегодня, чтобы сохранить серию.</p>
+        </div>
+        <div className="wc-daily-badges">
+          <strong>{dailyStreak}</strong><span>дней подряд</span>
+          <small>Рекорд: {bestDailyStreak}</small>
         </div>
       </section>
 
