@@ -652,8 +652,8 @@ function HomeScreen({
           <span className="wc-rank-badge">{levelNo >= 100 ? "👑 Легенда" : levelNo >= 75 ? "💎 Мастер" : levelNo >= 50 ? "🔥 Гранд-шеф" : levelNo >= 30 ? "🥇 Шеф-мастер" : levelNo >= 15 ? "🥘 Шеф" : levelNo >= 5 ? "🍳 Повар" : "🥄 Ученик"}</span>
         </div>
         <div className="wc-rank-progress">
-          <div className="wc-rank-level"><strong>Уровень {levelNo}</strong><span>{levelNo >= 100 ? "Максимальный ранг кампании" : `${Math.max(0, levelNo % 5)} / 5 до следующего ранга`}</span></div>
-          <div className="wc-bar"><div style={{ width: `${levelNo >= 100 ? 100 : ((levelNo % 5) / 5) * 100}%` }} /></div>
+          <div className="wc-rank-level"><strong>Уровень {levelNo}</strong><span>{levelNo >= 100 ? "Максимальный ранг кампании" : levelNo >= 75 ? `${100 - levelNo} уровней до Легенды` : levelNo >= 50 ? `${75 - levelNo} уровней до Мастера` : levelNo >= 30 ? `${50 - levelNo} уровней до Гранд-шефа` : levelNo >= 15 ? `${30 - levelNo} уровней до Шеф-мастера` : levelNo >= 5 ? `${15 - levelNo} уровней до Шефа` : `${5 - levelNo} уровней до Повара`}</span></div>
+          <div className="wc-bar"><div style={{ width: `${levelNo >= 100 ? 100 : levelNo >= 75 ? ((levelNo - 75) / 25) * 100 : levelNo >= 50 ? ((levelNo - 50) / 25) * 100 : levelNo >= 30 ? ((levelNo - 30) / 20) * 100 : levelNo >= 15 ? ((levelNo - 15) / 15) * 100 : levelNo >= 5 ? ((levelNo - 5) / 10) * 100 : ((levelNo - 1) / 4) * 100}%` }} /></div>
         </div>
         <div className="wc-rank-milestones">
           <span>🥄 1</span><span>🍳 5</span><span>🥘 15</span><span>🔥 30</span><span>💎 75</span><span>👑 100</span>
