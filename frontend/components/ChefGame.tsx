@@ -564,6 +564,7 @@ function HomeScreen({
           <span className="wc-home-kicker">ЕЖЕДНЕВНЫЙ РИТМ</span>
           <h2 id="wc-daily-title">🔥 Серия заказов</h2>
           <p>Заверши хотя бы один заказ сегодня, чтобы сохранить серию.</p>
+          <div className="wc-daily-reward"><span>🎁 Награда за день</span><strong>+{10 + Math.min(Math.max(dailyStreak, 1), 7) * 5} 🪙</strong></div>
         </div>
         <div className="wc-daily-badges">
           <strong>{dailyStreak}</strong><span>дней подряд</span>
