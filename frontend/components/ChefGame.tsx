@@ -252,7 +252,9 @@ export default function ChefGame() {
   const [dailyStreak, setDailyStreak] = useState(0);
   const [bestDailyStreak, setBestDailyStreak] = useState(0);
   const [lastCompletionDate, setLastCompletionDate] = useState("");
-  const [shopOwned, setShopOwned] = useState<Record<string, boolean>>({});
+  const [shopOwned, setShopOwned] = useState<Record<string, number>>({});
+  const [dailyQuestDate, setDailyQuestDate] = useState("");
+  const [dailyQuestClaimed, setDailyQuestClaimed] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -271,8 +273,16 @@ export default function ChefGame() {
     try { setLastCompletionDate(window.localStorage.getItem("wc_last_completion_date") ?? ""); } catch { setLastCompletionDate(""); }
     try {
       const rawShop = window.localStorage.getItem("wc_shop_owned");
-      setShopOwned(rawShop ? JSON.parse(rawShop) : {});
+      const parsed = rawShop ? JSON.parse(rawShop) : {};
+      setShopOwned(Object.fromEntries(Object.entries(parsed).map(([id, value]) => [id, value === true ? 1 : Number(value) || 0])));
     } catch { setShopOwned({}); }
+    try {
+      const today = new Date();
+      const date = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+      setDailyQuestDate(date);
+      const rawClaimed = window.localStorage.getItem("wc_daily_quest_claimed");
+      setDailyQuestClaimed(rawClaimed ? JSON.parse(rawClaimed) : {});
+    } catch { setDailyQuestDate(""); setDailyQuestClaimed({}); }
     try {
       const savedTheme = window.localStorage.getItem("wc_theme") ?? "classic";
       setThemeId(getWordChefTheme(savedTheme).id);
@@ -301,7 +311,8 @@ export default function ChefGame() {
     save("wc_best_daily_streak", bestDailyStreak);
     try { window.localStorage.setItem("wc_last_completion_date", lastCompletionDate); } catch {}
     try { window.localStorage.setItem("wc_shop_owned", JSON.stringify(shopOwned)); } catch {}
-  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, storageReady]);
+    try { window.localStorage.setItem("wc_daily_quest_claimed", JSON.stringify(dailyQuestClaimed)); } catch {}
+  }, [chefStats, dailyStreak, bestDailyStreak, lastCompletionDate, shopOwned, dailyQuestClaimed, storageReady]);
 
 
   const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
@@ -371,11 +382,20 @@ export default function ChefGame() {
           coins={coins}
           shopOwned={shopOwned}
           onShopPurchase={(id, cost) => {
-            if (shopOwned[id]) return;
+            const tier = shopOwned[id] ?? 0;
+            if (tier >= 3) return;
             if (coins < cost) { flash(`Нужно ещё ${cost - coins} 🪙`); return; }
             setCoins((value) => value - cost);
-            setShopOwned((owned) => ({ ...owned, [id]: true }));
-            flash("Улучшение куплено! 👨‍🍳");
+            setShopOwned((owned) => ({ ...owned, [id]: tier + 1 }));
+            flash(`Улучшение ${tier + 1}/3 куплено! 👨‍🍳`);
+          }}
+          dailyQuestDate={dailyQuestDate}
+          dailyQuestClaimed={dailyQuestClaimed}
+          onClaimQuest={(id, reward) => {
+            if (dailyQuestClaimed[id]) return;
+            setDailyQuestClaimed((claimed) => ({ ...claimed, [id]: true }));
+            setCoins((value) => value + reward);
+            flash(`Квест выполнен: +${reward} 🪙 🎯`);
           }}
         />
       )}
@@ -392,8 +412,10 @@ export default function ChefGame() {
           onBonusFound={() => updateChefStats("bonusWords")}
           onHintUsed={() => updateChefStats("hints")}
           onLevelComplete={recordLevelComplete}
-          hintCost={shopOwned.sharpKnife ? 20 : HINT_COST}
-          rewardBonus={shopOwned.goldenPan ? 10 : 0}
+          hintCost={Math.max(10, HINT_COST - (shopOwned.sharpKnife ?? 0) * 5)}
+          rewardBonus={(shopOwned.goldenPan ?? 0) * 10}
+          wordRewardMultiplier={1 + (shopOwned.comboApron ?? 0) * 0.25}
+          bonusReward={shopOwned.chefCharm ?? 0} * 2
         />
       )}
       {screen === "grand" && (
@@ -428,13 +450,14 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase, dailyQuestDate, dailyQuestClaimed, onClaimQuest,
 }: {
   levelNo: number; grandBest: number; themeId: string;
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
-  dailyStreak: number; bestDailyStreak: number; coins: number; shopOwned: Record<string, boolean>;
+  dailyStreak: number; bestDailyStreak: number; coins: number; shopOwned: Record<string, number>; dailyQuestDate: string; dailyQuestClaimed: Record<string, boolean>;
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
-  onShopPurchase: (id: string, cost: number) => void;
+  onShopPurchase: (id: string, cost: number) => void; onClaimQuest: (id: string, reward: number) => void;
+  dailyQuestDate: string; dailyQuestClaimed: Record<string, boolean>;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
   const kitchens = Object.entries(KITCHEN_RU);
@@ -612,32 +635,41 @@ function HomeScreen({
       </section>
 
       <section className="wc-card wc-shop-card" aria-labelledby="wc-shop-title">
-        <div className="wc-kitchen-heading">
-          <div>
-            <span className="wc-home-kicker">МАГАЗИН ШЕФА</span>
-            <h2 id="wc-shop-title">Улучшения кухни</h2>
-          </div>
-          <span className="wc-shop-balance">🪙 {coins}</span>
-        </div>
-        <p className="wc-shop-note">Покупки сохраняются навсегда и реально меняют игру.</p>
+        <div className="wc-kitchen-heading"><div><span className="wc-home-kicker">МАГАЗИН ШЕФА</span><h2 id="wc-shop-title">Улучшения кухни</h2></div><span className="wc-shop-balance">🪙 {coins}</span></div>
+        <p className="wc-shop-note">Каждое улучшение можно прокачать до <strong>3/3</strong>.</p>
         <div className="wc-shop-grid">
           {[
-            ["sharpKnife", "🔪", "Острый нож", "Подсказки стоят 20 вместо 25", 80],
-            ["goldenPan", "🍳", "Золотая сковорода", "Каждый завершённый заказ даёт +10 монет", 140],
-            ["comboApron", "🧤", "Фартук комбо", "Награды за слова получают +25%", 220],
-            ["chefCharm", "✨", "Талисман шефа", "Бонусные слова дают +2 дополнительные монеты", 180],
-          ].map(([id, icon, name, desc, cost]) => {
-            const owned = !!shopOwned[String(id)];
-            return (
-              <div className={`wc-shop-item ${owned ? "owned" : ""}`} key={String(id)}>
-                <span className="wc-shop-icon" aria-hidden="true">{String(icon)}</span>
-                <div className="wc-shop-copy"><strong>{String(name)}</strong><small>{String(desc)}</small></div>
-                <button type="button" className="wc-shop-buy" disabled={owned || coins < Number(cost)}
-                  onClick={() => onShopPurchase(String(id), Number(cost))}>
-                  {owned ? "✓ Куплено" : `🪙 ${cost}`}
-                </button>
-              </div>
-            );
+            ["sharpKnife","🔪","Острый нож","−5 🪙 к цене подсказки за уровень",80],
+            ["goldenPan","🍳","Золотая сковорода","+10 🪙 к завершённому заказу за уровень",140],
+            ["comboApron","🧤","Фартук комбо","+25% к наградам слов за уровень",220],
+            ["chefCharm","✨","Талисман шефа","+2 🪙 за бонусное слово за уровень",180],
+          ].map(([id,icon,name,desc,cost]) => {
+            const tier=shopOwned[String(id)]??0;
+            const nextCost=Number(cost)*(tier+1);
+            return <div className={`wc-shop-item ${tier >= 3 ? "owned" : ""}`} key={String(id)}>
+              <span className="wc-shop-icon">{String(icon)}</span>
+              <div className="wc-shop-copy"><strong>{String(name)} · {tier}/3</strong><small>{String(desc)}</small></div>
+              <button type="button" className="wc-shop-buy" disabled={tier>=3 || coins<nextCost} onClick={() => onShopPurchase(String(id),nextCost)}>
+                {tier>=3 ? "✓ Максимум" : `Улучшить до ${tier+1}/3 · 🪙 ${nextCost}`}
+              </button>
+            </div>;
+          })}
+        </div>
+      </section>
+
+      <section className="wc-card wc-quests-card" aria-labelledby="wc-quests-title">
+        <div className="wc-kitchen-heading"><div><span className="wc-home-kicker">СЕГОДНЯ</span><h2 id="wc-quests-title">Квесты шефа</h2></div><span className="wc-quest-date">{dailyQuestDate || "..."}</span></div>
+        <div className="wc-quests-grid">
+          {[
+            ["level","🍽️","Заказ дня",1,chefStats.levels,30],
+            ["words","🔤","Поварская разминка",5,chefStats.words,25],
+            ["bonus","⭐","Секретный ингредиент",1,chefStats.bonusWords,35],
+          ].map(([id,icon,name,target,progress,reward]) => {
+            const key=String(id); const done=Number(progress)>=Number(target); const claimed=!!dailyQuestClaimed[key];
+            return <div className={`wc-quest ${done ? "done" : ""} ${claimed ? "claimed" : ""}`} key={key}>
+              <span className="wc-quest-icon">{String(icon)}</span><div className="wc-quest-copy"><strong>{String(name)}</strong><small>{Math.min(Number(progress),Number(target))}/{Number(target)} · +{Number(reward)} 🪙</small></div>
+              <button type="button" className="wc-shop-buy" disabled={!done || claimed} onClick={() => onClaimQuest(key,Number(reward))}>{claimed ? "✓ Получено" : done ? "Забрать" : "В процессе"}</button>
+            </div>;
           })}
         </div>
       </section>
@@ -699,13 +731,13 @@ function HomeScreen({
 }
 
 function LevelScreen({
-  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash, onWordFound, onBonusFound, onHintUsed, onLevelComplete, hintCost = HINT_COST, rewardBonus = 0,
+  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash, onWordFound, onBonusFound, onHintUsed, onLevelComplete, hintCost = HINT_COST, rewardBonus = 0, wordRewardMultiplier = 1, bonusReward = 0,
 }: {
   levelNo: number; coins: number;
   addCoins: (n: number) => void; spendCoins: (n: number) => void;
   onNext: () => void; onHome: () => void; onGrandComplete?: () => void; grand?: boolean;
   onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
-  hintCost?: number; rewardBonus?: number;
+  hintCost?: number; rewardBonus?: number; wordRewardMultiplier?: number; bonusReward?: number;
   flash: (m: string) => void;
 }) {
   const level = useMemo<Level>(() => generateLevel(levelNo), [levelNo]);
@@ -747,7 +779,7 @@ function LevelScreen({
       } else {
         const nextCombo = combo + 1;
         const comboMultiplier = Math.min(4, Math.max(1, Math.floor(nextCombo / 2) + 1));
-        const reward = Math.floor(2 * word.length * comboMultiplier * (rewardBonus > 0 ? 1.25 : 1));
+        const reward = Math.floor(2 * word.length * comboMultiplier * wordRewardMultiplier);
         setFound((f) => [...f, word]);
         onWordFound?.();
         setCombo(nextCombo);
@@ -765,7 +797,7 @@ function LevelScreen({
       else {
         setBonusFound((b) => [...b, word]);
         onBonusFound?.();
-        addCoins(word.length + rewardBonusForBonusWord());
+        addCoins(word.length + bonusReward);
         setCombo((c) => c + 1);
         setRewardBurst(`БОНУС +${word.length} 🪙`);
         playGameTone("bonus");
@@ -892,9 +924,7 @@ function LevelScreen({
     return () => window.removeEventListener("keydown", onKey);
   }, [current, wheel, pickTile, submitWord]);
 
-  const rewardBonusForBonusWord = () => rewardBonus > 0 ? 2 : 0;
-
-  const doHint = () => {
+    const doHint = () => {
     const target = remaining.find((word) =>
       [...word].some((_, i) => !hinted[`${word}:${i}`]),
     );
