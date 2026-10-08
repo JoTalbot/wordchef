@@ -243,6 +243,12 @@ export default function ChefGame() {
   const [grandRound, setGrandRound] = useState(1);
   const [storageReady, setStorageReady] = useState(false);
   const [themeId, setThemeId] = useState("classic");
+  const [chefStats, setChefStats] = useState(() => ({
+    words: 0,
+    bonusWords: 0,
+    levels: 0,
+    hints: 0,
+  }));
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -250,6 +256,12 @@ export default function ChefGame() {
     setCoins(load("wc_coins", 100));
     setLevelNo(load("wc_level", 1, 1));
     setGrandBest(load("wc_grand_best", 0));
+    setChefStats({
+      words: load("wc_stat_words", 0),
+      bonusWords: load("wc_stat_bonus_words", 0),
+      levels: load("wc_stat_levels", 0),
+      hints: load("wc_stat_hints", 0),
+    });
     try {
       const savedTheme = window.localStorage.getItem("wc_theme") ?? "classic";
       setThemeId(getWordChefTheme(savedTheme).id);
@@ -268,6 +280,16 @@ export default function ChefGame() {
   useEffect(() => {
     if (storageReady) save("wc_grand_best", grandBest);
   }, [grandBest, storageReady]);
+  useEffect(() => {
+    if (!storageReady) return;
+    save("wc_stat_words", chefStats.words);
+    save("wc_stat_bonus_words", chefStats.bonusWords);
+    save("wc_stat_levels", chefStats.levels);
+    save("wc_stat_hints", chefStats.hints);
+  }, [chefStats, storageReady]);
+  const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
+    setChefStats((stats) => ({ ...stats, [key]: stats[key] + amount }));
+  }, []);
 
   const flash = useCallback((msg: string) => {
     setToast(msg);
@@ -303,7 +325,11 @@ export default function ChefGame() {
           }}
           onMulti={() => setScreen("multi")}
           themeId={themeId}
-          onThemeChange={setThemeId}
+          onThemeChange={(id) => {
+            setThemeId(id);
+            try { window.localStorage.setItem("wc_theme", id); } catch {}
+          }}
+          chefStats={chefStats}
         />
       )}
       {screen === "level" && (
@@ -315,6 +341,10 @@ export default function ChefGame() {
           onNext={() => setLevelNo((n) => n + 1)}
           onHome={() => setScreen("home")}
           flash={flash}
+          onWordFound={() => updateChefStats("words")}
+          onBonusFound={() => updateChefStats("bonusWords")}
+          onHintUsed={() => updateChefStats("hints")}
+          onLevelComplete={() => updateChefStats("levels")}
         />
       )}
       {screen === "grand" && (
@@ -328,6 +358,10 @@ export default function ChefGame() {
           onGrandComplete={() => setGrandBest((best) => Math.max(best, grandRound))}
           grand
           flash={flash}
+          onWordFound={() => updateChefStats("words")}
+          onBonusFound={() => updateChefStats("bonusWords")}
+          onHintUsed={() => updateChefStats("hints")}
+          onLevelComplete={() => updateChefStats("levels")}
         />
       )}
       {screen === "multi" && (
@@ -348,6 +382,7 @@ function HomeScreen({
   levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange,
 }: {
   levelNo: number; grandBest: number; themeId: string;
+  chefStats: { words: number; bonusWords: number; levels: number; hints: number };
   onPlay: () => void; onGrand: () => void; onMulti: () => void; onThemeChange: (id: string) => void;
 }) {
   const preview = useMemo(() => generateLevel(levelNo), [levelNo]);
@@ -569,6 +604,7 @@ function LevelScreen({
   levelNo: number; coins: number;
   addCoins: (n: number) => void; spendCoins: (n: number) => void;
   onNext: () => void; onHome: () => void; onGrandComplete?: () => void; grand?: boolean;
+  onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
   flash: (m: string) => void;
 }) {
   const level = useMemo<Level>(() => generateLevel(levelNo), [levelNo]);
@@ -612,6 +648,7 @@ function LevelScreen({
         const comboMultiplier = Math.min(4, Math.max(1, Math.floor(nextCombo / 2) + 1));
         const reward = 2 * word.length * comboMultiplier;
         setFound((f) => [...f, word]);
+        onWordFound?.();
         setCombo(nextCombo);
         setRewardBurst(`+${reward} 🪙${nextCombo >= 2 ? ` · COMBO ×${comboMultiplier}` : ""}`);
         addCoins(reward);
@@ -626,6 +663,7 @@ function LevelScreen({
       if (bonusFound.includes(word)) flash("Бонус уже найден");
       else {
         setBonusFound((b) => [...b, word]);
+        onBonusFound?.();
         addCoins(word.length);
         setCombo((c) => c + 1);
         setRewardBurst(`БОНУС +${word.length} 🪙`);
@@ -653,6 +691,7 @@ function LevelScreen({
       window.setTimeout(() => setDone(true), 1050);
       const reward = 30 + levelNo;
       addCoins(reward);
+      onLevelComplete?.();
       if (grand) onGrandComplete?.();
       if (typeof window !== "undefined" && typeof fetch === "function") {
         // best-effort server sync (offline play stays fully local)
@@ -762,6 +801,7 @@ function LevelScreen({
     const nextIdx = [...target].findIndex((_, i) => !hinted[`${target}:${i}`]);
     setHinted((h) => ({ ...h, [`${target}:${nextIdx}`]: true }));
     spendCoins(HINT_COST);
+    onHintUsed?.();
     flash(`Открыта буква «${target[nextIdx]}» · −${HINT_COST} 🪙`);
   };
 
