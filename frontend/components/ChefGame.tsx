@@ -340,8 +340,7 @@ export default function ChefGame() {
     if (newlyUnlocked.length === 0) return;
     setAchievementClaimed((claimed) => Object.fromEntries([...Object.entries(claimed), ...newlyUnlocked.map(([id]) => [id, true])]));
     setCoins((value) => value + newlyUnlocked.reduce((sum, [, , reward]) => sum + reward, 0));
-    flash(`🏆 Достижения: +${newlyUnlocked.reduce((sum, [, , reward]) => sum + reward, 0)} 🪙`);
-  }, [storageReady, levelNo, grandBest, achievementClaimed, flash]);
+  }, [storageReady, levelNo, grandBest, achievementClaimed]);
 
 
   const updateChefStats = useCallback((key: keyof typeof chefStats, amount = 1) => {
