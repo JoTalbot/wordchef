@@ -605,11 +605,12 @@ function HomeScreen({
 }
 
 function LevelScreen({
-  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash,
+  levelNo, coins, addCoins, spendCoins, onNext, onHome, onGrandComplete, grand, flash, onWordFound, onBonusFound, onHintUsed, onLevelComplete,
 }: {
   levelNo: number; coins: number;
   addCoins: (n: number) => void; spendCoins: (n: number) => void;
   onNext: () => void; onHome: () => void; onGrandComplete?: () => void; grand?: boolean;
+  onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
   onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
   onWordFound?: () => void; onBonusFound?: () => void; onHintUsed?: () => void; onLevelComplete?: () => void;
   flash: (m: string) => void;
