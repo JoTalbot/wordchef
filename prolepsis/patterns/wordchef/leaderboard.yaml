@@ -26,8 +26,9 @@ events:
 
   LEADERBOARD_UPDATE:
     requires: []
-    facts: [season, player_id, match_id, score, dishes, position]
+    facts: [season, player_id, match_id, score, dishes, position, content_digest]
     fact_types:
+      content_digest: string
       season: string
       player_id: string
       match_id: string
@@ -50,8 +51,9 @@ events:
 
   LEADERBOARD_COMMIT:
     requires: [LEADERBOARD_UPDATE]
-    facts: [season, entries, top_score, snapshot_digest]
+    facts: [season, entries, top_score, snapshot_digest, content_digest]
     fact_types:
+      content_digest: string
       season: string
       entries: number
       top_score: number

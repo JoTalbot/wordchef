@@ -44,8 +44,9 @@ events:
             valid, reason, score_delta, combo_before, combo_after,
             heat_before, heat_after, spice, golden_delta, flavor,
             secret_hit, kitchen, order_snapshot, claimed_result,
-            prep_tokens, boost_applied, double_applied]
+            prep_tokens, boost_applied, double_applied, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       player_id: string
       order_id: string
@@ -105,8 +106,9 @@ events:
 
   SCORE_AWARD:
     requires: [DISH_SUBMIT]
-    facts: [match_id, player_id, order_id, score_delta, score_total, combo_after, heat_after]
+    facts: [match_id, player_id, order_id, score_delta, score_total, combo_after, heat_after, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       player_id: string
       order_id: string
@@ -129,8 +131,9 @@ events:
 
   PREP_SERVICE:
     requires: []
-    facts: [match_id, player_id, order_id, word, word_len, points, prep_tokens]
+    facts: [match_id, player_id, order_id, word, word_len, points, prep_tokens, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       player_id: string
       order_id: string

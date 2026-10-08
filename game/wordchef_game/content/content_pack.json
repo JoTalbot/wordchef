@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "content_id": "wordchef-core",
+  "dictionaries": {
+    "default": "data/dictionary.txt",
+    "ru": "data/words_ru.txt"
+  },
+  "kitchens": [
+    {
+      "id": "street",
+      "name": "Street Kitchen",
+      "tagline": "Where every chef starts. Honest letters.",
+      "unlock_xp": 0,
+      "score_mult": 1,
+      "timer_mult": 1,
+      "rule": "none",
+      "theme": "street food",
+      "letter_overrides": {}
+    },
+    {
+      "id": "bakery",
+      "name": "Bakery",
+      "tagline": "Vowels rise like dough. Sweet words earn more.",
+      "unlock_xp": 2000,
+      "score_mult": 1.05,
+      "timer_mult": 1.1,
+      "rule": "vowels_worth_more",
+      "theme": "bakery",
+      "letter_overrides": {
+        "a": 110,
+        "e": 150,
+        "i": 95,
+        "o": 100,
+        "u": 40
+      }
+    },
+    {
+      "id": "sushi",
+      "name": "Sushi Bar",
+      "tagline": "Precision cuts. Short dishes, sharp rewards.",
+      "unlock_xp": 6000,
+      "score_mult": 1.1,
+      "timer_mult": 0.9,
+      "rule": "short_words_bonus",
+      "theme": "sushi",
+      "letter_overrides": {
+        "t": 110,
+        "a": 95,
+        "o": 90,
+        "i": 85
+      }
+    },
+    {
+      "id": "space",
+      "name": "Space Kitchen",
+      "tagline": "Zero gravity: letters drift in from the void.",
+      "unlock_xp": 14000,
+      "score_mult": 1.15,
+      "timer_mult": 1,
+      "rule": "wildcard_letter",
+      "theme": "space",
+      "letter_overrides": {}
+    },
+    {
+      "id": "cyber",
+      "name": "Cyber Kitchen",
+      "tagline": "Glitch letters mutate. So do the orders.",
+      "unlock_xp": 26000,
+      "score_mult": 1.2,
+      "timer_mult": 0.95,
+      "rule": "glitch_letters",
+      "theme": "cyber",
+      "letter_overrides": {
+        "x": 8,
+        "z": 8,
+        "q": 6,
+        "j": 6
+      }
+    },
+    {
+      "id": "ancient",
+      "name": "Ancient Kitchen",
+      "tagline": "Runes remember every dish you ever served.",
+      "unlock_xp": 44000,
+      "score_mult": 1.25,
+      "timer_mult": 1.05,
+      "rule": "combo_shield",
+      "theme": "ancient",
+      "letter_overrides": {}
+    },
+    {
+      "id": "midnight",
+      "name": "Midnight Diner",
+      "tagline": "The final shift. Heat never cools here.",
+      "unlock_xp": 70000,
+      "score_mult": 1.35,
+      "timer_mult": 1,
+      "rule": "heat_locked",
+      "theme": "night market",
+      "letter_overrides": {}
+    }
+  ],
+  "themes": {
+    "street food": [
+      "taco",
+      "pizza",
+      "burger",
+      "fries",
+      "kebab",
+      "salsa",
+      "wings",
+      "roll",
+      "wrap",
+      "grill",
+      "steam",
+      "corn",
+      "rice"
+    ],
+    "bakery": [
+      "bread",
+      "bun",
+      "cake",
+      "toast",
+      "crust",
+      "dough",
+      "loaf",
+      "muffin",
+      "scone",
+      "tart",
+      "waffle",
+      "yeast"
+    ],
+    "sushi": [
+      "tuna",
+      "rice",
+      "roll",
+      "salmon",
+      "eel",
+      "miso",
+      "tofu",
+      "soy",
+      "ginger",
+      "kelp",
+      "octopus",
+      "shrimp"
+    ],
+    "space": [
+      "orbit",
+      "comet",
+      "star",
+      "moon",
+      "rocket",
+      "solar",
+      "nova",
+      "meteor",
+      "alien",
+      "lunar",
+      "void",
+      "pulsar",
+      "quasar"
+    ],
+    "cyber": [
+      "code",
+      "data",
+      "chip",
+      "bot",
+      "hack",
+      "glitch",
+      "pixel",
+      "vector",
+      "cache",
+      "server",
+      "matrix",
+      "stack",
+      "script"
+    ],
+    "ancient": [
+      "rune",
+      "myth",
+      "hero",
+      "oracle",
+      "sword",
+      "temple",
+      "pharaoh",
+      "empire",
+      "glory",
+      "omen",
+      "pyramid",
+      "chariot"
+    ],
+    "night market": [
+      "soup",
+      "noodle",
+      "tea",
+      "dumpling",
+      "skewer",
+      "broth",
+      "wok",
+      "spice",
+      "chili",
+      "pickle",
+      "steam",
+      "herb"
+    ]
+  },
+  "secrets": [
+    "min_length_5",
+    "two_vowels",
+    "three_consonants",
+    "has_double",
+    "ends_vowel",
+    "no_rare_letters"
+  ],
+  "order_rules": [
+    "SINGLE_WORD",
+    "MIN_LENGTH",
+    "CONTAINS_LETTER",
+    "THEME",
+    "STREAK",
+    "SPEED"
+  ],
+  "dishes": [
+    {
+      "id": "street-taco",
+      "word": "bean",
+      "theme": "street food",
+      "base_reward": 55
+    },
+    {
+      "id": "bakery-bread",
+      "word": "bread",
+      "theme": "bakery",
+      "base_reward": 65
+    },
+    {
+      "id": "sushi-rice",
+      "word": "rice",
+      "theme": "sushi",
+      "base_reward": 60
+    },
+    {
+      "id": "space-orbit",
+      "word": "orbit",
+      "theme": "space",
+      "base_reward": 70
+    },
+    {
+      "id": "cyber-code",
+      "word": "code",
+      "theme": "cyber",
+      "base_reward": 75
+    },
+    {
+      "id": "ancient-rune",
+      "word": "stone",
+      "theme": "ancient",
+      "base_reward": 80
+    },
+    {
+      "id": "midnight-soup",
+      "word": "soup",
+      "theme": "night market",
+      "base_reward": 85
+    }
+  ]
+}

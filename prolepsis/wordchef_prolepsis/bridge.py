@@ -39,7 +39,8 @@ from prolepsis.agent_platform import (                       # noqa: E402
 )
 from prolepsis.persistent_cas import PersistentArtifactStore  # noqa: E402
 
-from wordchef_prolepsis.handlers import make_handlers        # noqa: E402
+from wordchef_prolepsis.handlers import make_handlers
+from wordchef_game.content import CONTENT_DIGEST        # noqa: E402
 
 PROLEPSIS_VERSION = "0.39.0"
 AGENT_PROTOCOL_VERSION = "1.0"
@@ -167,6 +168,7 @@ class WordChefRuntime:
         """Run one game operation to completion on the Prolepsis loom."""
         started = time.perf_counter()
         source = self.source_for(op)
+        events = self._bind_content(events)
         request = AgentRequest(
             request_id=request_id,
             agent_id=agent_id,
@@ -211,7 +213,7 @@ class WordChefRuntime:
         Uses the Agent Platform's ``prepare``/``execute_queued`` handshake so
         retries with the same request_id are idempotent.
         """
-        events = tuple(events)
+        events = self._bind_content(events)
         source = self.source_for(op)
         request = AgentRequest(
             request_id=request_id, agent_id=agent_id, source=str(source),
@@ -245,6 +247,18 @@ class WordChefRuntime:
             return record
 
         return self._pool.submit(_run)
+
+    @staticmethod
+    def _bind_content(events: Iterable[dict[str, Any]]) -> tuple[dict[str, Any], ...]:
+        """Bind every execution to the exact canonical content pack."""
+        bound: list[dict[str, Any]] = []
+        for event in events:
+            item = dict(event)
+            payload = dict(item.get("payload") or {})
+            payload.setdefault("content_digest", CONTENT_DIGEST)
+            item["payload"] = payload
+            bound.append(item)
+        return tuple(bound)
 
     # ───────────────────────── inspection ─────────────────────────
 
@@ -309,12 +323,14 @@ class WordChefRuntime:
     def ready(self) -> dict[str, Any]:
         ready = self.state_dir.exists() and self.cas_dir.exists()
         return {"status": "ready" if ready else "not_ready",
-                "protocol": AGENT_PROTOCOL_VERSION}
+                "protocol": AGENT_PROTOCOL_VERSION,
+                "content_digest": CONTENT_DIGEST}
 
     def version(self) -> dict[str, Any]:
         return {"server": f"wordchef-runtime/{PROLEPSIS_VERSION}",
                 "protocol": AGENT_PROTOCOL_VERSION,
-                "prolepsis": PROLEPSIS_VERSION}
+                "prolepsis": PROLEPSIS_VERSION,
+                "content_digest": CONTENT_DIGEST}
 
     def shutdown(self) -> None:
         self._pool.shutdown(wait=True, cancel_futures=False)

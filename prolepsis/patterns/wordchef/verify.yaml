@@ -23,8 +23,9 @@ events:
 
   MATCH_VERIFIED:
     requires: []
-    facts: [match_id, replayed, digest_match, executions, intent_count, verdict]
+    facts: [match_id, replayed, digest_match, executions, intent_count, verdict, content_digest]
     fact_types:
+      content_digest: string
       match_id: string
       replayed: number
       digest_match: number
