@@ -90,7 +90,7 @@ jobs:
         run: |
           BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
           INPUT="app/build/outputs/apk/release/app-release.apk"
-          OUTPUT="app/build/outputs/apk/release/wordchef-v1.15.0.apk"
+          OUTPUT="app/build/outputs/apk/release/wordchef-v1.16.0.apk"
           test -x "$BUILD_TOOLS/zipalign"
           test -x "$BUILD_TOOLS/apksigner"
           test -s "$INPUT"
@@ -100,25 +100,25 @@ jobs:
 
       - name: Verify WebView assets in APK
         run: |
-          unzip -l app/build/outputs/apk/release/wordchef-v1.15.0.apk | grep -E "assets/www/index.html|assets/www/_next/" | head -20
-          unzip -l app/build/outputs/apk/release/wordchef-v1.15.0.apk | grep -q "assets/www/index.html"
+          unzip -l app/build/outputs/apk/release/wordchef-v1.16.0.apk | grep -E "assets/www/index.html|assets/www/_next/" | head -20
+          unzip -l app/build/outputs/apk/release/wordchef-v1.16.0.apk | grep -q "assets/www/index.html"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wordchef-v1.15.0-apk
-          path: android/app/build/outputs/apk/release/wordchef-v1.15.0.apk
+          name: wordchef-v1.16.0-apk
+          path: android/app/build/outputs/apk/release/wordchef-v1.16.0.apk
           if-no-files-found: error
           retention-days: 30
 
-      - name: Create GitHub release v1.15.0
+      - name: Create GitHub release v1.16.0
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release view v1.15.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create v1.15.0 --repo "$GITHUB_REPOSITORY" --title "Word Chef v1.15.0" --generate-notes
+        run: gh release view v1.16.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create v1.16.0 --repo "$GITHUB_REPOSITORY" --title "Word Chef v1.16.0" --generate-notes
 
-      - name: Upload APK to v1.15.0 release
+      - name: Upload APK to v1.16.0 release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload v1.15.0 app/build/outputs/apk/release/wordchef-v1.15.0.apk --repo "${GITHUB_REPOSITORY}" --clobber
+        run: gh release upload v1.16.0 app/build/outputs/apk/release/wordchef-v1.16.0.apk --repo "${GITHUB_REPOSITORY}" --clobber
