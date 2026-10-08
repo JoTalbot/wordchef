@@ -4923,3 +4923,20 @@ button:focus-visible,
   .wc-daily-badges { min-width:82px; padding:9px 8px; }
   .wc-daily-badges strong { font-size:1.45rem; }
 }
+
+
+/* v1.11 daily streak reward */
+.wc-daily-reward {
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 11px;
+  border-radius:12px;
+  background:rgba(255,211,92,.12);
+  border:1px solid rgba(255,211,92,.24);
+  font-size:.72rem;
+}
+.wc-daily-reward strong { color:var(--accent2); white-space:nowrap; }
+@media(max-width:520px){ .wc-daily-reward { font-size:.66rem; } }
