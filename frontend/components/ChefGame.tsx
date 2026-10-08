@@ -304,14 +304,21 @@ export default function ChefGame() {
 
   const recordLevelComplete = useCallback(() => {
     updateChefStats("levels");
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
     if (lastCompletionDate === today) return;
-    const previous = lastCompletionDate ? new Date(`${lastCompletionDate}T00:00:00Z`) : null;
-    const current = new Date(`${today}T00:00:00Z`);
+    const previous = lastCompletionDate ? new Date(`${lastCompletionDate}T00:00:00`) : null;
+    const current = new Date(`${today}T00:00:00`);
     const daysSinceLast = previous ? Math.round((current.getTime() - previous.getTime()) / 86400000) : Infinity;
     const next = daysSinceLast === 1 ? dailyStreak + 1 : 1;
+    const dailyBonus = 10 + Math.min(next, 7) * 5;
     setDailyStreak(next);
     setBestDailyStreak((best) => Math.max(best, next));
+    setCoins((coins) => coins + dailyBonus);
     setLastCompletionDate(today);
   }, [dailyStreak, lastCompletionDate, updateChefStats]);
   const flash = useCallback((msg: string) => {
