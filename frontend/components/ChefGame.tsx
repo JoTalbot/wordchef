@@ -302,6 +302,8 @@ export default function ChefGame() {
             setScreen("grand");
           }}
           onMulti={() => setScreen("multi")}
+          themeId={themeId}
+          onThemeChange={setThemeId}
         />
       )}
       {screen === "level" && (
