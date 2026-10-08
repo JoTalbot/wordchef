@@ -4940,3 +4940,21 @@ button:focus-visible,
 }
 .wc-daily-reward strong { color:var(--accent2); white-space:nowrap; }
 @media(max-width:520px){ .wc-daily-reward { font-size:.66rem; } }
+
+
+/* v1.12 persistent chef upgrade shop */
+.wc-shop-card { overflow:hidden; background:linear-gradient(135deg,rgba(255,211,92,.13),rgba(255,255,255,.05)); }
+.wc-shop-balance { padding:7px 10px; border-radius:999px; background:rgba(255,211,92,.15); font-weight:900; white-space:nowrap; }
+.wc-shop-note { margin:8px 0 0; font-size:.74rem; opacity:.7; }
+.wc-shop-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:14px; }
+.wc-shop-item { min-width:0; display:grid; grid-template-columns:38px minmax(0,1fr); gap:9px; align-items:center; padding:11px; border:2px solid rgba(255,255,255,.12); border-radius:15px; background:rgba(0,0,0,.08); }
+.wc-shop-item.owned { border-color:rgba(74,222,128,.5); background:rgba(74,222,128,.08); }
+.wc-shop-icon { font-size:1.7rem; text-align:center; }
+.wc-shop-copy { min-width:0; display:flex; flex-direction:column; gap:3px; }
+.wc-shop-copy strong { font-size:.8rem; }
+.wc-shop-copy small { font-size:.65rem; line-height:1.25; opacity:.68; }
+.wc-shop-buy { grid-column:1 / -1; min-height:34px; border:0; border-radius:10px; background:rgba(255,211,92,.16); color:inherit; font-weight:900; cursor:pointer; }
+.wc-shop-buy:not(:disabled):hover { transform:translateY(-1px); background:rgba(255,211,92,.24); }
+.wc-shop-buy:disabled { opacity:.52; cursor:not-allowed; }
+.wc-shop-item.owned .wc-shop-buy { background:rgba(74,222,128,.14); color:var(--accent2); }
+@media(max-width:600px){ .wc-shop-grid { grid-template-columns:1fr; } }
