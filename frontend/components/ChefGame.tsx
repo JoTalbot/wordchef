@@ -463,7 +463,7 @@ export default function ChefGame() {
 }
 
 function HomeScreen({
-  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase, dailyQuestDate, dailyQuestClaimed, onClaimQuest,
+  levelNo, grandBest, onPlay, onGrand, onMulti, themeId, onThemeChange, chefStats, dailyStreak, bestDailyStreak, coins, shopOwned, onShopPurchase, dailyQuestDate, dailyQuestClaimed, dailyQuestBase, onClaimQuest,
 }: {
   levelNo: number; grandBest: number; themeId: string;
   chefStats: { words: number; bonusWords: number; levels: number; hints: number };
