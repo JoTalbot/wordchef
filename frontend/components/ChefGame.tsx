@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GameClient from "./GameClient";
 import { classifyWord, generateLevel, type Level } from "../lib/levels";
 import { dishNote } from "../lib/dishNotes";
+import { getWordChefTheme, WORDCHEF_THEMES } from "../lib/themes";
 
 type Screen = "home" | "level" | "grand" | "multi";
 
@@ -241,6 +242,7 @@ export default function ChefGame() {
   const [grandBest, setGrandBest] = useState(0);
   const [grandRound, setGrandRound] = useState(1);
   const [storageReady, setStorageReady] = useState(false);
+  const [themeId, setThemeId] = useState("classic");
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | null>(null);
 
@@ -248,6 +250,12 @@ export default function ChefGame() {
     setCoins(load("wc_coins", 100));
     setLevelNo(load("wc_level", 1, 1));
     setGrandBest(load("wc_grand_best", 0));
+    try {
+      const savedTheme = window.localStorage.getItem("wc_theme") ?? "classic";
+      setThemeId(getWordChefTheme(savedTheme).id);
+    } catch {
+      setThemeId("classic");
+    }
     setStorageReady(true);
   }, []);
 
@@ -275,7 +283,7 @@ export default function ChefGame() {
   }, []);
 
   return (
-    <div className="wc-shell">
+    <div className={`wc-shell ${getWordChefTheme(themeId).className}`}>
       <div className="wc-splash" aria-hidden style={{ backgroundImage: "url(img/splash.webp)" }} />
       {screen !== "level" && screen !== "grand" && (
         <div className="wc-top">
@@ -397,6 +405,31 @@ function HomeScreen({
           <span className="wc-main-cta-title"><span aria-hidden="true">▶</span> Играть</span>
           <span className="wc-cta-subtitle">Продолжить кампанию</span>
         </button>
+      </section>
+
+      <section className="wc-card wc-theme-card" aria-labelledby="wc-theme-title">
+        <div className="wc-kitchen-heading">
+          <div>
+            <span className="wc-home-kicker">ВНЕШНИЙ ВИД</span>
+            <h2 id="wc-theme-title">Скин кухни</h2>
+          </div>
+          <span className="wc-theme-current">{getWordChefTheme(themeId).emoji} {getWordChefTheme(themeId).name}</span>
+        </div>
+        <div className="wc-theme-grid" role="radiogroup" aria-label="Выбор скина">
+          {WORDCHEF_THEMES.map((theme) => (
+            <button
+              key={theme.id}
+              type="button"
+              role="radio"
+              aria-checked={theme.id === themeId}
+              className={`wc-theme-option ${theme.id === themeId ? "selected" : ""}`}
+              onClick={() => onThemeChange(theme.id)}
+            >
+              <span aria-hidden="true">{theme.emoji}</span>
+              <strong>{theme.name}</strong>
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="wc-home-modes" aria-label="Игровые режимы">
